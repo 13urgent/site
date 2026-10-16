@@ -18,3 +18,5 @@
 /* Contraste des boutons secondaires sur les fenêtres blanches. */
 .modal .btn.ghost{color:#1b1c20;border-color:#b8b8bf}
 .modal .btn.ghost:hover{background:#f0f0f3}
+
+#passwordSettings{display:grid;gap:16px}#passwordSettings h3,#passwordSettings p{margin:0}
