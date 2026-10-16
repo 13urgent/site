@@ -19,3 +19,17 @@ document.getElementById('signUp').addEventListener('click',()=>action('signup').
 document.getElementById('signIn').addEventListener('click',()=>action('signin').catch(()=>notify('Connexion au service impossible. Réessayez plus tard.')));
 document.getElementById('signOut').addEventListener('click',async()=>{if(sb){await sb.auth.signOut();notify('Vous êtes déconnecté.');await updateAuth();if(window.refreshProfessionalAccess)await window.refreshProfessionalAccess();}});
 updateAuth().catch(()=>notify('Le service de connexion est momentanément inaccessible.'));
+
+// Le lien ouvre la même origine HTTP(S) que celle utilisée pour la demande.
+document.getElementById('magicLink').addEventListener('click',async event=>{
+ const emailInput=document.getElementById('authEmail');
+ if(!emailInput.reportValidity())return;
+ if(!sb){notify('Service de connexion indisponible.');return;}
+ if(!['http:','https:'].includes(location.protocol)){notify('Ouvrez le site avec le serveur local HTTP ou son adresse HTTPS.');return;}
+ const button=event.currentTarget;button.disabled=true;
+ try{
+  const {error}=await sb.auth.signInWithOtp({email:emailInput.value.trim(),options:{shouldCreateUser:false,emailRedirectTo:location.origin}});
+  if(error){notify('Envoi impossible : '+error.message);return;}
+  notify('Si ce compte peut se connecter, un lien vient d’être envoyé. Ouvrez le dernier e-mail dans ce navigateur et gardez le serveur local lancé.');
+ }catch{notify('Service inaccessible. Aucun envoi ne peut être confirmé.');}finally{button.disabled=false;}
+});
