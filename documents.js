@@ -1,0 +1,105 @@
+"use strict";
+// Les actions utilisent exclusivement la session utilisateur et les politiques Supabase.
+const DOC_BUCKET='carrier-documents';
+const doc$=id=>document.getElementById(id);
+function docMsg(id,message){const e=doc$(id);e.hidden=false;e.textContent=message;}
+function safeText(v){return String(v??'');}
+function line(parent,tag,txt,cls){const e=document.createElement(tag);if(cls)e.className=cls;e.textContent=safeText(txt);parent.append(e);return e;}
+let professionalProfile=null;
+async function refreshProfessionalAccess(){
+  doc$('openDocuments').hidden=true;doc$('openAdmin').hidden=true;professionalProfile=null;
+  if(!sb)return;
+  const {data:{user},error:ue}=await sb.auth.getUser();if(ue||!user)return;
+  const {data,error}=await sb.from('profiles').select('id,company_id,role').eq('id',user.id).maybeSingle();
+  if(error){console.warn('Profil non accessible',error.message);return;}
+  professionalProfile=data;
+  doc$('openDocuments').hidden=data?.role!=='carrier';
+  doc$('openAdmin').hidden=data?.role!=='admin';
+}
+window.refreshProfessionalAccess=refreshProfessionalAccess;
+async function getOwnCompany(){
+  if(!professionalProfile?.company_id)throw Error('Profil entreprise introuvable. Reconnectez-vous.');
+  const {data,error}=await sb.from('companies').select('id,name,verification_status').eq('id',professionalProfile.company_id).single();
+  if(error)throw error;return data;
+}
+async function showMyDocuments(){
+  doc$('documentNotice').hidden=true;
+  if(!professionalProfile||professionalProfile.role!=='carrier')return;
+  doc$('documentsDialog').showModal();
+  try{
+    const c=await getOwnCompany();doc$('companyStatus').textContent=`${c.name} — Dossier : ${c.verification_status}`;
+    const {data,error}=await sb.from('carrier_documents').select('id,document_type,original_filename,review_status,expires_on,created_at').eq('company_id',c.id).order('created_at',{ascending:false});
+    if(error)throw error;
+    const host=doc$('myDocuments');host.replaceChildren();
+    if(!data?.length)line(host,'p','Aucun justificatif envoyé.');
+    for(const d of data){const item=line(host,'div','', 'doc-item');line(item,'strong',d.original_filename||d.document_type);line(item,'span',`${d.document_type} · ${d.review_status}${d.expires_on?' · expire le '+d.expires_on:''}`);}
+  }catch(e){docMsg('documentNotice','Erreur : '+e.message);}
+}
+async function uploadDocument(e){
+  e.preventDefault();const btn=e.submitter;btn.disabled=true;doc$('documentNotice').hidden=true;
+  try{
+    if(professionalProfile?.role!=='carrier')throw Error('Connectez-vous avec un compte transporteur.');
+    const company=await getOwnCompany();const file=doc$('documentFile').files[0];
+    if(!file)throw Error('Choisissez un fichier.');
+    if(file.size>10*1024*1024)throw Error('Le fichier dépasse 10 Mo.');
+    const allowed={'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png'};
+    if(!allowed[file.type])throw Error('Formats autorisés : PDF, JPG et PNG.');
+    const kind=doc$('documentType').value;
+    const path=`${company.id}/${crypto.randomUUID()}.${allowed[file.type]}`;
+    const {error:uploadError}=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:file.type,upsert:false});
+    if(uploadError)throw uploadError;
+    const row={company_id:company.id,document_type:kind,storage_path:path,original_filename:file.name,review_status:'pending'};
+    if(doc$('documentExpiry').value)row.expires_on=doc$('documentExpiry').value;
+    const {error}=await sb.from('carrier_documents').insert(row);
+    if(error)throw Error('Fichier envoyé mais fiche non enregistrée : '+error.message+' (contactez 13 URGENT).');
+    doc$('documentForm').reset();await showMyDocuments();docMsg('documentNotice','Document envoyé. Il reste en attente de vérification par 13 URGENT.');
+  }catch(err){docMsg('documentNotice','Envoi impossible : '+err.message);}finally{btn.disabled=false;}
+}
+async function showAdmin(){
+  if(professionalProfile?.role!=='admin')return;
+  doc$('adminDialog').showModal();await loadAdmin();
+}
+async function loadAdmin(){
+  doc$('adminNotice').hidden=true;const host=doc$('adminDossiers');host.replaceChildren();line(host,'p','Chargement des dossiers…');
+  const [companies,docs]=await Promise.all([
+    sb.from('companies').select('id,name,company_type,verification_status').in('company_type',['carrier','both']).order('created_at',{ascending:false}),
+    sb.from('carrier_documents').select('id,company_id,document_type,storage_path,original_filename,review_status,expires_on,created_at').order('created_at',{ascending:false})
+  ]);
+  if(companies.error||docs.error){docMsg('adminNotice','Lecture impossible : '+(companies.error?.message||docs.error?.message));host.replaceChildren();return;}
+  host.replaceChildren();if(!companies.data?.length){line(host,'p','Aucun transporteur enregistré.');return;}
+  for(const c of companies.data){
+    const card=line(host,'article','', 'dossier');line(card,'h3',c.name);line(card,'p',`Entreprise : ${c.verification_status} · ${c.id}`);
+    const items=(docs.data||[]).filter(d=>d.company_id===c.id);
+    if(!items.length)line(card,'p','Aucun document déposé.');
+    for(const d of items){
+      const row=line(card,'div','', 'doc-item');line(row,'strong',`${d.document_type} — ${d.original_filename||'fichier'}`);
+      line(row,'span',`Statut : ${d.review_status}${d.expires_on?' · Expiration : '+d.expires_on:''}`);
+      const buttons=line(row,'div','', 'doc-actions');
+      const view=line(buttons,'button','Voir le fichier','btn secondary');view.type='button';view.onclick=async()=>{
+        const {data,error}=await sb.storage.from(DOC_BUCKET).createSignedUrl(d.storage_path,60);
+        if(error){docMsg('adminNotice','Fichier inaccessible : '+error.message);return;}
+        window.open(data.signedUrl,'_blank','noopener,noreferrer');
+      };
+      if(d.review_status==='pending'){
+        for(const [status,label] of [['approved','Accepter'],['rejected','Refuser']]){
+          const b=line(buttons,'button',label,status==='approved'?'btn primary':'btn secondary');b.type='button';
+          b.onclick=async()=>{
+            if(!confirm(`${label} ce document ?`))return;
+            b.disabled=true;
+            const {data:{user}}=await sb.auth.getUser();
+            const {error}=await sb.from('carrier_documents').update({review_status:status,reviewed_at:new Date().toISOString(),reviewed_by:user.id}).eq('id',d.id);
+            if(error){docMsg('adminNotice','Validation impossible : '+error.message);b.disabled=false;return;}
+            await loadAdmin();docMsg('adminNotice',`Document ${status==='approved'?'accepté':'refusé'}. L’entreprise n’est pas automatiquement validée.`);
+          };
+        }
+      }
+    }
+  }
+}
+doc$('openDocuments').addEventListener('click',showMyDocuments);
+doc$('openAdmin').addEventListener('click',showAdmin);
+doc$('refreshAdmin').addEventListener('click',loadAdmin);
+doc$('documentForm').addEventListener('submit',uploadDocument);
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>doc$(b.dataset.close).close()));
+sb?.auth.onAuthStateChange(()=>{setTimeout(refreshProfessionalAccess,0);});
+refreshProfessionalAccess();
