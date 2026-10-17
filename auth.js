@@ -28,7 +28,7 @@ async function action(kind){if(!sb){notify('Connexion Supabase non configurée. 
   const siret=document.getElementById('businessSiret').value.trim();
   if(!company||!/^\d{14}$/.test(siret)||!document.getElementById('businessUse').checked){notify('Pour vous inscrire, renseignez la raison sociale, un SIRET de 14 chiffres et confirmez l’usage professionnel.');return;}
   // Déclarations utilisateur uniquement : aucun rôle ni statut vérifié attribué ici.
-  res=await sb.auth.signUp({email,password,options:{data:{requested_account_type:document.getElementById('accountType').value,business_name:company,business_siret:siret,business_use_declared:true,business_declaration_version:'2026-10-17'}}});
+  res=await sb.auth.signUp({email,password,options:{data:{requested_account_type:document.getElementById('accountType').value,account_type:document.getElementById('accountType').value,company_name:company,business_name:company,business_siret:siret,business_use_declared:true,business_declaration_version:'2026-10-17'}}});
  }else{res=await sb.auth.signInWithPassword({email,password});}
  if(res.error){notify('Erreur : '+res.error.message);return;}
  notify(kind==='signup'?'Inscription enregistrée. Vérifiez votre boîte e-mail si la confirmation est activée. Connectez-vous après confirmation pour consulter les fonctions disponibles pour votre profil.':'Connexion réussie. Les transporteurs disposant d’un profil entreprise peuvent accéder à leurs documents. Les offres en ligne ne sont pas encore activées.');await updateAuth();if(window.refreshProfessionalAccess)await window.refreshProfessionalAccess();

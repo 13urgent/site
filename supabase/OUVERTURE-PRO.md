@@ -11,3 +11,5 @@ Avant application : examiner les triggers existants de création des profils et 
 Tests locaux : PostgreSQL embarqué PGlite confirme refus des nouvelles inscriptions incomplètes et conservation des comptes existants. Navigateur avec API simulée : formulaire incomplet refusé, déclarations transmises, aucun rôle attribué par le formulaire, affichage 1,5 %, pas de débordement horizontal à 390 pixels. Aucun test de nouvelle inscription distante réalisé.
 
 Le site est toujours un prototype : demandes de transport locales, offres non activées. Ne pas collecter de frais réels avant validation du parcours métier, des contrats et de la TVA.
+
+Compatibilité contrôlée avec la fonction create_user_profile exportée du projet : celle-ci utilise account_type et company_name. Le formulaire transmet désormais ces deux champs en plus des déclarations professionnelles, sans transmettre de rôle administrateur. Test PGlite signup-compatibility.cjs : création client et carrier, nom entreprise correct, statut pending dans les deux cas. Aucun droit d’offre n’est conféré par ces métadonnées.
