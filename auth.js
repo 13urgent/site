@@ -79,10 +79,10 @@ document.getElementById('savePassword').addEventListener('click',async event=>{
 });
 // Choix déclaratif uniquement : ne confère ni abonnement actif ni validation entreprise.
 const subscriptionPlans=[
- {id:'basics',name:'Découverte',price:'Gratuit',limit:'1 transport par mois'},
- {id:'bronze',name:'Bronze',price:'12,50 € HT / mois',limit:'5 transports par mois'},
- {id:'silver',name:'Argent',price:'33,33 € HT / mois',limit:'30 transports par mois'},
- {id:'gold',name:'Or',price:'62,50 € HT / mois',limit:'Transports illimités'}
+ {id:'basics',name:'Start',price:'Gratuit',limit:'1 transport par mois'},
+ {id:'bronze',name:'Drive',price:'12,50 € HT / mois',limit:'5 transports par mois'},
+ {id:'silver',name:'Boost',price:'33,33 € HT / mois',limit:'30 transports par mois'},
+ {id:'gold',name:'Premium',price:'62,50 € HT / mois',limit:'Transports illimités'}
 ];
 const subscriptionRequest=document.createElement('fieldset');subscriptionRequest.id='subscriptionRequest';subscriptionRequest.hidden=true;
 const subscriptionLegend=document.createElement('legend');subscriptionLegend.textContent='Demande d’abonnement transporteur';subscriptionRequest.append(subscriptionLegend);
