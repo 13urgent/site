@@ -20,3 +20,5 @@
 .modal .btn.ghost:hover{background:#f0f0f3}
 
 #passwordSettings{display:grid;gap:16px}#passwordSettings h3,#passwordSettings p{margin:0}
+
+#businessRegistration{border:1px solid #d7d7dc;border-radius:8px;padding:16px;display:grid;gap:16px;min-width:0}#businessRegistration legend{font-size:13px;font-weight:700}.modal .professional-check,.form .professional-check{display:flex;flex-direction:row;align-items:flex-start;gap:10px;line-height:1.5}.professional-check input[type=checkbox]{width:18px;height:18px;flex-shrink:0;margin-top:2px}
