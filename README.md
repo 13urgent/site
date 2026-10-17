@@ -1,34 +1,41 @@
-# 13 URGENT — Étape documents et administration
+# 13 URGENT — plateforme professionnelle en développement
 
-## Inclus
-- Authentification Supabase, profils client / transporteur / administrateur.
-- Téléversement de justificatifs dans le bucket privé `carrier-documents` (PDF/JPG/PNG, 10 Mo max).
-- Tableau de bord admin : visualiser les dossiers, ouvrir les fichiers via lien temporaire, accepter/refuser un document.
-- Les courses et les offres restent en **démonstration locale**. Aucun transport réel, abonnement payant ou validation complète d’entreprise n’est encore opérationnel.
+Site statique HTML/CSS/JavaScript avec Supabase pour les comptes, les justificatifs et les brouillons externes. Logo et interface adaptés aux ordinateurs et mobiles. Service particuliers non ouvert.
 
-## Configuration
-La configuration publique du projet est dans `config.js`. Ne jamais y mettre une clé secrète.
-Le rôle admin doit être défini côté base ; le bouton Administration n’apparaît que pour un profil `admin`.
+**Les paiements, abonnements payés et réservations commerciales ne sont pas activés.** Le taux de mise en relation envisagé pour les donneurs d'ordre professionnels est de 1,5 % HT du tarif HT du transport. Les conditions contractuelles et la TVA restent à valider.
 
-## Sécurité / avant mise en ligne
-1. Vérifier les GRANT sur les tables, et s’assurer que seuls les admins peuvent mettre à jour les colonnes de revue.
-2. Confirmer la liste complète des valeurs permises par `carrier_documents.document_type` ; l’option assurance peut nécessiter un ajustement.
-3. Mettre en place une validation complète de l’entreprise (documents obligatoires, expiration), et la restriction RLS des offres.
-4. Corriger les informations légales et les mentions du site avant publication.
-5. Tester sur un hébergement HTTPS : les pages `file://` ne sont pas une configuration de production.
+## Démarrer
 
-## Essai
-Connectez-vous avec `exploitationchronoss@outlook.com` pour afficher « Mes documents ». Connectez-vous avec `saschronoss@outlook.com` pour afficher « Administration ». Si les comptes ne sont pas confirmés, vérifiez la boîte mail.
+Sous Windows : extraire le dépôt complet, conserver les dossiers `assets`, puis lancer `start-local.cmd` (Python installé dans PATH). Garder la fenêtre ouverte et saisir l'adresse indiquée dans le navigateur. Ne pas utiliser `file://` pour valider les connexions.
 
-## Ajout : préparation de missions B2PWeb / Rubiwin
-Dans « Administration », le formulaire « Importer une mission externe » permet de copier une mission et son budget interne, puis de l'enregistrer comme **brouillon local non publié**. Les transporteurs ne voient pas ces brouillons. Les données ne sont **pas synchronisées entre ordinateurs**. Aucun accès API ni republication automatique n'est inclus. Ne publier les offres de tiers qu'après obtention des droits nécessaires.
+Dans l'environnement cloud :
 
-## Développement — suivi local
-- Recherche par départ/destination et filtre par véhicule.
-- Suivi des demandes du navigateur, annulation locale persistante et export JSON.
-- Les offres sont désactivées même si le SDK Supabase ne charge pas.
-- Les coordonnées et demandes locales ne sont pas isolées par compte : ne pas utiliser comme espace client de production.
+```
+python -m http.server 8000 --bind 127.0.0.1 --directory /workspace/site
+```
 
-Validation : parcours Chromium avec création, rechargement, recherche, filtre véhicule, téléchargement JSON et annulation après rechargement ; aucune erreur JavaScript. Pour ce test, le SDK CDN a été téléchargé avec vérification TLS puis servi au navigateur par interception de requête, car Chromium rejette le certificat du proxy. Cela ne valide pas le chargement CDN en production ni la connexion Supabase.
+La configuration publique Supabase est dans `config.js`. Ne jamais y placer une clé secrète ou service_role. Les rôles autorisés sont définis par la base, pas par le formulaire ou les métadonnées utilisateur.
 
-Blocages : le proxy de la session refuse encore la connexion au projet Supabase (CONNECT 403). Authentification réelle, politiques RLS, stockage privé et validation des rôles non testés. Accès SFTP OVH en attente du support, ticket S16949971. Aucun déploiement réalisé.
+## Deux modes distincts
+
+- **Démonstration locale (défaut)** : `URGENT_MARKETPLACE_PILOT = false`. Les courses sont conservées uniquement dans le navigateur. Les offres réelles restent désactivées. Le choix Start/Drive/Boost/Premium dans le compte est une demande déclarative, sans abonnement actif.
+- **Pilote partagé gratuit** : après migration et autorisation des établissements, `URGENT_MARKETPLACE_PILOT = true` permet publication, propositions confidentielles, sélection et suivi. Aucune perception de frais ou confirmation d'affrètement automatique. [Procédure complète et limites](docs/PILOTE-COURSES.md).
+
+Les comptes et documents Supabase ainsi que les brouillons externes partagés ne dépendent pas de ce commutateur. Le stockage des documents utilise le bucket privé `carrier-documents`, PDF/JPG/PNG jusqu'à 10 Mo ; son fonctionnement requiert les politiques existantes de stockage et de tables.
+
+## Administration et vérifications
+
+L'administration est réservée aux profils serveur `admin`. Accepter un document ne valide pas toute l'entreprise. Les attestations de validité, les autorisations transport et le registre doivent être réellement contrôlés. Une immatriculation saisie ou une case cochée ne constitue pas une vérification indépendante.
+
+Le pilote ajoute une autorisation propre, distincte des états existants et des abonnements. Les documents doivent être approuvés et valides au moment d'une offre et d'une attribution. Aucune mise à jour des comptes existants, de leurs rôles ou des anciennes courses locales n'est effectuée automatiquement.
+
+## Ressources
+
+- [État réel du projet et blocages](docs/AVANCEMENT.md)
+- [Pilote des courses et offres — migration groupée, contrôles et tests](docs/PILOTE-COURSES.md)
+- [Ouverture professionnelle et SIRET](supabase/OUVERTURE-PRO.md)
+- [Recette d'inscription](docs/recette-inscription-professionnelle.md)
+- [Brouillons B2PWeb/Rubiwin](supabase/README.md)
+- [Relance du ticket OVH](docs/relance-ovh-S16949971.md)
+
+Les migrations sont ordonnées et à appliquer une seule fois après inspection ; certaines ont déjà été exécutées dans le projet de l'utilisateur. Ne pas rejouer tout le dossier aveuglément. Les tests utilisent PostgreSQL embarqué PGlite et Chromium ; ils ne remplacent pas la recette sur le projet distant, les essais de concurrence multi-connexions, le SMTP de production ni le contrôle juridique.

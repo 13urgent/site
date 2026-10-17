@@ -27,3 +27,6 @@
 @media(min-width:801px) and (max-width:1150px){.top{flex-wrap:wrap;height:auto;padding-top:12px;padding-bottom:12px}.top nav{order:3;flex-basis:100%;justify-content:center;flex-wrap:wrap}}
 
 #subscriptionRequest{border:1px solid #d7d7dc;border-radius:8px;display:grid;gap:12px;padding:16px;min-width:0}#subscriptionRequest legend{font-size:13px;font-weight:800}.modal .subscription-choice{flex-direction:row;align-items:flex-start;gap:12px;padding:12px;border:1px solid #ddd;border-radius:8px;line-height:1.5}.modal .subscription-choice input{width:18px;height:18px;flex-shrink:0;margin:2px 0 0}.subscription-choice:has(input:checked){border-color:#e62230;background:#fff5f6}
+.offer-pilot-form{display:grid;gap:10px;min-width:220px}.offer-pilot-form label{font-size:13px;display:grid;gap:8px}.offer-pilot-form input{padding:12px;border:1px solid #ccc;border-radius:6px;width:100%}.pilot-admin{margin-top:30px;padding:20px;border:1px solid #ddd;border-radius:12px}.dossier details{margin-top:15px}.dossier>.btn{margin:6px}.dossier .doc-item{margin:12px 0}
+
+.pilot-banner{margin:0;padding:14px 5%;background:#fff0d6;color:#583b00;text-align:center;font-size:13px;line-height:1.5}

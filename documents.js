@@ -6,11 +6,19 @@ function docMsg(id,message){const e=doc$(id);e.hidden=false;e.textContent=messag
 function safeText(v){return String(v??'');}
 function line(parent,tag,txt,cls){const e=document.createElement(tag);if(cls)e.className=cls;e.textContent=safeText(txt);parent.append(e);return e;}
 let professionalProfile=null;
+let professionalAccessGeneration=0;
+let professionalSessionId=null;
 async function refreshProfessionalAccess(){
+  const generation=++professionalAccessGeneration;
   doc$('openDocuments').hidden=true;doc$('openAdmin').hidden=true;professionalProfile=null;
   if(!sb)return;
-  const {data:{user},error:ue}=await sb.auth.getUser();if(ue||!user)return;
+  const {data:{user},error:ue}=await sb.auth.getUser();
+  if(generation!==professionalAccessGeneration)return;
+  const id=user?.id||null;
+  if(id!==professionalSessionId){professionalSessionId=id;clearProfessionalViews();}
+  if(ue||!user)return;
   const {data,error}=await sb.from('profiles').select('id,company_id,role').eq('id',user.id).maybeSingle();
+  if(generation!==professionalAccessGeneration)return;
   if(error){console.warn('Profil non accessible',error.message);return;}
   professionalProfile=data;
   doc$('openDocuments').hidden=data?.role!=='carrier';
@@ -23,6 +31,7 @@ async function getOwnCompany(){
   if(error)throw error;return data;
 }
 async function showMyDocuments(){
+  const generation=professionalAccessGeneration;
   doc$('documentNotice').hidden=true;
   if(!professionalProfile||professionalProfile.role!=='carrier')return;
   doc$('documentsDialog').showModal();
@@ -30,6 +39,7 @@ async function showMyDocuments(){
     const c=await getOwnCompany();doc$('companyStatus').textContent=`${c.name} — Dossier : ${c.verification_status}`;
     const {data,error}=await sb.from('carrier_documents').select('id,document_type,original_filename,review_status,expires_on,created_at').eq('company_id',c.id).order('created_at',{ascending:false});
     if(error)throw error;
+    if(generation!==professionalAccessGeneration)return;
     const host=doc$('myDocuments');host.replaceChildren();
     if(!data?.length)line(host,'p','Aucun justificatif envoyé.');
     for(const d of data){const item=line(host,'div','', 'doc-item');line(item,'strong',d.original_filename||d.document_type);line(item,'span',`${d.document_type} · ${d.review_status}${d.expires_on?' · expire le '+d.expires_on:''}`);}
@@ -60,11 +70,14 @@ async function showAdmin(){
   doc$('adminDialog').showModal();await loadAdmin();
 }
 async function loadAdmin(){
+  if(professionalProfile?.role!=='admin')return;
+  const generation=professionalAccessGeneration;
   doc$('adminNotice').hidden=true;const host=doc$('adminDossiers');host.replaceChildren();line(host,'p','Chargement des dossiers…');
   const [companies,docs]=await Promise.all([
     sb.from('companies').select('id,name,company_type,verification_status').in('company_type',['carrier','both']).order('created_at',{ascending:false}),
     sb.from('carrier_documents').select('id,company_id,document_type,storage_path,original_filename,review_status,expires_on,created_at').order('created_at',{ascending:false})
   ]);
+  if(generation!==professionalAccessGeneration)return;
   if(companies.error||docs.error){docMsg('adminNotice','Lecture impossible : '+(companies.error?.message||docs.error?.message));host.replaceChildren();return;}
   host.replaceChildren();if(!companies.data?.length){line(host,'p','Aucun transporteur enregistré.');return;}
   for(const c of companies.data){
@@ -96,10 +109,21 @@ async function loadAdmin(){
     }
   }
 }
-doc$('openDocuments').addEventListener('click',showMyDocuments);
-doc$('openAdmin').addEventListener('click',showAdmin);
-doc$('refreshAdmin').addEventListener('click',loadAdmin);
+doc$('openDocuments').addEventListener('click',()=>showMyDocuments().catch(()=>docMsg('documentNotice','Service momentanément inaccessible.')));
+doc$('openAdmin').addEventListener('click',()=>showAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.')));
+doc$('refreshAdmin').addEventListener('click',()=>loadAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.')));
 doc$('documentForm').addEventListener('submit',uploadDocument);
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>doc$(b.dataset.close).close()));
-sb?.auth.onAuthStateChange(()=>{setTimeout(refreshProfessionalAccess,0);});
-refreshProfessionalAccess();
+function clearProfessionalViews(){
+ for(const name of ['documentsDialog','adminDialog'])if(doc$(name).open)doc$(name).close();
+ for(const name of ['myDocuments','adminDossiers'])doc$(name).replaceChildren();
+ doc$('companyStatus').textContent='';doc$('documentForm').reset();
+}
+sb?.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>{
+ const id=session?.user?.id||null;
+ if(id!==professionalSessionId){
+  professionalSessionId=id;professionalAccessGeneration++;professionalProfile=null;clearProfessionalViews();
+ }
+ refreshProfessionalAccess().catch(()=>{});
+},0);});
+refreshProfessionalAccess().catch(()=>{});

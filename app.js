@@ -1,3 +1,5 @@
+(()=>{
+if(window.URGENT_MARKETPLACE_PILOT===true)return;
 'use strict';
 const KEY='13urgent_demo_shipments_v1';
 const $=id=>document.getElementById(id);
@@ -43,3 +45,5 @@ $('exportShipments').addEventListener('click',()=>{
 });
 $('shipmentForm').addEventListener('submit',e=>{e.preventDefault();const f=new FormData(e.currentTarget);const obj={id:'DEMO-'+Date.now().toString(36).toUpperCase(),company:String(f.get('company')).trim(),siret:String(f.get('siret')).trim(),businessUse:f.get('businessUse')==='on',email:String(f.get('email')).trim(),origin:String(f.get('origin')).trim(),destination:String(f.get('destination')).trim(),pickup:String(f.get('pickup')),vehicle:String(f.get('vehicle')),pallets:Number(f.get('pallets')),weight:Number(f.get('weight')),notes:String(f.get('notes')).trim(),createdAt:new Date().toISOString(),offers:[]};if(!/^\d{14}$/.test(obj.siret)||!obj.businessUse||!obj.company||!obj.email||!obj.origin||!obj.destination||!obj.pickup||!obj.vehicle){return}const rows=load();rows.push(obj);try{save(rows);}catch{$('formNotice').hidden=false;$('formNotice').textContent='Enregistrement impossible : vérifiez le stockage du navigateur.';return;}e.currentTarget.reset();$('formNotice').hidden=false;$('formNotice').textContent=`Demande ${obj.id} enregistrée dans ce navigateur uniquement. Elle n'a été transmise à personne.`;render();$('courses').scrollIntoView({behavior:'smooth'})});
 render();
+
+})();
