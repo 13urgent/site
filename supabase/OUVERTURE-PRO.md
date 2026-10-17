@@ -13,3 +13,10 @@ Tests locaux : PostgreSQL embarqué PGlite confirme refus des nouvelles inscript
 Le site est toujours un prototype : demandes de transport locales, offres non activées. Ne pas collecter de frais réels avant validation du parcours métier, des contrats et de la TVA.
 
 Compatibilité contrôlée avec la fonction create_user_profile exportée du projet : celle-ci utilise account_type et company_name. Le formulaire transmet désormais ces deux champs en plus des déclarations professionnelles, sans transmettre de rôle administrateur. Test PGlite signup-compatibility.cjs : création client et carrier, nom entreprise correct, statut pending dans les deux cas. Aucun droit d’offre n’est conféré par ces métadonnées.
+
+## Choix de forfait transporteur
+Catalogue mensuel demandé : Découverte gratuite (1 transport/mois), Bronze 12,50 € HT/mois (5), Argent 33,33 € HT/mois (30), Or 62,50 € HT/mois (illimité). Les montants payants sont des prix mensuels proposés à partir des repères annuels de la newsletter, pas une confirmation des conditions actuelles Rubiwin. Arrondi mensuel de la formule Argent : 399,96 € sur douze mois. Pas d'engagement ni de paiement activé. Définition du transport comptabilisé à arrêter avant application des quotas.
+
+Le choix est conservé comme demande déclarative dans les métadonnées du compte (subscription_plan_request, version catalogue), accessible aux administrateurs du projet Supabase via Authentication/Users/Raw JSON. Il ne crée ni abonnement payé, ni autorisation d'offre, ni validation entreprise. Une future gestion serveur des souscriptions et de leur approbation reste à développer ; ne jamais autoriser une offre à partir des métadonnées utilisateur. Les anciennes demandes sans version devront être confirmées avec les conditions définitives. Aucun tarif public détaillé sur l'accueil.
+
+Documents à jour obligatoires même en cas d'abonnement payé. La suspension, les remboursements et les exceptions doivent être définis contractuellement avant souscription ; pas de promesse absolue d'absence de remboursement en cas de désactivation quel qu'en soit le motif.

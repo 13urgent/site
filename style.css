@@ -25,3 +25,5 @@
 
 .subscription-steps{padding-left:24px;display:grid;gap:18px}.subscription-steps p{color:#6c6d74;line-height:1.7;margin:8px 0}.top nav{gap:14px}
 @media(min-width:801px) and (max-width:1150px){.top{flex-wrap:wrap;height:auto;padding-top:12px;padding-bottom:12px}.top nav{order:3;flex-basis:100%;justify-content:center;flex-wrap:wrap}}
+
+#subscriptionRequest{border:1px solid #d7d7dc;border-radius:8px;display:grid;gap:12px;padding:16px;min-width:0}#subscriptionRequest legend{font-size:13px;font-weight:800}.modal .subscription-choice{flex-direction:row;align-items:flex-start;gap:12px;padding:12px;border:1px solid #ddd;border-radius:8px;line-height:1.5}.modal .subscription-choice input{width:18px;height:18px;flex-shrink:0;margin:2px 0 0}.subscription-choice:has(input:checked){border-color:#e62230;background:#fff5f6}
