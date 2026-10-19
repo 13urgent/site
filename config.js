@@ -7,5 +7,8 @@ window.URGENT_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_spj4TyfehkAUs49pN-RVXw_
 // Ce commutateur ne confère aucun droit : tous les contrôles sont réalisés en base.
 window.URGENT_MARKETPLACE_PILOT = true;
 
+// À activer uniquement après déploiement des fonctions et configuration Stripe TEST.
+window.URGENT_BILLING_TEST_UI = false;
+
 // Le pilote public utilise les comptes existants ; aucun paiement.
 window.URGENT_ALLOW_REGISTRATION = false;
