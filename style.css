@@ -30,3 +30,5 @@
 .offer-pilot-form{display:grid;gap:10px;min-width:220px}.offer-pilot-form label{font-size:13px;display:grid;gap:8px}.offer-pilot-form input{padding:12px;border:1px solid #ccc;border-radius:6px;width:100%}.pilot-admin{margin-top:30px;padding:20px;border:1px solid #ddd;border-radius:12px}.dossier details{margin-top:15px}.dossier>.btn{margin:6px}.dossier .doc-item{margin:12px 0}
 
 .pilot-banner{margin:0;padding:14px 5%;background:#fff0d6;color:#583b00;text-align:center;font-size:13px;line-height:1.5}
+
+.incident-form{display:grid;gap:12px;margin:14px 0}.incident-form label{display:grid;gap:8px;font-size:13px}.incident-form textarea{width:100%;padding:12px;border:1px solid #ccc;border-radius:7px;min-height:100px}.shipment-incidents{margin-top:20px}

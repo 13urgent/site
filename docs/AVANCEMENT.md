@@ -1,4 +1,4 @@
-# Point d'avancement — 17 octobre 2026
+# Point d'avancement — 19 octobre 2026
 
 ## Vérifié sur le projet réel avec l'utilisateur
 
@@ -7,9 +7,9 @@
 - Dépôt, lecture et refus d'un document sur les comptes de test précédents ; accès au PDF par lien signé.
 - Brouillon externe partagé avec budget privé ; règles PostgreSQL contrôlées via tests de rôles dans SQL Editor.
 
-## Développé et testé localement, non activé à distance
+## Pilote appliqué, recette réelle partielle
 
-Courses partagées, prix confidentiels, attribution unique avec contrôle du prix affiché, accès pilote administrateur, admissibilité documentaire et quotas, contacts restreints après attribution, suivi horodaté et confirmation client. Voir PILOTE-COURSES.md pour la seule nouvelle migration et l'activation groupée.
+Courses partagées, prix confidentiels, attribution unique avec contrôle du prix affiché, accès pilote administrateur, admissibilité documentaire et quotas, contacts restreints après attribution, suivi horodaté et confirmation client. La migration pilote a été appliquée par l’utilisateur et la bannière affichée localement. La course complète client → transporteur → livraison reste non testée sur le projet réel.
 
 Des protections d'affichage ont été ajoutées pour effacer les dossiers au changement de session. Aucune fonctionnalité d'agent de surveillance autonome n'a été déployée : sujet explicitement reporté.
 
@@ -22,3 +22,7 @@ Des protections d'affichage ont été ajoutées pour effacer les dossiers au cha
 ## À ne pas annoncer comme prêt
 
 Abonnements payés, frais de 1,5 % encaissés, factures, contrats, assurance de conformité juridique, livraison GPS ou preuve de livraison signée, site public OVH opérationnel. Les particuliers restent exclus.
+
+## Dernière livraison préparée
+
+Outils de correction des catégories et dates par administrateur, diagnostic des pièces bloquantes, contrôle des dates obligatoires du pilote et signalements privés de prestation. Une seule nouvelle migration à appliquer et trois fichiers d’interface à mettre à jour : voir [la procédure groupée](MISE-A-JOUR-19-OCTOBRE.md). La garantie marchandises de CHRONOSS n’est pas établie par l’attestation RC reçue ; ne pas la déclarer validée pour débloquer le test.

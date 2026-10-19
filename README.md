@@ -31,6 +31,7 @@ Le pilote ajoute une autorisation propre, distincte des états existants et des 
 
 ## Ressources
 
+- [Mise à jour du 19 octobre — une intervention groupée](docs/MISE-A-JOUR-19-OCTOBRE.md)
 - [État réel du projet et blocages](docs/AVANCEMENT.md)
 - [Pilote des courses et offres — migration groupée, contrôles et tests](docs/PILOTE-COURSES.md)
 - [Ouverture professionnelle et SIRET](supabase/OUVERTURE-PRO.md)

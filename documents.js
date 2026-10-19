@@ -57,6 +57,7 @@ async function uploadDocument(e){
     const allowed={'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png'};
     if(!allowed[file.type])throw Error('Formats autorisés : PDF, JPG et PNG.');
     const kind=doc$('documentType').value;
+    if(kind!=='registration'&&!doc$('documentExpiry').value)throw Error('Renseignez la date de fin de validité figurant sur la licence ou l’assurance.');
     if(!['registration','transport_licence','insurance_rc','insurance_goods'].includes(kind))throw Error('Catégorie de document non prise en charge.');
     const path=`${company.id}/${crypto.randomUUID()}.${allowed[file.type]}`;
     const {error:uploadError}=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:file.type,upsert:false});
@@ -65,7 +66,7 @@ async function uploadDocument(e){
     if(doc$('documentExpiry').value)row.expires_on=doc$('documentExpiry').value;
     const {error}=await sb.from('carrier_documents').insert(row);
     if(error)throw Error('Fichier envoyé mais fiche non enregistrée : '+error.message+' (contactez 13 URGENT).');
-    doc$('documentForm').reset();await showMyDocuments();docMsg('documentNotice',`Document envoyé dans la catégorie « ${documentLabel(kind)} ». Il reste en attente de vérification par 13 URGENT.`);
+    doc$('documentFile').value='';await showMyDocuments();docMsg('documentNotice',`Document envoyé dans la catégorie « ${documentLabel(kind)} ». Il reste en attente de vérification par 13 URGENT.`);
   }catch(err){docMsg('documentNotice','Envoi impossible : '+err.message);}finally{btn.disabled=false;}
 }
 async function showAdmin(){
@@ -95,6 +96,22 @@ async function loadAdmin(){
         const {data,error}=await sb.storage.from(DOC_BUCKET).createSignedUrl(d.storage_path,60);
         if(error){docMsg('adminNotice','Fichier inaccessible : '+error.message);return;}
         window.open(data.signedUrl,'_blank','noopener,noreferrer');
+      };
+      const edit=line(buttons,'button','Corriger la catégorie / la date','btn secondary');edit.type='button';
+      edit.onclick=()=>{
+        if(row.querySelector('.document-correction'))return;
+        const form=document.createElement('form');form.className='document-correction doc-form';
+        const kindLabel=line(form,'label','Catégorie vérifiée');const select=document.createElement('select');
+        for(const [value,label] of Object.entries(documentLabels)){const option=document.createElement('option');option.value=value;option.textContent=label;option.selected=d.document_type===value;select.append(option);}kindLabel.append(select);
+        const dateLabel=line(form,'label','Date de fin de validité figurant sur la pièce');const expiry=document.createElement('input');expiry.type='date';expiry.value=d.expires_on||'';dateLabel.append(expiry);
+        line(form,'p','Toute correction remet la pièce en attente de revue. Pour le pilote, la licence et les assurances nécessitent une date de validité renseignée.','wide muted');
+        const submit=line(form,'button','Enregistrer la correction','btn primary');submit.type='submit';
+        const cancel=line(form,'button','Fermer','btn secondary');cancel.type='button';cancel.onclick=()=>form.remove();
+        form.onsubmit=async event=>{event.preventDefault();submit.disabled=true;
+          try{const {error}=await sb.rpc('urgent_correct_document',{p_document:d.id,p_kind:select.value,p_expiry:expiry.value||null});if(error)throw error;
+            await loadAdmin();docMsg('adminNotice','Correction enregistrée. La pièce doit être contrôlée puis approuvée à nouveau.');
+          }catch(e){docMsg('adminNotice','Correction impossible : '+e.message);}finally{submit.disabled=false;}
+        };row.append(form);
       };
       if(d.review_status==='pending'){
         for(const [status,label] of [['approved','Accepter'],['rejected','Refuser']]){
