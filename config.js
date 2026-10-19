@@ -6,3 +6,6 @@ window.URGENT_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_spj4TyfehkAUs49pN-RVXw_
 // Activer uniquement après application et recette de la migration marketplace pilote.
 // Ce commutateur ne confère aucun droit : tous les contrôles sont réalisés en base.
 window.URGENT_MARKETPLACE_PILOT = false;
+
+// À activer uniquement après déploiement des fonctions et configuration Stripe TEST.
+window.URGENT_BILLING_TEST_UI = false;

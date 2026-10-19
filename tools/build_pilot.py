@@ -14,7 +14,7 @@ if output == root or root in output.parents or output in root.parents:
 output.mkdir(parents=True, exist_ok=True)
 if any(output.iterdir()):
     raise SystemExit('Le dossier de sortie doit être vide pour préserver les fichiers existants.')
-files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js','documents.js','imports.js']
+files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js','billing.js','documents.js','imports.js']
 for name in files:
     shutil.copy2(root / name, output / name)
 (output / 'assets').mkdir()
@@ -23,6 +23,9 @@ config = (output / 'config.js').read_text()
 config, count = re.subn(r'window\.URGENT_MARKETPLACE_PILOT\s*=\s*false\s*;', 'window.URGENT_MARKETPLACE_PILOT = true;', config)
 if count != 1:
     raise SystemExit('Activation explicite du pilote introuvable dans config.js.')
+config, billing_count = re.subn(r'window\.URGENT_BILLING_TEST_UI\s*=\s*(?:true|false)\s*;', 'window.URGENT_BILLING_TEST_UI = false;', config)
+if billing_count != 1:
+    raise SystemExit('Commutateur des paiements de test introuvable dans config.js.')
 config += '\n// Le pilote public utilise les comptes existants ; aucun paiement.\nwindow.URGENT_ALLOW_REGISTRATION = false;\n'
 (output / 'config.js').write_text(config)
 html = (output / 'index.html').read_text()

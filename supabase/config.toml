@@ -1,0 +1,7 @@
+# Les fonctions vérifient elles-mêmes les identités/signatures :
+# Checkout appelle /auth/v1/user ; le webhook vérifie Stripe-Signature sur le corps brut.
+[functions.billing-checkout]
+verify_jwt = false
+
+[functions.billing-webhook]
+verify_jwt = false

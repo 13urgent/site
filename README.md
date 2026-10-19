@@ -29,6 +29,10 @@ L'administration est réservée aux profils serveur `admin`. Accepter un documen
 
 Le pilote ajoute une autorisation propre, distincte des états existants et des abonnements. Les documents doivent être approuvés et valides au moment d'une offre et d'une attribution. Aucune mise à jour des comptes existants, de leurs rôles ou des anciennes courses locales n'est effectuée automatiquement.
 
+## Préparation des paiements
+
+Un module Stripe **test uniquement** est préparé, désactivé par défaut. Il sépare les abonnements et les frais de 1,5 % sans encaisser le prix du transport. Aucun paiement ne valide les documents ou les accès. [Branchement sécurisé, recette et conditions restantes](docs/PAIEMENTS-TEST.md).
+
 ## Ressources
 
 - [Déploiement provisoire GitHub Pages](docs/DEPLOIEMENT-PILOTE.md)

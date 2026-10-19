@@ -1,5 +1,15 @@
 # Point d'avancement — 19 octobre 2026
 
+## Dernier état confirmé
+
+Le site est accessible sur https://13urgent.github.io/site/ ; l'utilisateur a confirmé son fonctionnement sur téléphone. Le parcours fictif CHRONOSS a été effectué jusqu'au statut « Réalisation confirmée par le client » (course e9fa89c6-b78b-4e13-bc0f-971d01d632bc). Cela ne valide pas les documents ni un transport réel. L'exception documentaire temporaire est limitée aux exercices fictifs et expire le 21 octobre à 15:23:32, heure de Paris.
+
+La préparation Stripe test est ajoutée : commandes serveur, tarifs fixes, frais de 1,5 %, webhook signé et journal idempotent, sans effet sur les droits du pilote. Pas de branchement Stripe ni de migration de facturation distante. Paiements réels, ouverture des inscriptions et activation commerciale restent à terminer. Voir [PAIEMENTS-TEST.md](PAIEMENTS-TEST.md).
+
+Validation locale de cette préparation : 13 scripts réussis (PostgreSQL embarqué, HTTP simulé et Chromium), dont le parcours complet du pilote et le paquet statique sans interface de paiement visible. Aucun paiement réel ni appel Stripe réel vérifié.
+
+Les sections ci-dessous conservent l'historique des étapes antérieures.
+
 ## Vérifié sur le projet réel avec l'utilisateur
 
 - Inscription transporteur CHRONOSS, confirmation e-mail, profil carrier, SIRET et demande Start enregistrés, entreprise pending.
@@ -9,7 +19,7 @@
 
 ## Pilote appliqué, recette réelle partielle
 
-Courses partagées, prix confidentiels, attribution unique avec contrôle du prix affiché, accès pilote administrateur, admissibilité documentaire et quotas, contacts restreints après attribution, suivi horodaté et confirmation client. La migration pilote a été appliquée par l’utilisateur et la bannière affichée localement. La course complète client → transporteur → livraison reste non testée sur le projet réel.
+Courses partagées, prix confidentiels, attribution unique avec contrôle du prix affiché, accès pilote administrateur, admissibilité documentaire et quotas, contacts restreints après attribution, suivi horodaté et confirmation client. La migration pilote a été appliquée par l’utilisateur et la bannière affichée localement. À ce stade antérieur, la course complète restait non testée ; la recette fictive est désormais confirmée ci-dessus.
 
 Des protections d'affichage ont été ajoutées pour effacer les dossiers au changement de session. Aucune fonctionnalité d'agent de surveillance autonome n'a été déployée : sujet explicitement reporté.
 
