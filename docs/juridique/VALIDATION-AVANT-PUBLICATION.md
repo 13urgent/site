@@ -17,7 +17,7 @@ L'utilisateur désigne CHRONOSS comme exploitant. Le Kbis fourni, à jour au 7 o
 
 Ces mentions ont été reprises dans le projet de conditions. Le document n’a pas été authentifié en ligne auprès du greffe. Le PDF et les informations personnelles des dirigeants ne sont pas copiés dans le dépôt public.
 
-Le SIRET communiqué 91871039300052 n’apparaît pas dans cet extrait : confirmer son rattachement à l’établissement. Le numéro et le régime de TVA ainsi que le contact contractuel restent à confirmer. L'adresse exploitation@chronoss.fr utilisée pour les tests n'est pas désignée automatiquement comme adresse de réclamation officielle.
+Le SIRET communiqué 91871039300052 n’apparaît pas dans cet extrait : confirmer son rattachement à l’établissement. Le numéro de TVA intracommunautaire **FR60918710393** a été communiqué par l’utilisateur et ajouté aux conditions. Sa clé numérique est cohérente avec le SIREN 918710393 ; ce contrôle de format ne constitue pas une vérification de validité ou d’activation auprès de l’administration/VIES. Le régime de TVA applicable aux services et le contact contractuel restent à confirmer. L'adresse exploitation@chronoss.fr utilisée pour les tests n'est pas désignée automatiquement comme adresse de réclamation officielle.
 
 L’activité mentionnée comprend transport de marchandises de tous tonnages, location de véhicules avec ou sans chauffeur et cross-docking. L’extrait ne suffit pas à établir que l’objet statutaire et les formalités couvrent l’exploitation de la plateforme : faire vérifier ce point, ainsi que les autorisations et assurances effectives. Il ne vaut pas approbation automatique du dossier transporteur.
 

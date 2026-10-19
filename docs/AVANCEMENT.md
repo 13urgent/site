@@ -2,7 +2,7 @@
 
 ## Conditions commerciales et facturation mensuelle — préparation
 
-Le Kbis fourni (à jour au 7 octobre 2026) a permis de compléter les conditions v2 : CHRONOSS, SAS à associé unique, capital 12 600,00 €, siège 27 Boulevard Charles Moretti, 13014 Marseille, RCS Marseille 918 710 393. TVA, e-mail contractuel et rattachement du SIRET restent à confirmer. Aucun PDF ni renseignement personnel de dirigeant n’est publié.
+Le Kbis fourni (à jour au 7 octobre 2026) a permis de compléter les conditions v2 : CHRONOSS, SAS à associé unique, capital 12 600,00 €, siège 27 Boulevard Charles Moretti, 13014 Marseille, RCS Marseille 918 710 393. Numéro de TVA communiqué et ajouté : FR60918710393 (clé numérique cohérente, validité administrative non vérifiée). Régime fiscal, e-mail contractuel et rattachement du SIRET restent à confirmer. Aucun PDF ni renseignement personnel de dirigeant n’est publié.
 
 CHRONOSS est désigné par l’utilisateur comme exploitant, sous réserve de vérification de ses mentions légales. Les donneurs d’ordre cumuleront les frais de 1,5 % HT pour une facture unique de fin de mois ; ce choix remplace le paiement unitaire des frais. Le [projet de CGU/CGV](juridique/CGU-CGV-PROJET.md), le [cadre à implémenter](juridique/FACTURATION-MENSUELLE-CADRE.md) et le [dossier de validation](juridique/VALIDATION-AVANT-PUBLICATION.md) sont rédigés. Ils couvrent annulations, preuve, contournement limité à la course apportée, impayés et suspension proportionnée, sans clause générale de non-remboursement. Documents de travail uniquement : pas de validation juridique ni de publication contractuelle ; le cumul mensuel et son recouvrement ne sont pas encore développés.
 

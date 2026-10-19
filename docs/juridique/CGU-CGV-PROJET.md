@@ -14,7 +14,7 @@ La plateforme « 13 URGENT » est exploitée par :
 - Siège social : **27 Boulevard Charles Moretti, 13014 Marseille**.
 - SIREN : **918 710 393** — **RCS Marseille 918 710 393**.
 - SIRET communiqué par l’exploitant : **91871039300052** (non mentionné dans l’extrait fourni ; rattachement de l’établissement à confirmer).
-- Numéro de TVA intracommunautaire ou régime d'exonération applicable : **[À COMPLÉTER]**.
+- Numéro de TVA intracommunautaire : **FR60918710393**, communiqué par l’exploitant.
 - Contact contractuel, réclamations et droits sur les données : **[ADRESSE E-MAIL À COMPLÉTER]**.
 
 Ci-après « l'Exploitant ». Le prestataire de paiement éventuel, les mentions d'hébergement et la politique de confidentialité sont identifiés dans les documents accessibles avant inscription. Aucun mandat de prélèvement n'est donné par la seule acceptation de ces conditions.
@@ -217,7 +217,7 @@ Sous réserve des règles impératives applicables, le service relève du droit 
 
 Identité, forme, capital, siège et RCS repris du Kbis fourni par l’utilisateur, à jour au 7 octobre 2026 et édité le 8 octobre 2026. Il s’agit d’une lecture documentaire, pas d’une authentification auprès du greffe. Le PDF source n’est pas ajouté au dépôt ni au site public ; les données personnelles des dirigeants ne sont pas reproduites.
 
-- Confirmer le rattachement du SIRET déclaré à l’établissement, les informations fiscales et le contact contractuel de l’article 1. Le Kbis identifie CHRONOSS mais n’indique pas le SIRET à 14 chiffres, la TVA ou l’e-mail.
+- Confirmer le rattachement du SIRET déclaré à l’établissement, le régime fiscal applicable et le contact contractuel de l’article 1. Le Kbis identifie CHRONOSS mais n’indique pas le SIRET à 14 chiffres, la TVA ou l’e-mail.
 - Faire examiner le rôle réel d'intermédiaire : le libellé contractuel ne suffit pas pour exclure le statut de commissionnaire de transport ou une autre réglementation.
 - Faire vérifier le fait générateur des frais, annulations, clauses de suspension, abonnements, résiliation, pénalités et compatibilité avec les règles impératives et le déséquilibre significatif.
 - Faire valider par l'expert-comptable TVA, assiettes, arrondis, calendrier mensuel, délais, mentions et circuit de facturation électronique en vigueur pour l'entreprise et les clients. Le document ne vaut pas facture ni validation fiscale.
