@@ -2,7 +2,11 @@
 
 Une version statique pilote est construite depuis le code source et publiée sur la branche `gh-pages`. Cette alternative ne requiert pas de changement DNS ni d'accès FTP OVH. Le domaine 13urgent.fr reste inchangé tant qu'aucune migration de domaine n'est décidée.
 
-## Activation du service GitHub Pages
+## Publication confirmée le 19 octobre 2026
+
+GitHub a lancé automatiquement le déploiement après création de gh-pages. L’exécution [39241061027](https://github.com/13urgent/site/actions/runs/39241061027) indique **Success** pour le commit de publication 13e75d4 et expose `https://13urgent.github.io/site/`. La requête HTTP directe vers cette adresse reste bloquée par le proxy cloud : sa consultation réelle et sa connexion au projet Supabase sont à confirmer dans le navigateur utilisateur.
+
+## Réglages du service GitHub Pages
 
 Le réglage du dépôt doit être : Settings → Pages → Build and deployment → Source = Deploy from a branch → Branch = gh-pages → Folder = / (root) → Save. La branche contient déjà les fichiers de publication. L'URL attendue après déploiement réussi est `https://13urgent.github.io/site/` ; ce nom n'est pas une preuve que la publication est active.
 

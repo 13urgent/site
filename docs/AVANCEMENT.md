@@ -32,3 +32,7 @@ Outils de correction des catégories et dates par administrateur, diagnostic des
 Les dix scripts de tests ont été exécutés avec succès : 4 PostgreSQL embarqué et 6 navigateurs, dont le paquet d'hébergement en sous-dossier. Aucune requête de test contre la base distante n'a réussi depuis la session : le proxy retourne toujours CONNECT 403. La dernière migration est annoncée appliquée par l'utilisateur ; cela ne prouve pas la recette réelle complète.
 
 Une version de publication pilote est construite séparément, avec paiements désactivés et inscriptions fermées dans l'interface. Voir DEPLOIEMENT-PILOTE.md pour l'activation Pages et les liens d'e-mail. Aucun DNS OVH n'est modifié.
+
+## Publication Pages confirmée
+
+Le 19 octobre, la branche gh-pages a été poussée (commit 13e75d4). GitHub Actions « pages build and deployment » n°39241061027 termine avec Success et indique https://13urgent.github.io/site/. Le contrôle de l'arborescence publiée confirme seulement les 11 fichiers statiques attendus. Les requêtes directes vers github.io et Supabase restent refusées par le proxy : l'ouverture HTTP et la recette réelle depuis cette adresse ne sont pas encore vérifiées par cette session. Le domaine 13urgent.fr reste chez OVH et n'a pas été modifié.
