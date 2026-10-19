@@ -1,5 +1,9 @@
 # Point d'avancement — 19 octobre 2026
 
+## Conditions commerciales et facturation mensuelle — préparation
+
+CHRONOSS est désigné par l’utilisateur comme exploitant, sous réserve de vérification de ses mentions légales. Les donneurs d’ordre cumuleront les frais de 1,5 % HT pour une facture unique de fin de mois ; ce choix remplace le paiement unitaire des frais. Le [projet de CGU/CGV](juridique/CGU-CGV-PROJET.md), le [cadre à implémenter](juridique/FACTURATION-MENSUELLE-CADRE.md) et le [dossier de validation](juridique/VALIDATION-AVANT-PUBLICATION.md) sont rédigés. Ils couvrent annulations, preuve, contournement limité à la course apportée, impayés et suspension proportionnée, sans clause générale de non-remboursement. Documents de travail uniquement : pas de validation juridique ni de publication contractuelle ; le cumul mensuel et son recouvrement ne sont pas encore développés.
+
 ## Dernier état confirmé
 
 Le site est accessible sur https://13urgent.github.io/site/ ; l'utilisateur a confirmé son fonctionnement sur téléphone. Le parcours fictif CHRONOSS a été effectué jusqu'au statut « Réalisation confirmée par le client » (course e9fa89c6-b78b-4e13-bc0f-971d01d632bc). Cela ne valide pas les documents ni un transport réel. L'exception documentaire temporaire est limitée aux exercices fictifs et expire le 21 octobre à 15:23:32, heure de Paris.

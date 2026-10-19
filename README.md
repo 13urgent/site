@@ -29,6 +29,10 @@ L'administration est réservée aux profils serveur `admin`. Accepter un documen
 
 Le pilote ajoute une autorisation propre, distincte des états existants et des abonnements. Les documents doivent être approuvés et valides au moment d'une offre et d'une attribution. Aucune mise à jour des comptes existants, de leurs rôles ou des anciennes courses locales n'est effectuée automatiquement.
 
+## Conditions professionnelles en préparation
+
+Le modèle retenu pour les donneurs d’ordre est désormais le cumul mensuel des frais de 1,5 % HT, puis une facture unique de fin de mois. [Projet de CGU/CGV CHRONOSS](docs/juridique/CGU-CGV-PROJET.md), [règles mensuelles à implémenter](docs/juridique/FACTURATION-MENSUELLE-CADRE.md) et [validations restantes](docs/juridique/VALIDATION-AVANT-PUBLICATION.md). Ces documents ne sont pas publiés ni applicables au pilote gratuit ; le parcours mensuel reste à développer et les mentions à compléter.
+
 ## Préparation des paiements
 
 Un module Stripe **test uniquement** est préparé, désactivé par défaut. Il sépare les abonnements et les frais de 1,5 % sans encaisser le prix du transport. Aucun paiement ne valide les documents ou les accès. [Branchement sécurisé, recette et conditions restantes](docs/PAIEMENTS-TEST.md).
