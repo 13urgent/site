@@ -1,17 +1,19 @@
 # 13 URGENT — Conditions générales d'utilisation et de vente professionnelles
 
-**PROJET DE TRAVAIL — version PRO-B2B-2026-10-19-v1 — non applicable au pilote gratuit.**
+**PROJET DE TRAVAIL — version PRO-B2B-2026-10-19-v2 — non applicable au pilote gratuit.**
 
-Ce document prépare le futur service commercial. Il n'a pas été validé par un avocat et ne doit pas être présenté comme une conformité acquise. Compléter l'identité de l'exploitant, faire vérifier le texte et la qualification de l'activité réelle, puis implémenter les fonctions décrites avant de proposer son acceptation. Les fonctions commerciales ci-dessous ne sont pas toutes disponibles aujourd'hui.
+Ce document prépare le futur service commercial. Il n'a pas été validé par un avocat et ne doit pas être présenté comme une conformité acquise. Compléter les informations fiscales et de contact restantes, faire vérifier le texte et la qualification de l'activité réelle, puis implémenter les fonctions décrites avant de proposer son acceptation. Les fonctions commerciales ci-dessous ne sont pas toutes disponibles aujourd'hui.
 
 ## 1. Exploitant et périmètre
 
 La plateforme « 13 URGENT » est exploitée par :
 
-- Dénomination légale : **CHRONOSS** (identité déclarée par l’utilisateur ; graphie exacte au registre à vérifier).
-- Forme juridique, capital social : **[À COMPLÉTER]**.
-- Siège social : **[À COMPLÉTER]**.
-- SIRET déclaré : **91871039300052** ; SIREN, inscription au registre et dénomination correspondante à contrôler avant publication.
+- Dénomination légale : **CHRONOSS**.
+- Forme juridique : **Société par actions simplifiée à associé unique (SASU)**.
+- Capital social : **12 600,00 €**.
+- Siège social : **27 Boulevard Charles Moretti, 13014 Marseille**.
+- SIREN : **918 710 393** — **RCS Marseille 918 710 393**.
+- SIRET communiqué par l’exploitant : **91871039300052** (non mentionné dans l’extrait fourni ; rattachement de l’établissement à confirmer).
 - Numéro de TVA intracommunautaire ou régime d'exonération applicable : **[À COMPLÉTER]**.
 - Contact contractuel, réclamations et droits sur les données : **[ADRESSE E-MAIL À COMPLÉTER]**.
 
@@ -213,7 +215,9 @@ Sous réserve des règles impératives applicables, le service relève du droit 
 
 ## Contrôles avant mise en application — notes internes à retirer de la version publiée
 
-- Confirmer toutes les mentions de l'article 1 ; le SIRET de l'entreprise de test ne désigne pas automatiquement l'Exploitant.
+Identité, forme, capital, siège et RCS repris du Kbis fourni par l’utilisateur, à jour au 7 octobre 2026 et édité le 8 octobre 2026. Il s’agit d’une lecture documentaire, pas d’une authentification auprès du greffe. Le PDF source n’est pas ajouté au dépôt ni au site public ; les données personnelles des dirigeants ne sont pas reproduites.
+
+- Confirmer le rattachement du SIRET déclaré à l’établissement, les informations fiscales et le contact contractuel de l’article 1. Le Kbis identifie CHRONOSS mais n’indique pas le SIRET à 14 chiffres, la TVA ou l’e-mail.
 - Faire examiner le rôle réel d'intermédiaire : le libellé contractuel ne suffit pas pour exclure le statut de commissionnaire de transport ou une autre réglementation.
 - Faire vérifier le fait générateur des frais, annulations, clauses de suspension, abonnements, résiliation, pénalités et compatibilité avec les règles impératives et le déséquilibre significatif.
 - Faire valider par l'expert-comptable TVA, assiettes, arrondis, calendrier mensuel, délais, mentions et circuit de facturation électronique en vigueur pour l'entreprise et les clients. Le document ne vaut pas facture ni validation fiscale.

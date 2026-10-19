@@ -1,6 +1,6 @@
 # Dossier de validation avant publication des conditions
 
-Version de travail : PRO-B2B-2026-10-19-v1. Ces documents ne sont pas déployés sur le site public et n'y sont pas proposés à l'acceptation.
+Version de travail : PRO-B2B-2026-10-19-v2. Ces documents ne sont pas déployés sur le site public et n'y sont pas proposés à l'acceptation.
 
 ## Documents remis
 
@@ -9,7 +9,17 @@ Version de travail : PRO-B2B-2026-10-19-v1. Ces documents ne sont pas déployés
 
 ## Points factuels encore nécessaires
 
-L'utilisateur désigne CHRONOSS comme exploitant. Le SIRET communiqué est 91871039300052. L'extrait du registre, le siège, la forme, le capital, le numéro d'inscription au registre, la TVA et le contact contractuel n'ont pas été vérifiés dans cette rédaction. L'adresse exploitation@chronoss.fr utilisée pour les tests n'est pas désignée automatiquement comme adresse de réclamation officielle. Ne pas déduire une adresse ou un statut fiscal d'une ancienne capture ou d'un nom de fichier.
+L'utilisateur désigne CHRONOSS comme exploitant. Le Kbis fourni, à jour au 7 octobre 2026 et édité le 8 octobre 2026, indique :
+
+- CHRONOSS, société par actions simplifiée à associé unique, capital de 12 600,00 €.
+- Siège : 27 Boulevard Charles Moretti, 13014 Marseille.
+- SIREN 918 710 393, RCS Marseille 918 710 393 ; immatriculation le 19 septembre 2022.
+
+Ces mentions ont été reprises dans le projet de conditions. Le document n’a pas été authentifié en ligne auprès du greffe. Le PDF et les informations personnelles des dirigeants ne sont pas copiés dans le dépôt public.
+
+Le SIRET communiqué 91871039300052 n’apparaît pas dans cet extrait : confirmer son rattachement à l’établissement. Le numéro et le régime de TVA ainsi que le contact contractuel restent à confirmer. L'adresse exploitation@chronoss.fr utilisée pour les tests n'est pas désignée automatiquement comme adresse de réclamation officielle.
+
+L’activité mentionnée comprend transport de marchandises de tous tonnages, location de véhicules avec ou sans chauffeur et cross-docking. L’extrait ne suffit pas à établir que l’objet statutaire et les formalités couvrent l’exploitation de la plateforme : faire vérifier ce point, ainsi que les autorisations et assurances effectives. Il ne vaut pas approbation automatique du dossier transporteur.
 
 Le contrat de banque et les moyens d'encaissement disponibles chez Qonto restent à examiner. Aucun prestataire n'est retenu contractuellement par le projet de conditions.
 
