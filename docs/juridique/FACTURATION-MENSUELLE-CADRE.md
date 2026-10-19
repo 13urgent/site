@@ -2,7 +2,7 @@
 
 **Spécification de travail — 19 octobre 2026. Aucun frais réel créé par ce document.**
 
-Exploitant : CHRONOSS, SAS à associé unique, capital de 12 600,00 €, siège au 27 Boulevard Charles Moretti, 13014 Marseille, RCS Marseille 918 710 393, selon le Kbis fourni à jour au 7 octobre 2026. Le SIRET déclaré 91871039300052 n’est pas indiqué dans cet extrait ; son rattachement reste à confirmer. Numéro de TVA intracommunautaire communiqué par l’exploitant : FR60918710393. Régime fiscal applicable, contact de réclamation et compte bancaire au nom de l’Exploitant restent à confirmer. Le choix du prestataire de paiement reste ouvert ; le compte Qonto peut être conservé. Aucun IBAN ni secret n'est enregistré dans ces documents.
+Exploitant : CHRONOSS, SAS à associé unique, capital de 12 600,00 €, siège au 27 Boulevard Charles Moretti, 13014 Marseille, RCS Marseille 918 710 393, selon le Kbis fourni à jour au 7 octobre 2026. Le SIRET déclaré 91871039300052 n’est pas indiqué dans cet extrait ; son rattachement reste à confirmer. Numéro de TVA intracommunautaire communiqué par l’exploitant : FR60918710393. Contact et réclamations : contact@13urgent.fr (échange aller-retour montré par l’utilisateur). Régime fiscal applicable et compte bancaire au nom de l’Exploitant restent à confirmer. Le choix du prestataire de paiement reste ouvert ; le compte Qonto peut être conservé. Aucun IBAN ni secret n'est enregistré dans ces documents.
 
 ## Décision de modèle
 
