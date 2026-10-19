@@ -1,6 +1,8 @@
 "use strict";
 // Les actions utilisent exclusivement la session utilisateur et les politiques Supabase.
 const DOC_BUCKET='carrier-documents';
+const documentLabels={registration:'Immatriculation / Kbis',transport_licence:'Licence de transport',insurance_rc:'Assurance responsabilité civile',insurance_goods:'Assurance marchandises transportées',other:'Autre document'};
+const documentLabel=kind=>documentLabels[kind]||kind;
 const doc$=id=>document.getElementById(id);
 function docMsg(id,message){const e=doc$(id);e.hidden=false;e.textContent=message;}
 function safeText(v){return String(v??'');}
@@ -42,7 +44,7 @@ async function showMyDocuments(){
     if(generation!==professionalAccessGeneration)return;
     const host=doc$('myDocuments');host.replaceChildren();
     if(!data?.length)line(host,'p','Aucun justificatif envoyé.');
-    for(const d of data){const item=line(host,'div','', 'doc-item');line(item,'strong',d.original_filename||d.document_type);line(item,'span',`${d.document_type} · ${d.review_status}${d.expires_on?' · expire le '+d.expires_on:''}`);}
+    for(const d of data){const item=line(host,'div','', 'doc-item');line(item,'strong',d.original_filename||d.document_type);line(item,'span',`${documentLabel(d.document_type)} · ${d.review_status}${d.expires_on?' · expire le '+d.expires_on:''}`);}
   }catch(e){docMsg('documentNotice','Erreur : '+e.message);}
 }
 async function uploadDocument(e){
@@ -55,6 +57,7 @@ async function uploadDocument(e){
     const allowed={'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png'};
     if(!allowed[file.type])throw Error('Formats autorisés : PDF, JPG et PNG.');
     const kind=doc$('documentType').value;
+    if(!['registration','transport_licence','insurance_rc','insurance_goods'].includes(kind))throw Error('Catégorie de document non prise en charge.');
     const path=`${company.id}/${crypto.randomUUID()}.${allowed[file.type]}`;
     const {error:uploadError}=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:file.type,upsert:false});
     if(uploadError)throw uploadError;
@@ -62,7 +65,7 @@ async function uploadDocument(e){
     if(doc$('documentExpiry').value)row.expires_on=doc$('documentExpiry').value;
     const {error}=await sb.from('carrier_documents').insert(row);
     if(error)throw Error('Fichier envoyé mais fiche non enregistrée : '+error.message+' (contactez 13 URGENT).');
-    doc$('documentForm').reset();await showMyDocuments();docMsg('documentNotice','Document envoyé. Il reste en attente de vérification par 13 URGENT.');
+    doc$('documentForm').reset();await showMyDocuments();docMsg('documentNotice',`Document envoyé dans la catégorie « ${documentLabel(kind)} ». Il reste en attente de vérification par 13 URGENT.`);
   }catch(err){docMsg('documentNotice','Envoi impossible : '+err.message);}finally{btn.disabled=false;}
 }
 async function showAdmin(){
@@ -85,7 +88,7 @@ async function loadAdmin(){
     const items=(docs.data||[]).filter(d=>d.company_id===c.id);
     if(!items.length)line(card,'p','Aucun document déposé.');
     for(const d of items){
-      const row=line(card,'div','', 'doc-item');line(row,'strong',`${d.document_type} — ${d.original_filename||'fichier'}`);
+      const row=line(card,'div','', 'doc-item');line(row,'strong',`${documentLabel(d.document_type)} — ${d.original_filename||'fichier'}`);
       line(row,'span',`Statut : ${d.review_status}${d.expires_on?' · Expiration : '+d.expires_on:''}`);
       const buttons=line(row,'div','', 'doc-actions');
       const view=line(buttons,'button','Voir le fichier','btn secondary');view.type='button';view.onclick=async()=>{
