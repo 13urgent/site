@@ -26,3 +26,9 @@ Abonnements payés, frais de 1,5 % encaissés, factures, contrats, assurance de 
 ## Dernière livraison préparée
 
 Outils de correction des catégories et dates par administrateur, diagnostic des pièces bloquantes, contrôle des dates obligatoires du pilote et signalements privés de prestation. Une seule nouvelle migration à appliquer et trois fichiers d’interface à mettre à jour : voir [la procédure groupée](MISE-A-JOUR-19-OCTOBRE.md). La garantie marchandises de CHRONOSS n’est pas établie par l’attestation RC reçue ; ne pas la déclarer validée pour débloquer le test.
+
+## Préparation de la publication provisoire
+
+Les dix scripts de tests ont été exécutés avec succès : 4 PostgreSQL embarqué et 6 navigateurs, dont le paquet d'hébergement en sous-dossier. Aucune requête de test contre la base distante n'a réussi depuis la session : le proxy retourne toujours CONNECT 403. La dernière migration est annoncée appliquée par l'utilisateur ; cela ne prouve pas la recette réelle complète.
+
+Une version de publication pilote est construite séparément, avec paiements désactivés et inscriptions fermées dans l'interface. Voir DEPLOIEMENT-PILOTE.md pour l'activation Pages et les liens d'e-mail. Aucun DNS OVH n'est modifié.

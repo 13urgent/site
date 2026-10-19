@@ -15,12 +15,13 @@ async function updateAuth(){
  accountDialog.querySelector('h2').textContent=user?'Mon compte':'Connexion / inscription';
  for(const id of ['authEmail','authPassword','accountType'])document.getElementById(id).closest('label').hidden=Boolean(user);
  for(const id of ['signUp','signIn','magicLink'])document.getElementById(id).hidden=Boolean(user);
+ if(window.URGENT_ALLOW_REGISTRATION===false){document.getElementById('signUp').hidden=true;document.getElementById('accountType').closest('label').hidden=true;}
  document.getElementById('passwordSettings').hidden=!user;
- document.getElementById('businessRegistration').hidden=Boolean(user);
+ document.getElementById('businessRegistration').hidden=Boolean(user)||window.URGENT_ALLOW_REGISTRATION===false;
  document.getElementById('accountIdentity').textContent=user?.email||'';
  await updateSubscriptionRequest(user);
 }
-async function action(kind){if(!sb){notify('Connexion Supabase non configurée. Renseignez config.js avec URL et clé publique.');return;}
+async function action(kind){if(kind==='signup'&&window.URGENT_ALLOW_REGISTRATION===false){notify('Les inscriptions publiques ne sont pas ouvertes sur ce pilote.');return;}if(!sb){notify('Connexion Supabase non configurée. Renseignez config.js avec URL et clé publique.');return;}
  const email=document.getElementById('authEmail').value.trim();const password=document.getElementById('authPassword').value;
  if(!email||password.length<8){notify('Saisissez un e-mail valide et un mot de passe de 8 caractères minimum.');return;}
  let res;
@@ -47,6 +48,8 @@ document.getElementById('signOut').addEventListener('click',async()=>{
 });
 
 
+// Conserve le sous-dossier d’hébergement, sans recopier les jetons de l’URL.
+function authReturnUrl(){const target=new URL('.',location.href);return target.pathname==='/'?target.origin:target.href;}
 // Le lien ouvre la même origine HTTP(S) que celle utilisée pour la demande.
 document.getElementById('magicLink').addEventListener('click',async event=>{
  const emailInput=document.getElementById('authEmail');
@@ -55,7 +58,7 @@ document.getElementById('magicLink').addEventListener('click',async event=>{
  if(!['http:','https:'].includes(location.protocol)){notify('Ouvrez le site avec le serveur local HTTP ou son adresse HTTPS.');return;}
  const button=event.currentTarget;button.disabled=true;
  try{
-  const {error}=await sb.auth.signInWithOtp({email:emailInput.value.trim(),options:{shouldCreateUser:false,emailRedirectTo:location.origin}});
+  const {error}=await sb.auth.signInWithOtp({email:emailInput.value.trim(),options:{shouldCreateUser:false,emailRedirectTo:authReturnUrl()}});
   if(error){notify('Envoi impossible : '+error.message);return;}
   notify('Si ce compte peut se connecter, un lien vient d’être envoyé. Ouvrez le dernier e-mail dans ce navigateur et gardez le serveur local lancé.');
  }catch{notify('Service inaccessible. Aucun envoi ne peut être confirmé.');}finally{button.disabled=false;}
@@ -100,7 +103,7 @@ let subscriptionView=0;
 async function updateSubscriptionRequest(user){
  const view=++subscriptionView;subscriptionRequest.hidden=true;saveSubscription.hidden=true;
  subscriptionRequest.querySelectorAll('input').forEach(input=>input.checked=false);
- if(!user){subscriptionRequest.hidden=document.getElementById('accountType').value!=='carrier';return;}
+ if(!user){subscriptionRequest.hidden=window.URGENT_ALLOW_REGISTRATION===false||document.getElementById('accountType').value!=='carrier';return;}
  const result=await sb.from('profiles').select('role').eq('id',user.id).maybeSingle();
  if(view!==subscriptionView||result.error||result.data?.role!=='carrier')return;
  subscriptionRequest.hidden=false;saveSubscription.hidden=false;
