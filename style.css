@@ -36,3 +36,5 @@
 .test-badge{display:block;padding:10px;background:#fff0d6;color:#583b00;border:1px solid #e7c87a;border-radius:6px;font-size:12px}
 
 #billing-tests{border:2px solid #e7c87a}#billing-tests>label{display:grid;gap:10px;margin:18px 0}#billing-tests .professional-check{display:flex;align-items:flex-start;gap:10px}#billing-tests select{padding:12px;border:1px solid #ccc;border-radius:7px}
+
+.footer-contact a{text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}.footer-contact a:hover{color:#fff}.footer-contact a:focus-visible{outline:2px solid currentColor;outline-offset:4px}
