@@ -32,3 +32,5 @@
 .pilot-banner{margin:0;padding:14px 5%;background:#fff0d6;color:#583b00;text-align:center;font-size:13px;line-height:1.5}
 
 .incident-form{display:grid;gap:12px;margin:14px 0}.incident-form label{display:grid;gap:8px;font-size:13px}.incident-form textarea{width:100%;padding:12px;border:1px solid #ccc;border-radius:7px;min-height:100px}.shipment-incidents{margin-top:20px}
+
+.test-badge{display:block;padding:10px;background:#fff0d6;color:#583b00;border:1px solid #e7c87a;border-radius:6px;font-size:12px}

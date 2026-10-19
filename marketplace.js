@@ -32,6 +32,7 @@
    for(const result of results)if(result.error)throw result.error;
    state.user=current.data.user;state.profile=profile.data;
    const canPublish=['client','admin'].includes(profile.data.role);
+   $('testShipmentChoice').hidden=profile.data.role!=='admin';
    $('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=!canPublish);
    if(!canPublish)notice('formNotice','Ce compte est transporteur. Les demandes sont déposées par un compte donneur d’ordre distinct.');
    [state.shipments,state.offers,state.private,state.events,state.incidents]=results.map(r=>r.data||[]);
@@ -43,11 +44,11 @@
   const visible=state.shipments.filter(s=>s.status==='open'&&(!vehicle||s.vehicle===vehicle)&&(!query||`${s.origin} ${s.destination}`.toLocaleLowerCase('fr').includes(query)));
   notice('courseCount',`${visible.length} course(s) ouverte(s) affichée(s). Pilote gratuit, 100 courses maximum par chargement.`);
   for(const s of visible){
-   const card=make('article',undefined,'shipment');const info=make('div');info.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${date(s.pickup)} · ${s.vehicle} · ${s.pallets} palette(s) · ${s.weight} kg`));card.append(info);
+   const card=make('article',undefined,'shipment');const info=make('div');if(s.is_test)info.append(make('strong','EXERCICE FICTIF — AUCUN TRANSPORT RÉEL','test-badge'));info.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${date(s.pickup)} · ${s.vehicle} · ${s.pallets} palette(s) · ${s.weight} kg`));card.append(info);
    if(state.profile?.role==='carrier'&&s.owner_company_id!==state.profile.company_id){
     const existing=state.offers.find(o=>o.shipment_id===s.id&&o.carrier_company_id===state.profile.company_id);
     if(existing)info.append(make('p',`Votre proposition : ${money(existing.amount_ht)} HT · ${existing.status==='withdrawn'?'retirée':'enregistrée'}`));
-    const form=make('form',undefined,'offer-pilot-form');const label=make('label','Votre tarif HT à recevoir (€)');const input=make('input');input.type='number';input.min='0.01';input.max='1000000';input.step='0.01';input.required=true;input.value=existing?.amount_ht||'';label.append(input);const submit=make('button','Enregistrer mon offre confidentielle','btn primary');submit.type='submit';form.append(label,submit);
+    const form=make('form',undefined,'offer-pilot-form');const label=make('label',s.is_test?'Tarif fictif de test (€ HT)':'Votre tarif HT à recevoir (€)');const input=make('input');input.type='number';input.min='0.01';input.max='1000000';input.step='0.01';input.required=true;input.value=existing?.amount_ht||'';label.append(input);const submit=make('button','Enregistrer mon offre confidentielle','btn primary');submit.type='submit';form.append(label,submit);
     form.onsubmit=async event=>{event.preventDefault();if(!form.reportValidity())return;submit.disabled=true;try{await rpc('urgent_submit_offer',{p_shipment:s.id,p_amount:input.value});await refresh();notice('trackingNotice','Offre enregistrée. Les autres transporteurs ne peuvent pas consulter votre prix.');}catch(e){notice('trackingNotice','Offre refusée : '+e.message);}finally{submit.disabled=false;}};
     card.append(form);
     if(existing?.status==='submitted')card.append(button('Retirer mon offre',async()=>{if(!confirm('Retirer cette proposition ?'))return;await rpc('urgent_withdraw_offer',{p_offer:existing.id});await refresh();}));
@@ -64,7 +65,7 @@
   const host=$('shipmentTracking');host.replaceChildren();const company=state.profile?.company_id;
   const rows=state.shipments.filter(s=>s.owner_company_id===company||s.assigned_company_id===company||state.profile?.role==='admin');
   for(const s of rows){
-   const card=make('article',undefined,'dossier');card.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${labels[s.status]} · ${s.id}`));
+   const card=make('article',undefined,'dossier');if(s.is_test)card.append(make('strong','EXERCICE FICTIF — AUCUN TRANSPORT RÉEL','test-badge'));card.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${labels[s.status]} · ${s.id}`));
    const contact=state.private.find(p=>p.shipment_id===s.id);if(contact){card.append(make('p',`Contact donneur d’ordre : ${contact.company_name} · ${contact.contact_email}`));if(contact.instructions)card.append(make('p',contact.instructions));}
    if(s.owner_company_id===company&&s.status==='open'){
     const offers=state.offers.filter(o=>o.shipment_id===s.id&&o.status==='submitted');
@@ -94,7 +95,7 @@
  }
  $('shipmentForm').onsubmit=async event=>{
   event.preventDefault();const form=event.currentTarget;if(!form.reportValidity())return;const button=event.submitter;button.disabled=true;
-  try{const f=new FormData(form);await rpc('urgent_publish_shipment',{p_origin:String(f.get('origin')).trim(),p_destination:String(f.get('destination')).trim(),p_pickup:new Date(String(f.get('pickup'))).toISOString(),p_vehicle:f.get('vehicle'),p_pallets:Number(f.get('pallets')),p_weight:Number(f.get('weight')),p_company_name:String(f.get('company')).trim(),p_email:String(f.get('email')).trim(),p_instructions:String(f.get('notes')).trim()});form.reset();await refresh();notice('formNotice','Course publiée dans le pilote gratuit. Les coordonnées et instructions privées ne sont accessibles qu’aux parties après attribution.');}catch(e){notice('formNotice','Publication refusée : '+e.message);}finally{button.disabled=false;}
+  try{const isTest=$('testShipmentInput').checked&&state.profile?.role==='admin';const f=new FormData(form);await rpc($('testShipmentInput').checked&&state.profile?.role==='admin'?'urgent_publish_test_shipment':'urgent_publish_shipment',{p_origin:String(f.get('origin')).trim(),p_destination:String(f.get('destination')).trim(),p_pickup:new Date(String(f.get('pickup'))).toISOString(),p_vehicle:f.get('vehicle'),p_pallets:Number(f.get('pallets')),p_weight:Number(f.get('weight')),p_company_name:String(f.get('company')).trim(),p_email:String(f.get('email')).trim(),p_instructions:String(f.get('notes')).trim()});form.reset();await refresh();notice('formNotice',isTest?'Exercice fictif publié. Aucun transport réel ni paiement.':'Course publiée dans le pilote gratuit. Les coordonnées et instructions privées ne sont accessibles qu’aux parties après attribution.');}catch(e){notice('formNotice','Publication refusée : '+e.message);}finally{button.disabled=false;}
  };
  async function renderPilotDirectory(){
   const generation=state.generation;
@@ -125,6 +126,9 @@
  $('courseFilters').onsubmit=e=>e.preventDefault();$('courseSearch').oninput=render;$('courseVehicle').onchange=render;
  $('exportShipments').textContent='Exporter les anciennes demandes locales';
  $('exportShipments').onclick=()=>{const raw=localStorage.getItem('13urgent_demo_shipments_v1')||'[]';const url=URL.createObjectURL(new Blob([raw],{type:'application/json'}));const a=make('a');a.href=url;a.download='13urgent-anciennes-demandes-locales.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+ const testChoice=make('label',undefined,'professional-check wide');testChoice.id='testShipmentChoice';testChoice.hidden=true;
+ const testInput=make('input');testInput.type='checkbox';testInput.id='testShipmentInput';testChoice.append(testInput,make('span','Créer un exercice fictif sans transport réel (administrateur uniquement).'));
+ $('shipmentForm').prepend(testChoice);
  const shipmentSiret=$('shipmentForm').elements.siret;shipmentSiret.required=false;shipmentSiret.closest('label').hidden=true;
  const refreshButton=button('Actualiser les courses et le suivi',refresh);$('courseFilters').after(refreshButton);
  const banner=make('p','Pilote professionnel gratuit — aucun paiement, abonnement payé ou frais de mise en relation activé.','pilot-banner');document.querySelector('main').prepend(banner);
