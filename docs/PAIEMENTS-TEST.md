@@ -1,5 +1,9 @@
 # Préparation des paiements — 19 octobre 2026
 
+## Décision du 20 octobre : facturation existante et virements manuels
+
+CHRONOSS utilisera son outil de facturation existant et adressera son RIB aux transporteurs après leur demande. Les droits seront activés manuellement après crédit bancaire effectif et contrôles, pour une période déterminée. Aucune intégration Stripe n’est nécessaire pour ce mode. Ce module reste une préparation historique désactivée. Voir [OUVERTURE-MANUELLE.md](OUVERTURE-MANUELLE.md).
+
 ## Évolution du modèle : facturation mensuelle retenue
 
 Après cette préparation, l’utilisateur a choisi le cumul des frais donneur d’ordre sur un mois complet, puis une facture unique en fin de mois. Le paiement unitaire des frais décrit plus bas est donc un ancien parcours de test, à ne pas ouvrir commercialement. Le choix du prestataire reste ouvert ; Qonto peut rester le compte bancaire de l’exploitant. Voir le [projet contractuel](juridique/CGU-CGV-PROJET.md) et le [cadre mensuel à implémenter](juridique/FACTURATION-MENSUELLE-CADRE.md). Aucun registre de créances ni facture mensuelle n’est implémenté par ces documents.

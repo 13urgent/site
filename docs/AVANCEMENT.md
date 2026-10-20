@@ -1,5 +1,9 @@
 # Point d'avancement — 19 octobre 2026
 
+## Décisions d’exploitation du 20 octobre 2026
+
+CHRONOSS utilisera son outil de facturation existant. Les abonnements transporteurs seront réglés par virement après demande et envoi du RIB, puis activés manuellement après rapprochement bancaire et contrôle documentaire. Stripe n’est pas retenu comme préalable au démarrage. L’utilisateur rapporte un avis favorable de son expert-comptable sur les conditions ; il demande d’attendre OVH pour le domaine. Le test d’inscription CHRONOSS est acquis, mais le config.js publié masque encore les inscriptions publiques et l’administration ne gère que l’accès pilote gratuit. Voir [le fonctionnement retenu et les adaptations restantes](OUVERTURE-MANUELLE.md). Aucun encaissement ni abonnement commercial activé par cette documentation.
+
 ## Conditions commerciales et facturation mensuelle — préparation
 
 Le Kbis fourni (à jour au 7 octobre 2026) a permis de compléter les conditions v2 : CHRONOSS, SAS à associé unique, capital 12 600,00 €, siège 27 Boulevard Charles Moretti, 13014 Marseille, RCS Marseille 918 710 393. Numéro de TVA communiqué et ajouté : FR60918710393 (clé numérique cohérente, validité administrative non vérifiée). Contact contractuel retenu : contact@13urgent.fr ; l’utilisateur a montré un échange aller-retour après configuration Outlook. Cela ne valide pas le SMTP automatique du site ni la délivrabilité générale. Régime fiscal et rattachement du SIRET restent à confirmer. Aucun PDF ni renseignement personnel de dirigeant n’est publié.

@@ -33,6 +33,10 @@ Le pilote ajoute une autorisation propre, distincte des états existants et des 
 
 Le modèle retenu pour les donneurs d’ordre est désormais le cumul mensuel des frais de 1,5 % HT, puis une facture unique de fin de mois. [Projet de CGU/CGV CHRONOSS](docs/juridique/CGU-CGV-PROJET.md), [règles mensuelles à implémenter](docs/juridique/FACTURATION-MENSUELLE-CADRE.md) et [validations restantes](docs/juridique/VALIDATION-AVANT-PUBLICATION.md). Ces documents ne sont pas publiés ni applicables au pilote gratuit ; le parcours mensuel reste à développer et les mentions à compléter.
 
+## Mode d’exploitation retenu
+
+Factures émises avec l’outil CHRONOSS existant ; abonnements transporteurs réglés par virement et activés manuellement après rapprochement et vérification documentaire. [Décisions et écarts techniques à traiter](docs/OUVERTURE-MANUELLE.md). Le module Stripe ci-dessous reste désactivé et ne constitue plus un préalable au démarrage.
+
 ## Préparation des paiements
 
 Un module Stripe **test uniquement** est préparé, désactivé par défaut. Il sépare les abonnements et les frais de 1,5 % sans encaisser le prix du transport. Aucun paiement ne valide les documents ou les accès. [Branchement sécurisé, recette et conditions restantes](docs/PAIEMENTS-TEST.md).
