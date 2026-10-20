@@ -11,4 +11,4 @@ window.URGENT_MARKETPLACE_PILOT = true;
 window.URGENT_BILLING_TEST_UI = false;
 
 // Ouverture des demandes professionnelles distincte des droits et du mode commercial.
-window.URGENT_ALLOW_REGISTRATION = false;
+window.URGENT_ALLOW_REGISTRATION = true;
