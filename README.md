@@ -31,7 +31,11 @@ Le pilote ajoute une autorisation propre, distincte des états existants et des 
 
 ## Conditions professionnelles en préparation
 
-Le modèle retenu pour les donneurs d’ordre est désormais le cumul mensuel des frais de 1,5 % HT, puis une facture unique de fin de mois. [Projet de CGU/CGV CHRONOSS](docs/juridique/CGU-CGV-PROJET.md), [règles mensuelles à implémenter](docs/juridique/FACTURATION-MENSUELLE-CADRE.md) et [validations restantes](docs/juridique/VALIDATION-AVANT-PUBLICATION.md). Ces documents ne sont pas publiés ni applicables au pilote gratuit ; le parcours mensuel reste à développer et les mentions à compléter.
+Le modèle retenu pour les donneurs d’ordre est désormais le cumul mensuel des frais de 1,5 % HT, puis une facture unique de fin de mois. [Projet de CGU/CGV CHRONOSS](docs/juridique/CGU-CGV-PROJET.md), [règles mensuelles à implémenter](docs/juridique/FACTURATION-MENSUELLE-CADRE.md) et [validations restantes](docs/juridique/VALIDATION-AVANT-PUBLICATION.md). Ces documents ne sont pas publiés ni applicables au pilote gratuit ; le parcours mensuel est implémenté et testé localement ; la migration distante et la recette avant ouverture restent nécessaires.
+
+## Mise à jour du 20 octobre — virements et facturation CHRONOSS
+
+Le module manuel est implémenté et testé localement : périodes payées, contrôle documentaire et quotas, frais à 1,5 %, cumul mensuel et export pour l'outil existant. [Installation groupée et état réel](docs/MISE-A-JOUR-20-OCTOBRE.md). Une migration distante reste nécessaire ; ni l'ouverture commerciale ni le domaine ne sont modifiés automatiquement. La variante `--open-registration` prépare les inscriptions publiques ; la variante par défaut les garde masquées pendant l'attente OVH.
 
 ## Mode d’exploitation retenu
 

@@ -1,5 +1,9 @@
 # Ouverture avec facturation CHRONOSS et virements — décision du 20 octobre 2026
 
+## Livraison du développement
+
+Les adaptations décrites plus bas sont désormais implémentées et testées localement : périodes après virement, contrôle des droits et quotas, frais et cumul mensuels, export et rapprochement avec les factures externes. Voir [la procédure groupée du 20 octobre](MISE-A-JOUR-20-OCTOBRE.md). La migration n'est pas appliquée à distance par cette session ; l'état initial ci-dessous est conservé pour contexte, pas comme description du code livré.
+
 ## Fonctionnement retenu par l'exploitant
 
 L'exploitant confirme disposer déjà d'un système de facturation chez CHRONOSS. Il rapporte un retour favorable de son expert-comptable sur les conditions. Cette information est retenue dans le projet, sans revendiquer un audit indépendant de ce retour ou de son périmètre.

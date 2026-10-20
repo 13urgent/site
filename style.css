@@ -38,3 +38,5 @@
 #billing-tests{border:2px solid #e7c87a}#billing-tests>label{display:grid;gap:10px;margin:18px 0}#billing-tests .professional-check{display:flex;align-items:flex-start;gap:10px}#billing-tests select{padding:12px;border:1px solid #ccc;border-radius:7px}
 
 .footer-contact a{text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}.footer-contact a:hover{color:#fff}.footer-contact a:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+
+#manualCommerce form{margin:24px 0}#manualCommerce h3{margin-top:32px}#manualCommerce .professional-check{display:flex;gap:10px;align-items:flex-start;margin:16px 0}#manualCommerce>p{max-width:850px}#commercialReport{max-height:420px;overflow:auto}#commercialOwn p,#commercialPeriods p,#commercialReport label{overflow-wrap:anywhere}

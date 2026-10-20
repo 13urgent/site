@@ -1,6 +1,6 @@
 # Dossier de validation avant publication des conditions
 
-Version de travail : PRO-B2B-2026-10-19-v2. Ces documents ne sont pas déployés sur le site public et n'y sont pas proposés à l'acceptation.
+Version de travail : PRO-B2B-2026-10-20-v3. Une version HTML des conditions commerciales est préparée pour le site ; les notes internes restent exclues. L’application effective requiert l’installation du module et l’ouverture du mode commercial, avec acceptation enregistrée côté serveur.
 
 ## Documents remis
 

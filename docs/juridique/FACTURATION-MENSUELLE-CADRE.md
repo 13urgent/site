@@ -4,6 +4,10 @@
 
 Exploitant : CHRONOSS, SAS à associé unique, capital de 12 600,00 €, siège au 27 Boulevard Charles Moretti, 13014 Marseille, RCS Marseille 918 710 393, selon le Kbis fourni à jour au 7 octobre 2026. Le SIRET déclaré 91871039300052 n’est pas indiqué dans cet extrait ; son rattachement reste à confirmer. Numéro de TVA intracommunautaire communiqué par l’exploitant : FR60918710393. Contact et réclamations : contact@13urgent.fr (échange aller-retour montré par l’utilisateur). Régime fiscal applicable et compte bancaire au nom de l’Exploitant restent à confirmer. Le choix du prestataire de paiement reste ouvert ; le compte Qonto peut être conservé. Aucun IBAN ni secret n'est enregistré dans ces documents.
 
+## État du développement au 20 octobre
+
+Le module de registre des frais, périodes après virement, cumul client et export mensuel est désormais développé et testé localement. CHRONOSS émet les factures/avoirs, rapproche les règlements et effectue les relances dans ses outils existants ; le site conserve leurs références. [Installation et limites](../MISE-A-JOUR-20-OCTOBRE.md). Les rubriques suivantes conservent le cadre de conception initial ; elles ne constituent pas une affirmation que toute automatisation décrite est livrée. Le mode commercial et la migration distante ne sont pas activés par la rédaction de ce cadre.
+
 ## Décision de modèle
 
 Le donneur d'ordre professionnel publie gratuitement et paie 1,5 % HT du transport HT pour chaque mise en relation aboutie. Les frais s'accumulent sur le mois civil à l'heure de Paris. Une facture regroupe les frais à la clôture du mois, avec échéance proposée à 7 jours de sa date d'émission. Pas de paiement par carte des frais à chaque course. Le transport reste facturé et payé directement entre client et transporteur.

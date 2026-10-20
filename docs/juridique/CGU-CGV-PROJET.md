@@ -1,6 +1,6 @@
 # 13 URGENT — Conditions générales d'utilisation et de vente professionnelles
 
-**PROJET DE TRAVAIL — version PRO-B2B-2026-10-19-v2 — non applicable au pilote gratuit.**
+**PROJET DE TRAVAIL — version PRO-B2B-2026-10-20-v3 — non applicable au pilote gratuit.**
 
 Ce document prépare le futur service commercial. Il n'a pas été validé par un avocat et ne doit pas être présenté comme une conformité acquise. Confirmer le régime fiscal applicable et les informations d’établissement restantes, faire vérifier le texte et la qualification de l'activité réelle, puis implémenter les fonctions décrites avant de proposer son acceptation. Les fonctions commerciales ci-dessous ne sont pas toutes disponibles aujourd'hui.
 

@@ -7,6 +7,7 @@ import shutil
 root = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
 parser.add_argument('--output', required=True)
+parser.add_argument('--open-registration', action='store_true', help='Ouvrir les demandes professionnelles ; ne change pas le mode commercial en base.')
 args = parser.parse_args()
 output = Path(args.output).resolve()
 if output == root or root in output.parents or output in root.parents:
@@ -14,7 +15,7 @@ if output == root or root in output.parents or output in root.parents:
 output.mkdir(parents=True, exist_ok=True)
 if any(output.iterdir()):
     raise SystemExit('Le dossier de sortie doit être vide pour préserver les fichiers existants.')
-files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js','billing.js','documents.js','imports.js']
+files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js','manual-commerce.js','conditions-professionnelles.html','conditions-professionnelles-v3.html','billing.js','documents.js','imports.js']
 for name in files:
     shutil.copy2(root / name, output / name)
 (output / 'assets').mkdir()
@@ -26,12 +27,13 @@ if count != 1:
 config, billing_count = re.subn(r'window\.URGENT_BILLING_TEST_UI\s*=\s*(?:true|false)\s*;', 'window.URGENT_BILLING_TEST_UI = false;', config)
 if billing_count != 1:
     raise SystemExit('Commutateur des paiements de test introuvable dans config.js.')
-config += '\n// Le pilote public utilise les comptes existants ; aucun paiement.\nwindow.URGENT_ALLOW_REGISTRATION = false;\n'
+config += '\n// Ouverture des demandes professionnelles distincte des droits et du mode commercial.\nwindow.URGENT_ALLOW_REGISTRATION = '+('true' if args.open_registration else 'false')+';\n'
 (output / 'config.js').write_text(config)
 html = (output / 'index.html').read_text()
 html = html.replace('<head>', '<head><meta name="robots" content="noindex,nofollow">', 1)
-html = html.replace('Connexion / inscription', 'Connexion au pilote')
+if not args.open_registration:
+    html = html.replace('Connexion / inscription', 'Connexion au pilote')
 (output / 'index.html').write_text(html)
 (output / '.nojekyll').write_text('')
 (output / 'robots.txt').write_text('User-agent: *\nDisallow: /\n')
-print('Version pilote créée : paiements désactivés, inscription masquée, aucune pièce justificative copiée.')
+print('Version créée : paiement Stripe désactivé, inscriptions '+('ouvertes aux demandes professionnelles' if args.open_registration else 'masquées')+', aucune pièce justificative copiée. Le mode commercial reste contrôlé en base.')

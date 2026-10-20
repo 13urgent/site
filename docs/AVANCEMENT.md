@@ -1,5 +1,11 @@
 # Point d'avancement — 19 octobre 2026
 
+## Livraison technique du 20 octobre — mode manuel
+
+Validation : 15 scripts de tests réussis localement (SQL, HTTP simulé et navigateur), dont les deux nouveaux parcours commerce manuel ; la publication est aussi vérifiée avec inscriptions fermées puis ouvertes. L’empreinte des conditions HTML correspond à celle enregistrée dans la migration. Aucun test bancaire ou encaissement réel n’est revendiqué.
+
+Abonnements après virement avec période et quota contrôlés côté serveur, acceptation des conditions v3, attributions commerciales avec frais de 1,5 % HT, cumul mensuel privé et export CSV pour l'outil CHRONOSS, corrections et références de factures externes : implémentés et testés localement. Voir [la mise à jour groupée](MISE-A-JOUR-20-OCTOBRE.md). La migration unique reste à appliquer au projet réel : le proxy refuse toujours l'accès Supabase. La préparation conserve le pilote gratuit et les inscriptions masquées dans la variante d'attente ; aucune ouverture commerciale ni intervention OVH n'est réalisée par cette session.
+
 ## Décisions d’exploitation du 20 octobre 2026
 
 CHRONOSS utilisera son outil de facturation existant. Les abonnements transporteurs seront réglés par virement après demande et envoi du RIB, puis activés manuellement après rapprochement bancaire et contrôle documentaire. Stripe n’est pas retenu comme préalable au démarrage. L’utilisateur rapporte un avis favorable de son expert-comptable sur les conditions ; il demande d’attendre OVH pour le domaine. Le test d’inscription CHRONOSS est acquis, mais le config.js publié masque encore les inscriptions publiques et l’administration ne gère que l’accès pilote gratuit. Voir [le fonctionnement retenu et les adaptations restantes](OUVERTURE-MANUELLE.md). Aucun encaissement ni abonnement commercial activé par cette documentation.

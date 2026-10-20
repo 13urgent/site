@@ -6,7 +6,7 @@ CHRONOSS utilisera son outil de facturation existant et adressera son RIB aux tr
 
 ## Évolution du modèle : facturation mensuelle retenue
 
-Après cette préparation, l’utilisateur a choisi le cumul des frais donneur d’ordre sur un mois complet, puis une facture unique en fin de mois. Le paiement unitaire des frais décrit plus bas est donc un ancien parcours de test, à ne pas ouvrir commercialement. Le choix du prestataire reste ouvert ; Qonto peut rester le compte bancaire de l’exploitant. Voir le [projet contractuel](juridique/CGU-CGV-PROJET.md) et le [cadre mensuel à implémenter](juridique/FACTURATION-MENSUELLE-CADRE.md). Aucun registre de créances ni facture mensuelle n’est implémenté par ces documents.
+Après cette préparation, l’utilisateur a choisi le cumul des frais donneur d’ordre sur un mois complet, puis une facture unique en fin de mois. Le paiement unitaire des frais décrit plus bas est donc un ancien parcours de test, à ne pas ouvrir commercialement. Le choix du prestataire reste ouvert ; Qonto peut rester le compte bancaire de l’exploitant. Voir le [projet contractuel](juridique/CGU-CGV-PROJET.md) et le [cadre mensuel à implémenter](juridique/FACTURATION-MENSUELLE-CADRE.md). Le registre des frais, les périodes manuelles et le relevé mensuel sont désormais implémentés dans la mise à jour du 20 octobre ; les factures restent émises avec l’outil CHRONOSS existant. Voir [la procédure groupée](MISE-A-JOUR-20-OCTOBRE.md).
 
 ## État et modèle
 
