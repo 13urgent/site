@@ -40,3 +40,7 @@ Tester https://13urgent.fr/ et https://www.13urgent.fr/, logo, contact, conditio
 Dans Supabase Authentication → URL Configuration, ajouter https://13urgent.fr/ et https://www.13urgent.fr/ aux Redirect URLs sans retirer les adresses de recette existantes. Définir la Site URL définitive sur https://13urgent.fr/ lors du basculement. Vérifier les e-mails de confirmation et liens de connexion ; leur configuration ne se déduit pas du DNS Web.
 
 Envoyer et recevoir un message de test contact@13urgent.fr après raccordement. Les MX/SPF/DKIM restent inchangés. Ne publier les vidéos de lancement qu’après vérification du parcours réellement ouvert.
+
+## Résultat confirmé par captures utilisateur
+
+GitHub affiche DNS check successful puis certificat activé (3/3) et Enforce HTTPS coché. L’utilisateur ouvre 13urgent.fr sans alerte et se connecte avec ses comptes administrateur et transporteur. Supabase Site URL indique https://13urgent.fr ; Redirect URLs conserve la racine avec/sans barre finale, www avec barre finale et l’adresse locale existante. Le test de connexion administrateur est annoncé réussi. Le fonctionnement des e-mails et inscriptions des nouveaux comptes doit être vérifié séparément ; ne pas déduire leur réussite de celle des comptes existants.

@@ -1,5 +1,11 @@
 # Point d'avancement — 19 octobre 2026
 
+## Ouverture des inscriptions professionnelles demandée le 20 octobre
+
+Après raccordement HTTPS et vérification des connexions administrateur/transporteur sur 13urgent.fr, l’utilisateur demande explicitement l’ouverture des inscriptions publiques. La variante de publication est construite avec `--open-registration` : donneurs d’ordre et transporteurs professionnels peuvent demander un compte, avec SIRET et déclaration d’activité. Cela ne valide ni entreprise, ni document, ni abonnement et n’active pas le mode commercial. Pour les prochaines publications, conserver `--open-registration` afin de ne pas refermer ces demandes par le défaut conservateur du constructeur.
+
+Les captures utilisateur confirment le dossier CHRONOSS admissible au pilote avec Kbis approuvé, licence datée au 26/09/2029 et assurances RC/marchandises datées au 31/12/2026. Ce constat logiciel n’est pas une authentification indépendante des pièces ni une garantie générale de couverture.
+
 ## Livraison technique du 20 octobre — mode manuel
 
 Validation : 15 scripts de tests réussis localement (SQL, HTTP simulé et navigateur), dont les deux nouveaux parcours commerce manuel ; la publication est aussi vérifiée avec inscriptions fermées puis ouvertes. L’empreinte des conditions HTML correspond à celle enregistrée dans la migration. Aucun test bancaire ou encaissement réel n’est revendiqué.

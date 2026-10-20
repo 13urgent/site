@@ -4,6 +4,10 @@ Site statique HTML/CSS/JavaScript avec Supabase pour les comptes, les justificat
 
 **Les paiements, abonnements payés et réservations commerciales ne sont pas activés.** Le taux de mise en relation envisagé pour les donneurs d'ordre professionnels est de 1,5 % HT du tarif HT du transport. Les conditions contractuelles et la TVA restent à valider.
 
+## Publication actuelle
+
+Le domaine `13urgent.fr` est raccordé à GitHub Pages avec HTTPS, selon les vérifications utilisateur. Les inscriptions professionnelles sont ouvertes à sa demande le 20 octobre ; les droits d’accès restent contrôlés par Supabase et l’administration. **Conserver `--open-registration` lors des prochaines constructions** ; le défaut du constructeur reste fermé par précaution. Préserver les dossiers `videos/` et le fichier `CNAME` lors de la publication. L’ouverture des inscriptions ne change pas le mode commercial en base.
+
 ## Démarrer
 
 Sous Windows : extraire le dépôt complet, conserver les dossiers `assets`, puis lancer `start-local.cmd` (Python installé dans PATH). Garder la fenêtre ouverte et saisir l'adresse indiquée dans le navigateur. Ne pas utiliser `file://` pour valider les connexions.
