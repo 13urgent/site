@@ -34,6 +34,8 @@ html = html.replace('<head>', '<head><meta name="robots" content="noindex,nofoll
 if not args.open_registration:
     html = html.replace('Connexion / inscription', 'Connexion au pilote')
 (output / 'index.html').write_text(html)
+if (root / 'CNAME').exists():
+    shutil.copy2(root / 'CNAME', output / 'CNAME')
 (output / '.nojekyll').write_text('')
 (output / 'robots.txt').write_text('User-agent: *\nDisallow: /\n')
 print('Version créée : paiement Stripe désactivé, inscriptions '+('ouvertes aux demandes professionnelles' if args.open_registration else 'masquées')+', aucune pièce justificative copiée. Le mode commercial reste contrôlé en base.')
