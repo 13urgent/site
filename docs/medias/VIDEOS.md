@@ -16,3 +16,11 @@ Recette locale : lecteurs HTML chargent les deux fichiers avec dimensions et dur
 Sources originales et rendus conservés dans /workspace/13urgent-videos/. Le fichier page-telechargement-videos.html est une copie du HTML publié pour faciliter sa maintenance. Les binaires sont uniquement sur gh-pages et dans le dossier de travail, pas dans main.
 
 Attention : tools/build_pilot.py reconstruit le site de base sans inclure videos/. Tout futur déploiement doit préserver ce dossier de publication ; ne pas le supprimer lors d'un remplacement global de l'arborescence. Le constructeur refusait déjà les fichiers inconnus lors du script de publication utilisé en session ; conserver cette vérification ou intégrer explicitement les médias.
+
+## Versions commerciales préparées le 20 octobre en vue du 21 octobre
+
+Nouvelle page : https://13urgent.fr/videos/commerciales/ ; ZIP : https://13urgent.fr/videos/commerciales/13urgent-videos-commerciales.zip . Donneurs d’ordre 27 s (1,5 % HT sur transport HT, TVA en sus et facture mensuelle CHRONOSS), transporteurs 24 s (propositions confidentielles, forfait et activation après validation du dossier et vérification du virement).
+
+Ces versions utilisent le même visuel illustratif IA et le logo, avec un nouveau montage de titres et musique originale. Toujours sans voix off parlée ; scripts fournis dans le ZIP. Aucune diffusion sociale automatique. Elles sont destinées à la diffusion après activation et vérification du mode commercial, actuellement laissé désactivé pour la pause de l’exploitant. Les anciens liens /site/videos/ ne sont plus la référence après raccordement : utiliser https://13urgent.fr/videos/ .
+
+Décodage complet des deux MP4 vérifié (H.264/AAC, 1080×1920) ; scène du pourcentage contrôlée visuellement. Lecteurs et téléchargement du ZIP vérifiés dans Chromium aux largeurs mobile et ordinateur. Sources et exports conservés dans /workspace/13urgent-videos-commerciales-20261020/ .
