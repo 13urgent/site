@@ -10,5 +10,5 @@ window.URGENT_MARKETPLACE_PILOT = true;
 // À activer uniquement après déploiement des fonctions et configuration Stripe TEST.
 window.URGENT_BILLING_TEST_UI = false;
 
-// Le pilote public utilise les comptes existants ; aucun paiement.
+// Ouverture des demandes professionnelles distincte des droits et du mode commercial.
 window.URGENT_ALLOW_REGISTRATION = false;
