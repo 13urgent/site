@@ -2,6 +2,8 @@
 
 ## Ouverture des inscriptions professionnelles demandée le 20 octobre
 
+Recette réelle confirmée par l’utilisateur : inscription avec une adresse différente des comptes existants, réception du mail de confirmation, lien fonctionnel et connexion réussie sur 13urgent.fr. Un premier essai réutilisait un compte existant ; il ne validait pas une nouvelle inscription. Une limite temporaire entre demandes a été rencontrée puis dépassée sans modifier les protections. Le mode commercial reste désactivé.
+
 Après raccordement HTTPS et vérification des connexions administrateur/transporteur sur 13urgent.fr, l’utilisateur demande explicitement l’ouverture des inscriptions publiques. La variante de publication est construite avec `--open-registration` : donneurs d’ordre et transporteurs professionnels peuvent demander un compte, avec SIRET et déclaration d’activité. Cela ne valide ni entreprise, ni document, ni abonnement et n’active pas le mode commercial. Pour les prochaines publications, conserver `--open-registration` afin de ne pas refermer ces demandes par le défaut conservateur du constructeur.
 
 Les captures utilisateur confirment le dossier CHRONOSS admissible au pilote avec Kbis approuvé, licence datée au 26/09/2029 et assurances RC/marchandises datées au 31/12/2026. Ce constat logiciel n’est pas une authentification indépendante des pièces ni une garantie générale de couverture.
