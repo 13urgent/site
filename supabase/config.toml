@@ -5,3 +5,7 @@ verify_jwt = false
 
 [functions.billing-webhook]
 verify_jwt = false
+
+# Authentification par secret serveur distinct, vérifiée dans la fonction.
+[functions.registration-alerts]
+verify_jwt = false

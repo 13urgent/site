@@ -32,3 +32,7 @@ node tests/external-drafts-browser.cjs
 ```
 
 Le proxy de cette session refuse encore les requêtes Supabase avec CONNECT 403. Aucune clé privée n'est nécessaire dans le JavaScript public.
+
+## Alertes d'inscription (préparées le 21 octobre)
+
+Migration `202610210001_registration_alerts.sql`, fonction `registration-alerts` et planification : voir [installation, recette et arrêt](../docs/ALERTES-INSCRIPTIONS.md). Préparé/testé localement seulement ; destinataire demandé : saschronoss@outlook.com. Aucun envoi ni activation à distance effectué. Le [projet d'assistant de validation](../docs/VALIDATION-AUTOMATIQUE-TRANSPORTEURS.md) est distinct et n'est pas encore implémenté.
