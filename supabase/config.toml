@@ -9,3 +9,7 @@ verify_jwt = false
 # Authentification par secret serveur distinct, vérifiée dans la fonction.
 [functions.registration-alerts]
 verify_jwt = false
+
+# Nom réellement déployé via le tableau de bord le 21 octobre.
+[functions.bright-service]
+verify_jwt = false

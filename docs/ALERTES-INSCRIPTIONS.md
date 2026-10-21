@@ -2,7 +2,7 @@
 
 ## État et destination
 
-**Préparé et testé localement ; non déployé dans Supabase, aucun e-mail réel envoyé.**
+**Code testé localement. Selon les confirmations utilisateur : fonction déployée sous `bright-service`, JWT legacy désactivé, migration appliquée et secrets Vault créés. La planification, l’activation et la réception réelle restent à vérifier.**
 Destinataire demandé par CHRONOSS : **saschronoss@outlook.com**. Cette adresse est fixée côté serveur. Aucun paramètre envoyé depuis le navigateur ne peut la modifier.
 
 Chaque nouvelle création de profil client/transporteur ajoute un travail dans une file privée. Un worker planifié chaque minute envoie un e-mail via Resend : entreprise, type de compte, e-mail, SIRET déclaré, état de confirmation de l'adresse et références. Le bouton ouvre le site ; après connexion administrateur, cliquer sur Administration. Il n'ouvre pas directement la fiche entreprise.
@@ -15,7 +15,7 @@ L'environnement de travail n'a ni session de gestion Supabase ni identifiants d'
 
 1. Dans Resend, configurer un domaine d'envoi et les entrées DNS demandées pour `13urgent.fr`. Ne pas remplacer les MX OVH qui reçoivent le courrier. Vérifier le tarif/quota en vigueur avant activation. L'adresse de réception Outlook est indépendante du domaine d'envoi.
 2. Dans le projet Supabase `rwkxkpbekvssmfnugcyn`, exécuter `supabase/migrations/202610210001_registration_alerts.sql`. Cette migration dépend des tables existantes `profiles`, `companies`, `auth.users` et des rôles Supabase standard ; elle ne dépend pas de Stripe.
-3. Déployer `supabase/functions/registration-alerts/index.ts` sous le nom `registration-alerts`. Ce fichier est autonome et peut être collé dans l'éditeur Edge Functions. Désactiver la vérification JWT de la passerelle pour cette fonction uniquement ; le code vérifie son propre secret Bearer. Le CLI utilise déjà `supabase/config.toml` : `supabase functions deploy registration-alerts --project-ref rwkxkpbekvssmfnugcyn`.
+3. Déployer `supabase/functions/registration-alerts/index.ts` sous le nom `bright-service` (nom conservé après création dans le tableau de bord). Ce fichier est autonome et peut être collé dans l'éditeur Edge Functions. Désactiver la vérification JWT de la passerelle pour cette fonction uniquement ; le code vérifie son propre secret Bearer. La source du code reste dans `registration-alerts/index.ts`. Pour un déploiement CLI ultérieur sous `bright-service`, préparer un dossier de fonction portant ce nom avec le même code ; ne pas déployer une seconde fonction `registration-alerts` par inadvertance. `supabase/config.toml` déclare la vérification JWT désactivée pour les deux noms.
 4. Dans Edge Functions → Secrets :
    - `REGISTRATION_ALERTS_SECRET` : une valeur aléatoire de 32 caractères minimum ;
    - `REGISTRATION_ALERTS_ENABLED` : `false` pendant l'installation, puis `true` pour activer ;
