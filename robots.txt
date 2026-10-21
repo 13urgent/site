@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /videos/
+
+Sitemap: https://13urgent.fr/sitemap.xml

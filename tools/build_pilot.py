@@ -15,7 +15,7 @@ if output == root or root in output.parents or output in root.parents:
 output.mkdir(parents=True, exist_ok=True)
 if any(output.iterdir()):
     raise SystemExit('Le dossier de sortie doit être vide pour préserver les fichiers existants.')
-files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js','manual-commerce.js','conditions-professionnelles.html','conditions-professionnelles-v3.html','billing.js','documents.js','imports.js']
+files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js','manual-commerce.js','conditions-professionnelles.html','conditions-professionnelles-v3.html','billing.js','documents.js','imports.js','robots.txt','sitemap.xml']
 for name in files:
     shutil.copy2(root / name, output / name)
 (output / 'assets').mkdir()
@@ -30,12 +30,10 @@ if billing_count != 1:
 config += '\n// Ouverture des demandes professionnelles distincte des droits et du mode commercial.\nwindow.URGENT_ALLOW_REGISTRATION = '+('true' if args.open_registration else 'false')+';\n'
 (output / 'config.js').write_text(config)
 html = (output / 'index.html').read_text()
-html = html.replace('<head>', '<head><meta name="robots" content="noindex,nofollow">', 1)
 if not args.open_registration:
     html = html.replace('Connexion / inscription', 'Connexion au pilote')
 (output / 'index.html').write_text(html)
 if (root / 'CNAME').exists():
     shutil.copy2(root / 'CNAME', output / 'CNAME')
 (output / '.nojekyll').write_text('')
-(output / 'robots.txt').write_text('User-agent: *\nDisallow: /\n')
 print('Version créée : paiement Stripe désactivé, inscriptions '+('ouvertes aux demandes professionnelles' if args.open_registration else 'masquées')+', aucune pièce justificative copiée. Le mode commercial reste contrôlé en base.')
