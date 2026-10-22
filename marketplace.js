@@ -19,8 +19,11 @@
   reset();const generation=state.generation;
   try{
    if(!sb)throw Error('Service de connexion indisponible.');
-   const current=await sb.auth.getUser();if(current.error)throw current.error;
-   if(!current.data?.user){notice('courseCount','Connectez-vous avec votre compte professionnel pour consulter le pilote.');return;}
+   const current=await sb.auth.getUser();
+   if(generation!==state.generation)return;
+   const missingSession=current.error?.name==='AuthSessionMissingError'||current.error?.message==='Auth session missing!';
+   if(current.error&&!missingSession)throw current.error;
+   if(missingSession||!current.data?.user){notice('courseCount','Connectez-vous ou inscrivez-vous avec votre compte professionnel pour consulter les courses disponibles.');return;}
    const profile=await sb.from('profiles').select('id,role,company_id').eq('id',current.data.user.id).single();if(profile.error)throw profile.error;
    const results=await Promise.all([
     sb.from('urgent_shipments').select('*').order('created_at',{ascending:false}).limit(100),
@@ -38,7 +41,7 @@
    if(!canPublish)notice('formNotice','Ce compte est transporteur. Les demandes sont déposées par un compte donneur d’ordre distinct.');
    [state.shipments,state.offers,state.private,state.events,state.incidents]=results.map(r=>r.data||[]);
    $('pilotAdmin').hidden=profile.data.role!=='admin';render();
-  }catch(e){if(generation===state.generation){reset();notice('courseCount','Pilote inaccessible : '+e.message+' Aucune donnée locale n’est publiée automatiquement.');}}
+  }catch(e){if(generation===state.generation){reset();notice('courseCount','Impossible de charger les courses pour le moment. Actualisez la page ou reconnectez-vous.');}}
  }
  function render(){
   const list=$('shipments');list.replaceChildren();const query=$('courseSearch').value.trim().toLocaleLowerCase('fr');const vehicle=$('courseVehicle').value;
