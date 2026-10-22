@@ -10,7 +10,11 @@
  const commercial=s=>window.urgentCommerce?.ready===true&&window.urgentCommerce.enabled===true&&!s?.is_test;
  const money=v=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(Number(v));
  const date=v=>new Date(v).toLocaleString('fr-FR',{timeZone:'Europe/Paris'});
- const reset=()=>{if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
+ const publicationAccess=make('div');publicationAccess.id='publicationAccess';publicationAccess.setAttribute('role','status');
+ const publicationMessage=make('p');const publicationLogin=button('Connexion / inscription',()=>{$('openAccount').click();});
+ publicationAccess.append(publicationMessage,publicationLogin);$('shipmentForm').before(publicationAccess);
+ function publicationStatus(message,login=false){publicationAccess.hidden=!message;publicationMessage.textContent=message;publicationLogin.hidden=!login;}
+ const reset=()=>{publicationStatus('Vérification de votre accès au formulaire…');$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
  async function rpc(name,args){if(!sb)throw Error('Service de connexion indisponible.');const result=await sb.rpc(name,args);if(result.error)throw result.error;return result.data;}
  function button(text,action,cls='btn secondary'){
   const b=make('button',text,cls);b.type='button';b.onclick=async()=>{b.disabled=true;try{await action();}catch(e){notice('trackingNotice','Opération non confirmée : '+e.message);}finally{b.disabled=false;}};return b;
@@ -23,8 +27,17 @@
    if(generation!==state.generation)return;
    const missingSession=current.error?.name==='AuthSessionMissingError'||current.error?.message==='Auth session missing!';
    if(current.error&&!missingSession)throw current.error;
-   if(missingSession||!current.data?.user){notice('courseCount','Connectez-vous ou inscrivez-vous avec votre compte professionnel pour consulter les courses disponibles.');return;}
-   const profile=await sb.from('profiles').select('id,role,company_id').eq('id',current.data.user.id).single();if(profile.error)throw profile.error;
+   if(missingSession||!current.data?.user){publicationStatus('Connectez-vous avec votre compte professionnel pour remplir et publier une demande de transport.',true);notice('courseCount','Connectez-vous ou inscrivez-vous avec votre compte professionnel pour consulter les courses disponibles.');return;}
+   const profile=await sb.from('profiles').select('id,role,company_id').eq('id',current.data.user.id).single();
+   if(generation!==state.generation)return;
+   if(profile.error)throw profile.error;
+   if(!profile.data||!['client','carrier','admin'].includes(profile.data.role))throw Error('Profil professionnel indisponible.');
+   state.user=current.data.user;state.profile=profile.data;
+   const canPublish=['client','carrier','admin'].includes(profile.data.role);
+   $('testShipmentChoice').hidden=profile.data.role!=='admin';
+   $('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=!canPublish);
+   publicationStatus(profile.data.role==='carrier'?'Vous déposez cette course comme donneur d’ordre. En mode commercial, les frais de mise en relation de 1,5 % HT, TVA applicable en sus, s’ajoutent à votre abonnement lors de la confirmation d’une proposition. Le dépôt seul reste gratuit.':'');
+   $('pilotAdmin').hidden=profile.data.role!=='admin';
    const results=await Promise.all([
     sb.from('urgent_shipments').select('*').order('created_at',{ascending:false}).limit(100),
     sb.from('urgent_offers').select('*').order('created_at',{ascending:false}).limit(500),
@@ -34,19 +47,14 @@
    ]);
    if(generation!==state.generation)return;
    for(const result of results)if(result.error)throw result.error;
-   state.user=current.data.user;state.profile=profile.data;
-   const canPublish=['client','admin'].includes(profile.data.role);
-   $('testShipmentChoice').hidden=profile.data.role!=='admin';
-   $('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=!canPublish);
-   if(!canPublish)notice('formNotice','Ce compte est transporteur. Les demandes sont déposées par un compte donneur d’ordre distinct.');
    [state.shipments,state.offers,state.private,state.events,state.incidents]=results.map(r=>r.data||[]);
    $('pilotAdmin').hidden=profile.data.role!=='admin';render();
-  }catch(e){if(generation===state.generation){reset();notice('courseCount','Impossible de charger les courses pour le moment. Actualisez la page ou reconnectez-vous.');}}
+  }catch(e){if(generation===state.generation){if(!state.profile){reset();publicationStatus('Impossible de vérifier votre accès. Reconnectez-vous ou réessayez dans quelques instants.',true);}notice('courseCount','Impossible de charger les courses pour le moment. Actualisez la page ou reconnectez-vous.');}}
  }
  function render(){
   const list=$('shipments');list.replaceChildren();const query=$('courseSearch').value.trim().toLocaleLowerCase('fr');const vehicle=$('courseVehicle').value;
   const visible=state.shipments.filter(s=>s.status==='open'&&(!vehicle||s.vehicle===vehicle)&&(!query||`${s.origin} ${s.destination}`.toLocaleLowerCase('fr').includes(query)));
-  notice('courseCount',`${visible.length} course(s) ouverte(s) affichée(s). ${commercial()?'Service professionnel':'Pilote gratuit'}, 100 courses maximum par chargement.`);
+  notice('courseCount',`${visible.length} course(s) ouverte(s) affichée(s). Service professionnel, 100 courses maximum par chargement.`);
   for(const s of visible){
    const card=make('article',undefined,'shipment');const info=make('div');if(s.is_test)info.append(make('strong','EXERCICE FICTIF — AUCUN TRANSPORT RÉEL','test-badge'));info.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${date(s.pickup)} · ${s.vehicle} · ${s.pallets} palette(s) · ${s.weight} kg`));card.append(info);
    if(state.profile?.role==='carrier'&&s.owner_company_id!==state.profile.company_id){
@@ -107,7 +115,7 @@
  }
  $('shipmentForm').onsubmit=async event=>{
   event.preventDefault();const form=event.currentTarget;if(!form.reportValidity())return;const button=event.submitter;button.disabled=true;
-  try{const isTest=$('testShipmentInput').checked&&state.profile?.role==='admin';const f=new FormData(form);await rpc($('testShipmentInput').checked&&state.profile?.role==='admin'?'urgent_publish_test_shipment':'urgent_publish_shipment',{p_origin:String(f.get('origin')).trim(),p_destination:String(f.get('destination')).trim(),p_pickup:new Date(String(f.get('pickup'))).toISOString(),p_vehicle:f.get('vehicle'),p_pallets:Number(f.get('pallets')),p_weight:Number(f.get('weight')),p_company_name:String(f.get('company')).trim(),p_email:String(f.get('email')).trim(),p_instructions:String(f.get('notes')).trim()});form.reset();await refresh();notice('formNotice',isTest?'Exercice fictif publié. Aucun transport réel ni paiement.':(commercial()?'Course publiée. ':'Course publiée dans le pilote gratuit. ')+'Les coordonnées et instructions privées ne sont accessibles qu’aux parties après attribution.');}catch(e){notice('formNotice','Publication refusée : '+e.message);}finally{button.disabled=false;}
+  try{const isTest=$('testShipmentInput').checked&&state.profile?.role==='admin';const f=new FormData(form);await rpc($('testShipmentInput').checked&&state.profile?.role==='admin'?'urgent_publish_test_shipment':'urgent_publish_shipment',{p_origin:String(f.get('origin')).trim(),p_destination:String(f.get('destination')).trim(),p_pickup:new Date(String(f.get('pickup'))).toISOString(),p_vehicle:f.get('vehicle'),p_pallets:Number(f.get('pallets')),p_weight:Number(f.get('weight')),p_company_name:String(f.get('company')).trim(),p_email:String(f.get('email')).trim(),p_instructions:String(f.get('notes')).trim()});form.reset();await refresh();notice('formNotice',isTest?'Exercice fictif publié. Aucun transport réel ni paiement.':'Course publiée. '+'Les coordonnées et instructions privées ne sont accessibles qu’aux parties après attribution.');}catch(e){notice('formNotice','Publication refusée : '+e.message);}finally{button.disabled=false;}
  };
  async function renderPilotDirectory(){
   const generation=state.generation;
