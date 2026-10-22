@@ -141,18 +141,18 @@
  $('shipmentForm').prepend(testChoice);
  const shipmentSiret=$('shipmentForm').elements.siret;shipmentSiret.required=false;shipmentSiret.closest('label').hidden=true;
  const refreshButton=button('Actualiser les courses et le suivi',refresh);$('courseFilters').after(refreshButton);
- const banner=make('p','Pilote professionnel gratuit — aucun paiement, abonnement payé ou frais de mise en relation activé.','pilot-banner');document.querySelector('main').prepend(banner);
- document.querySelector('.hero-inner>p').textContent='Pilote réservé aux professionnels vérifiés : publiez une course, comparez les propositions confidentielles et suivez la prestation. Aucun paiement sur ce pilote.';
- document.querySelector('#courses .section-head p').textContent='Courses partagées du pilote professionnel gratuit. Les prix proposés sont confidentiels entre chaque transporteur, le donneur d’ordre et l’administration.';
- document.querySelector('#deposer .section-head p').textContent='Pilote gratuit : connexion et établissement préalablement vérifié par 13 URGENT requis. Les offres sont réservées aux transporteurs autorisés et aux documents valides.';
+ const banner=make('p','13 URGENT — Transport express et mise en relation entre professionnels.','pilot-banner');document.querySelector('main').prepend(banner);
+ document.querySelector('.hero-inner>p').textContent='Publiez votre besoin de transport express, comparez les propositions confidentielles et suivez votre course. Service réservé aux professionnels vérifiés.';
+ document.querySelector('#courses .section-head p').textContent='Demandes de transport entre professionnels. Les prix proposés sont confidentiels entre chaque transporteur, le donneur d’ordre et l’administration.';
+ document.querySelector('#deposer .section-head p').textContent='Connexion et établissement préalablement vérifié par 13 URGENT requis. Les offres sont réservées aux transporteurs autorisés et aux documents valides.';
  document.querySelector('#suivi h2').textContent='Mes courses et leur suivi';document.querySelector('#suivi .section-head p').textContent='Suivi partagé entre les parties. La livraison déclarée par le transporteur doit être confirmée par le donneur d’ordre ; aucune preuve de livraison signée n’est encore collectée ici.';
- document.querySelector('#suivi .eyebrow').textContent='PILOTE PROFESSIONNEL GRATUIT';document.querySelector('nav a[href="#suivi"]').textContent='Mes courses';
+ document.querySelector('#suivi .eyebrow').textContent='ESPACE PROFESSIONNEL';document.querySelector('nav a[href="#suivi"]').textContent='Mes courses';
  const presentationSelectors=['.hero-inner>p','#courses .section-head p','#deposer .section-head p','#tarifs .pricebox small'];const pilotPresentation=presentationSelectors.map(selector=>document.querySelector(selector).textContent);
  function updateCommercialPresentation(){
-  const active=commercial();banner.textContent=active?'Service professionnel — facturation mensuelle CHRONOSS. Abonnements transporteurs par virement après vérification du dossier.':'Pilote professionnel gratuit — aucun paiement, abonnement payé ou frais de mise en relation activé.';
+  const active=commercial();banner.textContent=active?'Service professionnel — facturation mensuelle CHRONOSS. Abonnements transporteurs par virement après vérification du dossier.':'13 URGENT — Transport express et mise en relation entre professionnels.';
   if(!active)presentationSelectors.forEach((selector,index)=>document.querySelector(selector).textContent=pilotPresentation[index]);
   if(active){document.querySelector('.hero-inner>p').textContent='Courses express et transports urgents : publiez votre besoin, comparez les propositions confidentielles et suivez les étapes de votre prestation. Service réservé aux professionnels vérifiés.';document.querySelector('#courses .section-head p').textContent='Demandes professionnelles partagées. Propositions confidentielles ; dossier valide et droits d’accès requis.';document.querySelector('#deposer .section-head p').textContent='Publication gratuite, réservée aux professionnels vérifiés. Les frais de mise en relation sont présentés avant votre confirmation et regroupés sur votre facture mensuelle CHRONOSS.';document.querySelector('#tarifs .pricebox small').textContent='Frais calculés sur le prix HT du transport, TVA applicable en sus. Cumul mensuel ; facture CHRONOSS. Transport facturé séparément par le transporteur.';}
-  document.querySelector('#suivi .eyebrow').textContent=active?'ESPACE PROFESSIONNEL':'PILOTE PROFESSIONNEL GRATUIT';
+  document.querySelector('#suivi .eyebrow').textContent=active?'ESPACE PROFESSIONNEL':'ESPACE PROFESSIONNEL';
   if(state.profile)render();
  }
  window.addEventListener('urgent-commerce-updated',updateCommercialPresentation);
