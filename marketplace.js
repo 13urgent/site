@@ -14,7 +14,7 @@
  const publicationMessage=make('p');const publicationLogin=button('Connexion / inscription',()=>{$('openAccount').click();});
  publicationAccess.append(publicationMessage,publicationLogin);$('shipmentForm').before(publicationAccess);
  function publicationStatus(message,login=false){publicationAccess.hidden=!message;publicationMessage.textContent=message;publicationLogin.hidden=!login;}
- const reset=()=>{publicationStatus('Vérification de votre accès au formulaire…');$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
+ const reset=()=>{publicationStatus('Vérification de votre accès au formulaire…');if($('pilotAdmin'))$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
  async function rpc(name,args){if(!sb)throw Error('Service de connexion indisponible.');const result=await sb.rpc(name,args);if(result.error)throw result.error;return result.data;}
  function button(text,action,cls='btn secondary'){
   const b=make('button',text,cls);b.type='button';b.onclick=async()=>{b.disabled=true;try{await action();}catch(e){notice('trackingNotice','Opération non confirmée : '+e.message);}finally{b.disabled=false;}};return b;
@@ -53,7 +53,7 @@
    $('testShipmentChoice').hidden=profile.data.role!=='admin';
    $('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=!canPublish);
    publicationStatus(profile.data.role==='carrier'?'Vous déposez cette course comme donneur d’ordre. En mode commercial, les frais de mise en relation de 1,5 % HT, TVA applicable en sus, s’ajoutent à votre abonnement lors de la confirmation d’une proposition. Le dépôt seul reste gratuit.':'');
-   $('pilotAdmin').hidden=profile.data.role!=='admin';
+   if($('pilotAdmin'))$('pilotAdmin').hidden=profile.data.role!=='admin';
    const results=await Promise.all([
     readRows('urgent_shipments',generation),
     readRows('urgent_offers',generation),
@@ -63,7 +63,7 @@
    ]);
    if(generation!==state.generation)return;
    [state.shipments,state.offers,state.private,state.events,state.incidents]=results;
-   $('pilotAdmin').hidden=profile.data.role!=='admin';render();
+   if($('pilotAdmin'))$('pilotAdmin').hidden=profile.data.role!=='admin';render();
   }catch(e){if(generation===state.generation){if(!state.profile){reset();publicationStatus('Impossible de vérifier votre accès. Reconnectez-vous ou réessayez dans quelques instants.',true);}notice('courseCount','Impossible de charger les courses pour le moment. Actualisez la page ou reconnectez-vous.');}}
  }
  function render(){
@@ -150,6 +150,7 @@
    }
   }catch(e){notice('pilotAccessNotice','Annuaire pilote indisponible : '+e.message);}
  }
+ if($('pilotAccessForm')){
  const pilotDirectory=make('div');pilotDirectory.id='pilotDirectory';$('pilotAccessForm').before(pilotDirectory);
  $('openAdmin').addEventListener('click',async()=>{
   if(!state.profile)await refresh();
@@ -159,6 +160,7 @@
   event.preventDefault();const b=event.submitter;b.disabled=true;const f=new FormData(event.currentTarget);
   try{await rpc('urgent_review_pilot',{p_company:f.get('companyId'),p_siret:f.get('siret'),p_plan:f.get('plan'),p_enabled:f.get('enabled')==='true',p_registry_checked:f.get('registryChecked')==='on'});await renderPilotDirectory();notice('pilotAccessNotice','Décision pilote enregistrée. Aucun abonnement payé activé. Les documents sont contrôlés à chaque offre et attribution.');}catch(e){notice('pilotAccessNotice','Décision refusée : '+e.message);}finally{b.disabled=false;}
  };
+ }
  $('courseFilters').onsubmit=e=>e.preventDefault();$('courseSearch').oninput=render;$('courseVehicle').onchange=render;
  $('exportShipments').textContent='Exporter les anciennes demandes locales';
  let legacyRequests=null;try{legacyRequests=localStorage.getItem('13urgent_demo_shipments_v1');}catch{}
@@ -184,5 +186,5 @@
   if(state.profile)render();
  }
  window.addEventListener('urgent-commerce-updated',updateCommercialPresentation);
- sb?.auth.onAuthStateChange(()=>{reset();$('pilotAdmin').hidden=true;setTimeout(refresh,0);});refresh();
+ sb?.auth.onAuthStateChange(()=>{reset();if($('pilotAdmin'))$('pilotAdmin').hidden=true;setTimeout(refresh,0);});refresh();
 })();

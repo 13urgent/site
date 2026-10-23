@@ -35,6 +35,10 @@ python -m http.server 8000 --bind 127.0.0.1 --directory /workspace/site
 
 Ne pas utiliser `file://` pour tester les connexions. La configuration publique est dans `config.js` ; n'y placer aucune clé secrète ou `service_role`. Le fichier source garde `URGENT_MARKETPLACE_PILOT=false` ; la construction publique l'active explicitement. Une configuration manquante bloque le formulaire en production plutôt que d'enregistrer une course seulement dans le navigateur. La démonstration locale exige `URGENT_LOCAL_DEMO=true` et une adresse localhost ; elle n'est pas le mode d'exploitation public.
 
+Les administrateurs accèdent à la gestion via le lien **Administration**, qui ouvre `admin.html` après vérification de leur rôle serveur. Le panneau n’est plus inclus dans l’accueil. Après modification de la présentation partagée, régénérer la page locale avec `python tools/build_admin.py` ; le constructeur public le fait automatiquement.
+
+La version 4 des conditions est préparée avec une migration d’activation distincte : [corrections et ordre de publication](docs/CORRECTIONS-PUBLICATION-23-OCTOBRE.md). Sa présence dans les fichiers ne signifie pas qu’elle est déjà la version contractuelle active dans Supabase.
+
 ## Accès, documents et facturation
 
 Les rôles viennent de la base. L'administration est réservée aux profils serveur `admin`. Une immatriculation saisie, un document accepté ou un règlement enregistré ne suffisent pas à valider automatiquement toute l'entreprise. Vérifier le registre, les autorisations et les garanties ; les pièces doivent être approuvées et valides au moment des opérations qui les exigent.

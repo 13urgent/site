@@ -25,7 +25,7 @@ const assert=require('assert/strict');
    order:async()=>({data:table==='companies'?[{id:'company-test',name:'Test transporteur',verification_status:'pending'}]:[{...testDoc}]})};return q;}
  })};`}));
  const errors=[];p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());
- await p.goto('http://127.0.0.1:8010/');await p.locator('#openAdmin').click();
+ await p.goto('http://127.0.0.1:8010/admin.html');await p.locator('#openAdmin').click();
  const revoke=p.getByRole('button',{name:'Retirer l’approbation',exact:true});
  await revoke.waitFor();await p.evaluate(()=>sessionExpired=true);await revoke.click();
  await p.waitForFunction(()=>document.getElementById('adminNotice').textContent.includes('Session administrateur expirée'));
