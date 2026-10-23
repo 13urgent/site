@@ -1,0 +1,24 @@
+[
+  {
+    "video": "donneurs-ordre",
+    "duration": 25,
+    "resolution": "1080x1920",
+    "codecs": "H.264/AAC",
+    "sha256": "df6ada3dcba289b63c96801d25fc717b646534c44bce98f99ab0ee64ad9baa0e",
+    "integrated_loudness_LUFS": "-15.83",
+    "true_peak_dBTP": "-1.95",
+    "decode": "PASS",
+    "fps": 30
+  },
+  {
+    "video": "transporteurs",
+    "duration": 22,
+    "resolution": "1080x1920",
+    "codecs": "H.264/AAC",
+    "sha256": "d6a739078bb342acdb64b79d8b134781c42e5b38c3a2db55aa0d43b1bbb384d0",
+    "integrated_loudness_LUFS": "-16.02",
+    "true_peak_dBTP": "-3.03",
+    "decode": "PASS",
+    "fps": 30
+  }
+]
