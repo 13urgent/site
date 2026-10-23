@@ -1,0 +1,13 @@
+{
+  "duration": 25,
+  "resolution": "1080x1920",
+  "fps": 30,
+  "video": "H.264",
+  "audio": "AAC",
+  "decode": "PASS",
+  "integrated_loudness_LUFS": "-16.53",
+  "true_peak_dBTP": "-1.90",
+  "sha256": "cee1c58645d089f28e9d138b04b5727ddb9e90059ec4846d81b89bb750d0aca1",
+  "narration": "fr-FR-VivienneMultilingualNeural",
+  "audio_speedup": false
+}

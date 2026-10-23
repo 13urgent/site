@@ -2,6 +2,8 @@
 
 Livraison : https://13urgent.fr/videos/reels-20261023/
 
+Nouvelle narration féminine demandée ensuite par l’exploitant : https://13urgent.fr/videos/voix-feminine-20261023/ ; voir `../voix-feminine-20261023/README.md`. Le kit initial reste disponible pour comparaison.
+
 - Donneurs d’ordre : 25 secondes, frais de 1,5 % HT sur le prix HT du transport à l’attribution commerciale confirmée, TVA en sus.
 - Transporteurs : 22 secondes, dossier et droits valides, offres confidentielles et forfaits.
 - MP4 H.264/AAC, 1080×1920, 30 i/s, voix synthétique française et sous-titres intégrés. Couvertures JPEG, sous-titres SRT/VTT, textes, bios, liens UTM et crédits dans le ZIP.
