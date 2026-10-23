@@ -19,6 +19,22 @@
  function button(text,action,cls='btn secondary'){
   const b=make('button',text,cls);b.type='button';b.onclick=async()=>{b.disabled=true;try{await action();}catch(e){notice('trackingNotice','Opération non confirmée : '+e.message);}finally{b.disabled=false;}};return b;
  }
+ // Paginer côté API : les limites d'une réponse ne doivent pas masquer une course suivie.
+ async function readRows(table,generation,dated=true){
+  const rows=[],size=100;let offset=0;
+  while(generation===state.generation){
+   let query=sb.from(table).select('*');
+   if(dated)query=query.order('created_at',{ascending:false});
+   query=query.order(table==='urgent_shipment_private'?'shipment_id':'id',{ascending:true});
+   const result=await query.range(offset,offset+size-1);
+   if(result.error)throw result.error;
+   if(generation!==state.generation)return [];
+   const page=result.data||[];rows.push(...page);
+   if(page.length<size)return [...new Map(rows.map(row=>[row.id||row.shipment_id,row])).values()];
+   offset+=size;
+  }
+  return [];
+ }
  async function refresh(){
   reset();const generation=state.generation;
   try{
@@ -39,22 +55,21 @@
    publicationStatus(profile.data.role==='carrier'?'Vous déposez cette course comme donneur d’ordre. En mode commercial, les frais de mise en relation de 1,5 % HT, TVA applicable en sus, s’ajoutent à votre abonnement lors de la confirmation d’une proposition. Le dépôt seul reste gratuit.':'');
    $('pilotAdmin').hidden=profile.data.role!=='admin';
    const results=await Promise.all([
-    sb.from('urgent_shipments').select('*').order('created_at',{ascending:false}).limit(100),
-    sb.from('urgent_offers').select('*').order('created_at',{ascending:false}).limit(500),
-    sb.from('urgent_shipment_private').select('*').limit(100),
-    sb.from('urgent_shipment_events').select('*').order('created_at',{ascending:false}).limit(300),
-    sb.from('urgent_shipment_incidents').select('*').order('created_at',{ascending:false}).limit(300)
+    readRows('urgent_shipments',generation),
+    readRows('urgent_offers',generation),
+    readRows('urgent_shipment_private',generation,false),
+    readRows('urgent_shipment_events',generation),
+    readRows('urgent_shipment_incidents',generation)
    ]);
    if(generation!==state.generation)return;
-   for(const result of results)if(result.error)throw result.error;
-   [state.shipments,state.offers,state.private,state.events,state.incidents]=results.map(r=>r.data||[]);
+   [state.shipments,state.offers,state.private,state.events,state.incidents]=results;
    $('pilotAdmin').hidden=profile.data.role!=='admin';render();
   }catch(e){if(generation===state.generation){if(!state.profile){reset();publicationStatus('Impossible de vérifier votre accès. Reconnectez-vous ou réessayez dans quelques instants.',true);}notice('courseCount','Impossible de charger les courses pour le moment. Actualisez la page ou reconnectez-vous.');}}
  }
  function render(){
   const list=$('shipments');list.replaceChildren();const query=$('courseSearch').value.trim().toLocaleLowerCase('fr');const vehicle=$('courseVehicle').value;
   const visible=state.shipments.filter(s=>s.status==='open'&&(!vehicle||s.vehicle===vehicle)&&(!query||`${s.origin} ${s.destination}`.toLocaleLowerCase('fr').includes(query)));
-  notice('courseCount',`${visible.length} course(s) ouverte(s) affichée(s). Service professionnel, 100 courses maximum par chargement.`);
+  notice('courseCount',`${visible.length} course(s) ouverte(s) affichée(s). Service professionnel. Toutes les courses accessibles ont été chargées.`);
   for(const s of visible){
    const card=make('article',undefined,'shipment');const info=make('div');if(s.is_test)info.append(make('strong','EXERCICE FICTIF — AUCUN TRANSPORT RÉEL','test-badge'));info.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${date(s.pickup)} · ${s.vehicle} · ${s.pallets} palette(s) · ${s.weight} kg`));card.append(info);
    if(state.profile?.role==='carrier'&&s.owner_company_id!==state.profile.company_id){

@@ -5,10 +5,25 @@ const configured=Boolean(window.URGENT_SUPABASE_URL&&window.URGENT_SUPABASE_PUBL
 window.URGENT_SUPABASE_CONFIGURED=configured;
 const sb=configured?window.supabase.createClient(window.URGENT_SUPABASE_URL,window.URGENT_SUPABASE_PUBLISHABLE_KEY):null;
 function notify(msg){authNotice.hidden=false;authNotice.textContent=msg;}
+let authOperationPending=false;
+let authView=0;
+async function runAuthOperation(operation,errorMessage){
+ if(authOperationPending)return;
+ authOperationPending=true;
+ const controls=['signUp','signIn','signOut','magicLink','savePassword','saveSubscription'].map(id=>document.getElementById(id)).filter(Boolean);
+ const disabled=controls.map(control=>control.disabled);
+ controls.forEach(control=>control.disabled=true);accountDialog.setAttribute('aria-busy','true');
+ try{await operation();}catch{notify(errorMessage);}finally{
+  controls.forEach((control,index)=>control.disabled=disabled[index]);
+  accountDialog.removeAttribute('aria-busy');authOperationPending=false;
+ }
+}
 document.getElementById('openAccount').addEventListener('click',()=>{authNotice.hidden=true;accountDialog.showModal();updateAuth().catch(()=>notify('Impossible de vérifier la session.'));});
 document.getElementById('closeAccount').addEventListener('click',()=>accountDialog.close());
 async function updateAuth(){
+ const view=++authView;
  const result=sb?await sb.auth.getUser():{data:{user:null}};
+ if(view!==authView)return;
  const user=result.data?.user||null;
  document.getElementById('signOut').hidden=!user;
  document.getElementById('openAccount').textContent=user?'Mon compte':'Connexion / Inscription';
@@ -36,50 +51,50 @@ async function action(kind){if(kind==='signup'&&window.URGENT_ALLOW_REGISTRATION
   res=await sb.auth.signUp({email,password,options:{data:{requested_account_type:document.getElementById('accountType').value,account_type:document.getElementById('accountType').value,company_name:company,business_name:company,business_siret:siret,business_use_declared:true,business_declaration_version:'2026-10-17',...(plan?{subscription_plan_request:plan,subscription_catalog_version:'2026-10-17'}:{})}}});
  }else{res=await sb.auth.signInWithPassword({email,password});}
  if(res.error){notify('Erreur : '+res.error.message);return;}
- notify(kind==='signup'?'Inscription enregistrée. Vérifiez votre boîte e-mail si la confirmation est activée. Connectez-vous après confirmation pour consulter les fonctions disponibles pour votre profil.':'Connexion réussie. Les fonctions disponibles dépendent de votre rôle et de la validation de votre établissement. Pour les transporteurs, les propositions nécessitent aussi des documents valides et des droits d’accès en cours.');await updateAuth();if(window.refreshProfessionalAccess)await window.refreshProfessionalAccess();
+ notify(kind==='signup'?'Inscription enregistrée. Vérifiez votre boîte e-mail si la confirmation est activée. Connectez-vous après confirmation pour consulter les fonctions disponibles pour votre profil.':'Connexion réussie. Les fonctions disponibles dépendent de votre rôle et de la validation de votre établissement. Pour les transporteurs, les propositions nécessitent aussi des documents valides et des droits d’accès en cours.');
+ try{await updateAuth();if(window.refreshProfessionalAccess)await window.refreshProfessionalAccess();}
+ catch{notify(kind==='signup'?'Inscription enregistrée, mais votre espace ne peut pas être actualisé. Actualisez la page avant de réessayer.':'Connexion effectuée, mais votre espace ne peut pas être actualisé. Actualisez la page.');}
 }
-document.getElementById('signUp').addEventListener('click',()=>action('signup').catch(()=>notify('Connexion au service impossible. Réessayez plus tard.')));
-document.getElementById('signIn').addEventListener('click',()=>action('signin').catch(()=>notify('Connexion au service impossible. Réessayez plus tard.')));
-document.getElementById('signOut').addEventListener('click',async()=>{
+document.getElementById('signUp').addEventListener('click',()=>runAuthOperation(()=>action('signup'),'Connexion au service impossible. Réessayez plus tard.'));
+document.getElementById('signIn').addEventListener('click',()=>runAuthOperation(()=>action('signin'),'Connexion au service impossible. Réessayez plus tard.'));
+document.getElementById('signOut').addEventListener('click',()=>runAuthOperation(async()=>{
  try{if(!sb)return;const {error}=await sb.auth.signOut();if(error)throw error;
  document.getElementById('authPassword').value='';document.getElementById('newPassword').value='';document.getElementById('confirmPassword').value='';
  await updateAuth();notify('Vous êtes déconnecté.');if(window.refreshProfessionalAccess)await window.refreshProfessionalAccess();
  }catch{notify('Déconnexion non confirmée. Réessayez.');}
-});
+},'Déconnexion non confirmée. Réessayez.'));
 
 
 // Conserve le sous-dossier d’hébergement, sans recopier les jetons de l’URL.
 function authReturnUrl(){const target=new URL('.',location.href);return target.pathname==='/'?target.origin:target.href;}
 // Le lien ouvre la même origine HTTP(S) que celle utilisée pour la demande.
-document.getElementById('magicLink').addEventListener('click',async event=>{
+document.getElementById('magicLink').addEventListener('click',()=>runAuthOperation(async()=>{
  const emailInput=document.getElementById('authEmail');
  if(!emailInput.reportValidity())return;
  if(!sb){notify('Service de connexion indisponible.');return;}
  if(!['http:','https:'].includes(location.protocol)){notify('Ouvrez le site avec le serveur local HTTP ou son adresse HTTPS.');return;}
- const button=event.currentTarget;button.disabled=true;
  try{
   const {error}=await sb.auth.signInWithOtp({email:emailInput.value.trim(),options:{shouldCreateUser:false,emailRedirectTo:authReturnUrl()}});
   if(error){notify('Envoi impossible : '+error.message);return;}
   notify('Si ce compte peut se connecter, un lien vient d’être envoyé. Ouvrez le dernier e-mail dans ce navigateur et gardez le serveur local lancé.');
- }catch{notify('Service inaccessible. Aucun envoi ne peut être confirmé.');}finally{button.disabled=false;}
-});
+ }catch{notify('Service inaccessible. Aucun envoi ne peut être confirmé.');}
+},'Service inaccessible. Aucun envoi ne peut être confirmé.'));
 
 // Un mot de passe ne peut être défini que pour la session authentifiée courante.
 const passwordSettings=document.createElement('section');passwordSettings.id='passwordSettings';passwordSettings.hidden=true;
 passwordSettings.innerHTML='<p id="accountIdentity"></p><h3>Définir mon mot de passe</h3><p>Choisissez un mot de passe personnel pour vos prochaines connexions.</p><label>Nouveau mot de passe<input id="newPassword" type="password" minlength="12" autocomplete="new-password"></label><label>Confirmer le mot de passe<input id="confirmPassword" type="password" minlength="12" autocomplete="new-password"></label><button id="savePassword" class="btn primary" type="button">Enregistrer mon mot de passe</button>';
 authNotice.before(passwordSettings);
-document.getElementById('savePassword').addEventListener('click',async event=>{
+document.getElementById('savePassword').addEventListener('click',()=>runAuthOperation(async()=>{
  const field=document.getElementById('newPassword'), confirmation=document.getElementById('confirmPassword');
  if(field.value.length<12){notify('Choisissez au moins 12 caractères.');return;}
  if(field.value!==confirmation.value){notify('Les deux mots de passe doivent être identiques.');return;}
- const button=event.currentTarget;button.disabled=true;
  try{
   if(!sb)throw Error('Service indisponible.');const {data,error}=await sb.auth.getUser();
   if(error||!data?.user){notify('Reconnectez-vous avant de définir votre mot de passe.');return;}
   const result=await sb.auth.updateUser({password:field.value});if(result.error){notify('Modification refusée : '+result.error.message);return;}
   field.value='';confirmation.value='';notify('Mot de passe enregistré. Vous pourrez vous connecter avec votre e-mail et ce mot de passe.');
- }catch{notify('Modification non confirmée. Le service est inaccessible.');}finally{button.disabled=false;}
-});
+ }catch{notify('Modification non confirmée. Le service est inaccessible.');}
+},'Modification non confirmée. Le service est inaccessible.'));
 // Choix déclaratif uniquement : ne confère ni abonnement actif ni validation entreprise.
 const subscriptionPlans=[
  {id:'basics',name:'Start',price:'Gratuit',limit:'1 transport par mois'},
@@ -96,7 +111,7 @@ for(const plan of subscriptionPlans){
  label.append(radio,description);subscriptionRequest.append(label);
 }
 const subscriptionInfo=document.createElement('p');subscriptionInfo.className='muted';subscriptionInfo.textContent='Demande de forfait à examiner par CHRONOSS. Pour le service commercial, CHRONOSS confirme le prix et transmet son RIB ; la période est activée après vérification du crédit bancaire effectif et du dossier. Aucun prélèvement automatique. Le pilote gratuit ne demande aucun paiement. Tout abonnement, même payé, ne dispense pas de fournir des documents professionnels valides et à jour. L’accès aux offres reste soumis à la validation du dossier par 13 URGENT et pourra être suspendu si les justificatifs expirent ou deviennent non conformes. Les conditions de suspension, de résiliation, de remboursement et de décompte des transports seront communiquées avant toute souscription.';subscriptionRequest.append(subscriptionInfo);
-const saveSubscription=document.createElement('button');saveSubscription.type='button';saveSubscription.className='btn primary';saveSubscription.textContent='Enregistrer ma demande de forfait';saveSubscription.hidden=true;subscriptionRequest.append(saveSubscription);
+const saveSubscription=document.createElement('button');saveSubscription.id='saveSubscription';saveSubscription.type='button';saveSubscription.className='btn primary';saveSubscription.textContent='Enregistrer ma demande de forfait';saveSubscription.hidden=true;subscriptionRequest.append(saveSubscription);
 passwordSettings.before(subscriptionRequest);
 function selectedPlan(){const value=subscriptionRequest.querySelector('input:checked')?.value;return subscriptionPlans.some(p=>p.id===value)?value:null;}
 let subscriptionView=0;
@@ -111,8 +126,8 @@ async function updateSubscriptionRequest(user){
  subscriptionRequest.querySelectorAll('input').forEach(input=>input.checked=input.value===previous);
 }
 document.getElementById('accountType').addEventListener('change',()=>{updateAuth().catch(()=>notify('Impossible de vérifier la session.'));});
-saveSubscription.addEventListener('click',async()=>{
- const plan=selectedPlan();if(!plan){notify('Choisissez un forfait.');return;}saveSubscription.disabled=true;
+saveSubscription.addEventListener('click',()=>runAuthOperation(async()=>{
+ const plan=selectedPlan();if(!plan){notify('Choisissez un forfait.');return;}
  try{
   const current=await sb.auth.getUser();if(current.error||!current.data?.user)throw Error('Session requise.');
   const profile=await sb.from('profiles').select('role').eq('id',current.data.user.id).maybeSingle();
@@ -120,7 +135,7 @@ saveSubscription.addEventListener('click',async()=>{
   const result=await sb.auth.updateUser({data:{subscription_plan_request:plan,subscription_catalog_version:'2026-10-17',subscription_requested_at:new Date().toISOString()}});
   if(result.error)throw result.error;
   notify('Choix enregistré dans votre compte. Aucun paiement effectué ; votre abonnement et votre dossier ne sont pas activés.');
- }catch{notify('Demande non confirmée. Vérifiez votre connexion et réessayez.');}finally{saveSubscription.disabled=false;}
-});
-if(sb)sb.auth.onAuthStateChange(()=>{setTimeout(()=>{document.getElementById('newPassword').value='';document.getElementById('confirmPassword').value='';updateAuth().catch(()=>notify('Impossible de vérifier la session.'));},0);});
+ }catch{notify('Demande non confirmée. Vérifiez votre connexion et réessayez.');}
+},'Demande non confirmée. Vérifiez votre connexion et réessayez.'));
+if(sb)sb.auth.onAuthStateChange(()=>{authView++;setTimeout(()=>{document.getElementById('newPassword').value='';document.getElementById('confirmPassword').value='';updateAuth().catch(()=>notify('Impossible de vérifier la session.'));},0);});
 updateAuth().catch(()=>notify('Le service de connexion est momentanément inaccessible.'));

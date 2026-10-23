@@ -1,4 +1,4 @@
-"""Construit un site statique pilote, sans documents de test ni clés privées."""
+"""Construit le site statique professionnel, sans documents de test ni clés privées."""
 from pathlib import Path
 import argparse
 import re
@@ -15,7 +15,7 @@ if output == root or root in output.parents or output in root.parents:
 output.mkdir(parents=True, exist_ok=True)
 if any(output.iterdir()):
     raise SystemExit('Le dossier de sortie doit être vide pour préserver les fichiers existants.')
-files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js','manual-commerce.js','conditions-professionnelles.html','conditions-professionnelles-v3.html','billing.js','documents.js','imports.js','robots.txt','sitemap.xml']
+files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js','manual-commerce.js','conditions-professionnelles.html','conditions-professionnelles-v3.html','mentions-legales.html','confidentialite.html','billing.js','documents.js','imports.js','robots.txt','sitemap.xml']
 for name in files:
     shutil.copy2(root / name, output / name)
 (output / 'assets').mkdir()

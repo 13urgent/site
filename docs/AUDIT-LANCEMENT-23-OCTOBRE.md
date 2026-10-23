@@ -127,3 +127,21 @@ Après les tentatives utilisateur, l'ancien `clear()` remettait tous les formula
 Correctif de présentation : état actuel explicite près du formulaire ; synchronisation du sélecteur avec la configuration reçue ; placeholder sans état sélectionné pendant une vérification ou un échec de lecture ; confirmation locale après relecture de la configuration ; erreur explicite si l'enregistrement ou la relecture échoue. Le contrôle n'est disponible qu'après identification administrateur et lecture valide. Les contrôles serveur restent inchangés. Référence versionnée du script dans le HTML pour éviter une ancienne version en cache.
 
 Le test `manual-commerce-browser.cjs` couvre désormais le vrai formulaire d'activation/désactivation relié au SQL local, le rechargement, le rejet d'une confirmation incorrecte et le cas « écriture réussie mais lecture suivante en panne » sans faux succès ni retour affiché à false. Les parcours existants de frais, facture et régularisation restent passants. Aucune activation de la base réelle n'a été effectuée par cette correction ; lire le nouvel état confirmé avant de demander à nouveau une activation.
+
+## Contrôle parallèle et corrections complémentaires — état confirmé le 23 octobre
+
+Six revues spécialisées ont été réalisées (sécurité, parcours, facturation, documents, information légale et déploiement). Le mode commercial actif et l'application du durcissement 003 sont désormais confirmés par les captures de l'exploitant. Le récapitulatif mensuel a été installé dans Supabase et son message TEST réellement reçu, avec statut sent/une tentative/sans erreur. Ces confirmations remplacent les états d'attente et enabled=false des exports précédents ; elles ne changent pas les preuves historiques.
+
+Corrections complémentaires côté site :
+
+- Pagination des cinq ensembles de courses/offres/suivi pour que la limite d'une réponse API ne masque pas les anciennes courses actives ; contrôle du changement de session.
+- Frais et cumul mensuel accessibles aussi aux transporteurs lorsqu'ils publient comme donneurs d'ordre, séparément des abonnements ; confidentialité par entreprise conservée.
+- Raccourci administrateur vers l'enregistrement du virement : fermeture de la fenêtre modale avant l'accès au formulaire.
+- Retrait explicite d'une approbation documentaire, gestion des sessions expirées et vérification d'une vraie ligne modifiée avant tout succès affiché.
+- Données et messages tardifs ignorés après déconnexion pendant la lecture, l'envoi ou l'enregistrement d'un document ; avertissement sur le renouvellement en attente.
+- Actions de compte protégées contre les doubles clics et opérations concurrentes ; erreurs et réponses de session tardives traitées sans encourager une inscription en doublon.
+- Suppression des textes statiques de démonstration et paiement désactivé dans les parcours réels ; versions des scripts actualisées.
+- Pages distinctes mentions légales/confidentialité, accessibles avant inscription et depuis le pied de page. Identité connue, prestataires utilisés, accès et droits décrits ; directeur de publication HAECKEL HAMRI et téléphone 04 91 82 63 12 confirmés par l'exploitant. Les conditions v3 acceptées et leur empreinte n'ont pas été modifiées.
+- Consignes de déploiement corrigées pour conserver les inscriptions ouvertes, CNAME et vidéos ; contrôles mensuels intégrés à la suite groupée.
+
+Les tests restent locaux (PostgreSQL jetable et navigateur avec réseau simulé). Ils vérifient les parcours et les refus selon les fonctions exportées ; ils n'impliquent ni compte utilisateur réel nouvellement créé, ni course payante réelle, ni contrôle des sessions privées du tableau de bord Supabase. Le nom des prestataires ne suffit pas à établir leurs conditions contractuelles ou les transferts réels : voir `docs/juridique/INFORMATIONS-PUBLICATION-A-CONFIRMER.md`. Aucune certification de sécurité ou conformité juridique globale n'est revendiquée.

@@ -1,42 +1,46 @@
-# Déploiement provisoire GitHub Pages
+# Déploiement GitHub Pages — 13 URGENT
 
-Une version statique pilote est construite depuis le code source et publiée sur la branche `gh-pages`. Cette alternative ne requiert pas de changement DNS ni d'accès FTP OVH. Le domaine 13urgent.fr reste inchangé tant qu'aucune migration de domaine n'est décidée.
+État revu le **23 octobre 2026**. Le site public est `https://13urgent.fr/`, hébergé par GitHub Pages depuis la branche `gh-pages`. Le fichier `CNAME` contient `13urgent.fr`. Le code source est sur `main` : un changement de source ne republie pas automatiquement le site.
 
-## Publication confirmée le 19 octobre 2026
+## État confirmé
 
-GitHub a lancé automatiquement le déploiement après création de gh-pages. L’exécution [39241061027](https://github.com/13urgent/site/actions/runs/39241061027) indique **Success** pour le commit de publication 13e75d4 et expose `https://13urgent.github.io/site/`. La requête HTTP directe vers cette adresse reste bloquée par le proxy cloud : sa consultation réelle et sa connexion au projet Supabase sont à confirmer dans le navigateur utilisateur.
+- L'utilisateur a confirmé le raccordement du domaine, HTTPS, les inscriptions professionnelles et le fonctionnement du dépôt d'une course côté transporteur.
+- Le mode commercial est **actif**, confirmé par le statut serveur affiché dans l'administration et la capture utilisateur. Son état est stocké dans Supabase ; le commutateur JavaScript de marketplace ne l'active pas et ne le désactive pas.
+- Les restrictions d'accès, le stockage privé et ses limites PDF/JPEG/PNG de 10 Mo ont été confirmés dans le résultat SQL fourni par l'utilisateur.
+- Les alertes d'inscription et le récapitulatif mensuel ont été testés avec réception effective des e-mails. Le récapitulatif est un document préparatoire ; les factures restent émises dans l'outil CHRONOSS.
+- La publication permet l'indexation : balise `index,follow`, canonical `https://13urgent.fr/`, robots et sitemap publics. Cela ne garantit aucun classement ni délai d'indexation.
 
-## Réglages du service GitHub Pages
+L'audit de déploiement a constaté le succès de l'exécution Pages [39931917689](https://github.com/13urgent/site/actions/runs/39931917689), pour la publication `4bf6e161`. Les contrôles navigateur sur cet artefact téléchargé passent pour le domaine racine et le sous-dossier GitHub Pages. L'accès HTTPS direct au domaine reste bloqué par le proxy de l'environnement d'audit : ces tests ne constituent pas une nouvelle connexion réelle au site ou au projet Supabase.
 
-Le réglage du dépôt doit être : Settings → Pages → Build and deployment → Source = Deploy from a branch → Branch = gh-pages → Folder = / (root) → Save. La branche contient déjà les fichiers de publication. L'URL attendue après déploiement réussi est `https://13urgent.github.io/site/` ; ce nom n'est pas une preuve que la publication est active.
+## Construire sans refermer les inscriptions
 
-L'accès API GitHub et le domaine github.io sont refusés par le proxy de cette session. La session peut pousser des commits via l'accès Git existant et lire les pages publiques github.com, mais ne peut pas confirmer ce réglage via l'API ni effectuer une requête vers le site final. L'utilisateur doit confirmer l'activation dans Pages et la réussite de l'ouverture réelle du site.
+Utiliser un **nouveau dossier vide séparé du dépôt** et conserver les deux arguments d'ouverture :
 
-## Connexion Supabase depuis le pilote public
-
-Les comptes existants avec mot de passe peuvent se connecter. Pour les liens par e-mail, ajouter exactement `https://13urgent.github.io/site/` à Authentication → URL Configuration → Redirect URLs, sans supprimer les adresses existantes. Les retours conservent le sous-dossier /site/ et ne recopient aucun jeton de l'adresse courante. Les envois restent soumis au quota de messagerie Supabase ; SMTP de production non configuré.
-
-Les inscriptions sont masquées et refusées dans l'interface de publication pour éviter d'ouvrir commercialement le pilote. Cela ne désactive pas l'API d'inscription de Supabase : les protections B2B serveur et les autorisations pilote demeurent nécessaires. Ne pas considérer le masquage d'interface comme une restriction d'accès serveur.
-
-## Contenu et sécurité
-
-- Pilote gratuit activé dans le fichier de configuration de déploiement uniquement ; configuration locale source inchangée.
-- Aucun paiement, souscription payée ou frais de service encaissé.
-- Le paquet exclut les pièces jointes, fichiers PDF, tests, documentation interne, migrations SQL et métadonnées Git.
-- Seule la clé publique Supabase déjà utilisée par le client est incluse. Une clé privée ou service_role ne doit jamais être introduite.
-- Robots et balise noindex demandent l'absence d'indexation ; ce ne sont pas des contrôles d'accès.
-- Les données sont protégées par Supabase/RLS et les fonctions serveur. L'utilisateur indique avoir appliqué la dernière migration ; la session cloud ne peut toujours pas tester son exécution réelle.
-- Le contrôle documentaire n'est pas contourné : CHRONOSS doit encore justifier la garantie marchandises ; l'attestation RC reçue ne suffit pas à l'établir.
-
-## Reconstruire une publication
-
-```
-python tools/build_pilot.py --output /workspace/releases/NOUVEAU-DOSSIER-VIDE
-node tests/deployment-browser.cjs /workspace/releases/NOUVEAU-DOSSIER-VIDE
+```sh
+python tools/build_pilot.py --output /workspace/releases/NOUVEAU-DOSSIER-VIDE --open-registration
+node tests/deployment-browser.cjs /workspace/releases/NOUVEAU-DOSSIER-VIDE open
 ```
 
-La publication gh-pages est une copie construite, distincte de main. Un simple changement sur main ne republie pas ce paquet : il faut le reconstruire, tester et pousser la nouvelle arborescence de publication. Ne jamais mélanger les pièces ou le dossier de tests avec les fichiers d'hébergement.
+La variante sans `--open-registration` masque les inscriptions ; elle n'est pas celle du site public actuel. Le constructeur active `URGENT_MARKETPLACE_PILOT`, garde `URGENT_BILLING_TEST_UI=false` et définit `URGENT_ALLOW_REGISTRATION=true` avec l'option ci-dessus. Les autorisations réelles restent contrôlées par Supabase.
 
-## Validation avant ouverture commerciale
+**Préserver `videos/` et `CNAME` de la publication existante.** Les vidéos ne sont pas recopiées par le constructeur. Ne pas remplacer aveuglément toute la branche par le seul dossier construit : une mise à jour doit conserver les médias existants et ne modifier que les fichiers prévus. Vérifier le diff avant de pousser. Le paquet public exclut pièces justificatives, tests, documentation interne, migrations et métadonnées Git. Ne jamais y introduire de clé privée ou `service_role`.
 
-Confirmer le HTTPS réel, les connexions existantes, les droits sur le projet distant, une course client/transporteur complète, les liens d'e-mail et la non-exposition des prix/contacts aux tiers. Valider ensuite les contrats, coordonnées légales, TVA, paiements et abonnements avant leur activation. Cette publication sert à la recette du pilote, pas à annoncer un service payant opérationnel.
+## Publier et contrôler
+
+1. Vérifier les tests applicables et le test de déploiement de la variante ouverte.
+2. Comparer les fichiers à publier avec `gh-pages`, en préservant les vidéos, `CNAME`, `.nojekyll` et les commutateurs de production.
+3. Pousser les fichiers publics sur `gh-pages` ; pousser seulement `main` ne suffit pas.
+4. Attendre **Success** dans GitHub Actions pour le commit publié avant d'annoncer la mise en ligne.
+5. Contrôler le site et les parcours concernés dans un navigateur. Une réussite du build ne prouve pas les droits Supabase ni une opération métier réelle.
+
+Dans Settings → Pages, le mode attendu est **Deploy from a branch → gh-pages → / (root)**. Le domaine canonique reste `13urgent.fr` ; ne pas changer DNS, domaine ou paramètres Supabase lors d'une simple mise à jour de fichiers.
+
+## Connexions et changements serveur
+
+Les liens de connexion doivent revenir vers `https://13urgent.fr/`, autorisé dans Authentication → URL Configuration. Garder les URL existantes nécessaires aux environnements de recette ; le code sait également conserver `/site/` pour une publication en sous-dossier. Ne jamais copier les jetons de l'URL courante dans les paramètres de retour.
+
+Les migrations SQL, Edge Functions et secrets Supabase sont déployés séparément du site statique. Ne pas rejouer tout le dossier de migrations : vérifier celles déjà appliquées et les résultats fournis par l'utilisateur. Le fonctionnement des notifications via Resend ne prouve pas à lui seul la configuration du SMTP d'authentification Supabase.
+
+## Portée de la validation
+
+Le mode commercial actif, les tests locaux et les e-mails reçus ne signifient pas que tous les parcours ont été rejoués en production. Vérifier notamment les offres confidentielles, les droits entre entreprises, une attribution réelle, les périodes payées, les quotas et les expirations documentaires. Les coordonnées légales, les engagements contractuels, la TVA applicable et le statut réglementaire doivent rester cohérents avec l'activité réelle ; ne pas présenter les tests techniques comme une validation juridique.

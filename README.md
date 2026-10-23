@@ -1,64 +1,65 @@
-# 13 URGENT — plateforme professionnelle en développement
+# 13 URGENT — plateforme de transport entre professionnels
 
-Site statique HTML/CSS/JavaScript avec Supabase pour les comptes, les justificatifs et les brouillons externes. Logo et interface adaptés aux ordinateurs et mobiles. Service particuliers non ouvert.
+Site HTML/CSS/JavaScript publié sur **https://13urgent.fr/** avec Supabase pour les comptes, les documents et la marketplace. Service réservé aux professionnels ; particuliers et applications mobiles ne sont pas ouverts.
 
-**Les paiements, abonnements payés et réservations commerciales ne sont pas activés.** Le taux de mise en relation envisagé pour les donneurs d'ordre professionnels est de 1,5 % HT du tarif HT du transport. Les conditions contractuelles et la TVA restent à valider.
+## État confirmé au 23 octobre 2026
 
-## Publication actuelle
+- Site sur GitHub Pages avec domaine et HTTPS confirmés par l'utilisateur ; inscriptions professionnelles ouvertes et indexation autorisée.
+- **Mode commercial actif**, confirmé par le statut serveur de l'administration. Frais de service de **1,5 % HT du montant HT du transport**, enregistrés à l'attribution commerciale, cumulés pour la facturation mensuelle. Le transport reste facturé directement par le transporteur au donneur d'ordre.
+- Abonnements transporteurs par **virement et activation manuelle** après rapprochement du règlement et vérification documentaire. Aucun prélèvement automatique ; Stripe reste désactivé.
+- Protections d'accès et stockage documentaire privé limitant les fichiers aux PDF/JPEG/PNG de 10 Mo confirmés par les résultats SQL utilisateur.
+- Alertes d'inscription et récapitulatif mensuel installés, activés et testés avec réception réelle. Le relevé du mois clôturé est prévu le 1er du mois à partir de 8 h, heure de Paris, avec HTML imprimable et CSV. Il prépare la facturation ; il n'émet pas de facture et n'envoie rien aux clients. [Fonctionnement et exploitation](docs/RECAPITULATIF-MENSUEL.md).
 
-Le domaine `13urgent.fr` est raccordé à GitHub Pages avec HTTPS, selon les vérifications utilisateur. Les inscriptions professionnelles sont ouvertes à sa demande le 20 octobre ; les droits d’accès restent contrôlés par Supabase et l’administration. **Conserver `--open-registration` lors des prochaines constructions** ; le défaut du constructeur reste fermé par précaution. Préserver les dossiers `videos/` et le fichier `CNAME` lors de la publication. L’ouverture des inscriptions ne change pas le mode commercial en base.
+Ces confirmations ne remplacent pas la recette complète en production ni la validation du cadre juridique. Les tests locaux utilisent des données simulées ; ne pas annoncer tous les parcours vérifiés sur la seule base de leur réussite.
 
-## Démarrer
+## Publication
 
-Sous Windows : extraire le dépôt complet, conserver les dossiers `assets`, puis lancer `start-local.cmd` (Python installé dans PATH). Garder la fenêtre ouverte et saisir l'adresse indiquée dans le navigateur. Ne pas utiliser `file://` pour valider les connexions.
+`main` contient le source ; **`gh-pages` contient les fichiers réellement publiés**. Une modification sur `main` ne met pas automatiquement le site à jour.
 
-Dans l'environnement cloud :
-
+```sh
+python tools/build_pilot.py --output /workspace/releases/NOUVEAU-DOSSIER-VIDE --open-registration
+node tests/deployment-browser.cjs /workspace/releases/NOUVEAU-DOSSIER-VIDE open
 ```
+
+Conserver `--open-registration` et l'argument de test `open` : le constructeur ferme les inscriptions par défaut. **Préserver `videos/` et `CNAME` déjà présents dans `gh-pages`** ; les vidéos ne sont pas copiées par le constructeur. Contrôler le diff, publier uniquement les fichiers prévus puis attendre le succès GitHub Pages. [Procédure de déploiement](docs/DEPLOIEMENT-PILOTE.md).
+
+Les migrations SQL, Edge Functions et secrets Supabase sont distincts de la publication statique. Ne pas rejouer aveuglément des migrations déjà appliquées, modifier le mode commercial ou changer de domaine pendant une simple actualisation.
+
+## Développement local
+
+Sous Windows : conserver les dossiers du dépôt et lancer `start-local.cmd` avec Python installé. Dans l'environnement cloud :
+
+```sh
 python -m http.server 8000 --bind 127.0.0.1 --directory /workspace/site
 ```
 
-La configuration publique Supabase est dans `config.js`. Ne jamais y placer une clé secrète ou service_role. Les rôles autorisés sont définis par la base, pas par le formulaire ou les métadonnées utilisateur.
+Ne pas utiliser `file://` pour tester les connexions. La configuration publique est dans `config.js` ; n'y placer aucune clé secrète ou `service_role`. Le fichier source garde `URGENT_MARKETPLACE_PILOT=false` ; la construction publique l'active explicitement. Une configuration manquante bloque le formulaire en production plutôt que d'enregistrer une course seulement dans le navigateur. La démonstration locale exige `URGENT_LOCAL_DEMO=true` et une adresse localhost ; elle n'est pas le mode d'exploitation public.
 
-## Deux modes distincts
+## Accès, documents et facturation
 
-- **Démonstration locale (défaut)** : `URGENT_MARKETPLACE_PILOT = false`. Les courses sont conservées uniquement dans le navigateur. Les offres réelles restent désactivées. Le choix Start/Drive/Boost/Premium dans le compte est une demande déclarative, sans abonnement actif.
-- **Pilote partagé gratuit** : après migration et autorisation des établissements, `URGENT_MARKETPLACE_PILOT = true` permet publication, propositions confidentielles, sélection et suivi. Aucune perception de frais ou confirmation d'affrètement automatique. [Procédure complète et limites](docs/PILOTE-COURSES.md).
+Les rôles viennent de la base. L'administration est réservée aux profils serveur `admin`. Une immatriculation saisie, un document accepté ou un règlement enregistré ne suffisent pas à valider automatiquement toute l'entreprise. Vérifier le registre, les autorisations et les garanties ; les pièces doivent être approuvées et valides au moment des opérations qui les exigent.
 
-Les comptes et documents Supabase ainsi que les brouillons externes partagés ne dépendent pas de ce commutateur. Le stockage des documents utilise le bucket privé `carrier-documents`, PDF/JPG/PNG jusqu'à 10 Mo ; son fonctionnement requiert les politiques existantes de stockage et de tables.
+Le commutateur JavaScript historique `URGENT_MARKETPLACE_PILOT` ouvre le module partagé ; il ne signifie pas que le service est gratuit. Le **mode commercial vient de Supabase**. Les droits et quotas dépendent des accès autorisés, des périodes payées et de la validité documentaire. La publication d'une demande n'entraîne pas de frais d'attribution. Un transporteur qui agit comme donneur d'ordre conserve les frais de ce rôle en complément de son abonnement.
 
-## Administration et vérifications
+Factures et avoirs sont émis dans l'outil CHRONOSS existant. Le relevé mensuel distingue frais, régularisations, références déjà facturées et suivi des abonnements pour éviter une double facturation. La TVA doit être déterminée dans l'outil de facturation selon la situation réelle. Les conditions professionnelles acceptées sont versionnées ; ne pas modifier rétroactivement leur document immuable sans nouvelle version et procédure d'acceptation.
 
-L'administration est réservée aux profils serveur `admin`. Accepter un document ne valide pas toute l'entreprise. Les attestations de validité, les autorisations transport et le registre doivent être réellement contrôlés. Une immatriculation saisie ou une case cochée ne constitue pas une vérification indépendante.
+## Vérifications
 
-Le pilote ajoute une autorisation propre, distincte des états existants et des abonnements. Les documents doivent être approuvés et valides au moment d'une offre et d'une attribution. Aucune mise à jour des comptes existants, de leurs rôles ou des anciennes courses locales n'est effectuée automatiquement.
+```sh
+python tools/check_launch.py
+```
 
-## Conditions professionnelles en préparation
+Les contrôles utilisent PostgreSQL embarqué PGlite et Chromium ; les dépendances doivent être installées dans l'environnement. Ils ne remplacent pas les essais avec des comptes réels, la concurrence entre connexions, les contrôles d'e-mails, les réglages distants et le conseil juridique. L'outil n'appelle pas le projet Supabase de production.
 
-Le modèle retenu pour les donneurs d’ordre est désormais le cumul mensuel des frais de 1,5 % HT, puis une facture unique de fin de mois. [Projet de CGU/CGV CHRONOSS](docs/juridique/CGU-CGV-PROJET.md), [règles mensuelles à implémenter](docs/juridique/FACTURATION-MENSUELLE-CADRE.md) et [validations restantes](docs/juridique/VALIDATION-AVANT-PUBLICATION.md). Ces documents ne sont pas publiés ni applicables au pilote gratuit ; le parcours mensuel est implémenté et testé localement ; la migration distante et la recette avant ouverture restent nécessaires.
+## Documentation
 
-## Mise à jour du 20 octobre — virements et facturation CHRONOSS
-
-Le module manuel est implémenté et testé localement : périodes payées, contrôle documentaire et quotas, frais à 1,5 %, cumul mensuel et export pour l'outil existant. [Installation groupée et état réel](docs/MISE-A-JOUR-20-OCTOBRE.md). Une migration distante reste nécessaire ; ni l'ouverture commerciale ni le domaine ne sont modifiés automatiquement. La variante `--open-registration` prépare les inscriptions publiques ; la variante par défaut les garde masquées pendant l'attente OVH.
-
-## Mode d’exploitation retenu
-
-Factures émises avec l’outil CHRONOSS existant ; abonnements transporteurs réglés par virement et activés manuellement après rapprochement et vérification documentaire. [Décisions et écarts techniques à traiter](docs/OUVERTURE-MANUELLE.md). Le module Stripe ci-dessous reste désactivé et ne constitue plus un préalable au démarrage.
-
-## Préparation des paiements
-
-Un module Stripe **test uniquement** est préparé, désactivé par défaut. Il sépare les abonnements et les frais de 1,5 % sans encaisser le prix du transport. Aucun paiement ne valide les documents ou les accès. [Branchement sécurisé, recette et conditions restantes](docs/PAIEMENTS-TEST.md).
-
-## Ressources
-
-- [Déploiement provisoire GitHub Pages](docs/DEPLOIEMENT-PILOTE.md)
-
-- [Mise à jour du 19 octobre — une intervention groupée](docs/MISE-A-JOUR-19-OCTOBRE.md)
-- [État réel du projet et blocages](docs/AVANCEMENT.md)
-- [Pilote des courses et offres — migration groupée, contrôles et tests](docs/PILOTE-COURSES.md)
+- [Audit de lancement du 23 octobre](docs/AUDIT-LANCEMENT-23-OCTOBRE.md)
+- [Récapitulatif mensuel et surveillance](docs/RECAPITULATIF-MENSUEL.md)
+- [Facturation manuelle — installation initiale du 20 octobre](docs/MISE-A-JOUR-20-OCTOBRE.md)
+- [Choix du fonctionnement manuel](docs/OUVERTURE-MANUELLE.md)
 - [Ouverture professionnelle et SIRET](supabase/OUVERTURE-PRO.md)
 - [Recette d'inscription](docs/recette-inscription-professionnelle.md)
-- [Brouillons B2PWeb/Rubiwin](supabase/README.md)
-- [Relance du ticket OVH](docs/relance-ovh-S16949971.md)
+- [Historique du pilote partagé](docs/PILOTE-COURSES.md)
+- [Paiements Stripe de test, désactivés](docs/PAIEMENTS-TEST.md)
 
-Les migrations sont ordonnées et à appliquer une seule fois après inspection ; certaines ont déjà été exécutées dans le projet de l'utilisateur. Ne pas rejouer tout le dossier aveuglément. Les tests utilisent PostgreSQL embarqué PGlite et Chromium ; ils ne remplacent pas la recette sur le projet distant, les essais de concurrence multi-connexions, le SMTP de production ni le contrôle juridique.
+Les documents datés décrivent parfois un état antérieur à l'ouverture commerciale. Utiliser l'état confirmé ci-dessus et les résultats de recette récents pour préparer une mise à jour ; conserver les réserves qui n'ont pas été effectivement levées.
