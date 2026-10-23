@@ -1,10 +1,11 @@
 "use strict";
 // Les actions utilisent exclusivement la session utilisateur et les politiques Supabase.
 const DOC_BUCKET='carrier-documents';
+const adminPage=document.body.dataset.adminPage==='true';
 const documentLabels={registration:'Immatriculation / Kbis',transport_licence:'Licence de transport',insurance_rc:'Assurance responsabilité civile',insurance_goods:'Assurance marchandises transportées',other:'Autre document'};
 const documentLabel=kind=>documentLabels[kind]||kind;
 const doc$=id=>document.getElementById(id);
-function docMsg(id,message){const e=doc$(id);e.hidden=false;e.textContent=message;}
+function docMsg(id,message){const e=doc$(id)||doc$('authNotice');if(e){e.hidden=false;e.textContent=message;}}
 function safeText(v){return String(v??'');}
 function line(parent,tag,txt,cls){const e=document.createElement(tag);if(cls)e.className=cls;e.textContent=safeText(txt);parent.append(e);return e;}
 let professionalProfile=null;
@@ -25,6 +26,7 @@ async function refreshProfessionalAccess(){
   professionalProfile=data;
   doc$('openDocuments').hidden=data?.role!=='carrier';
   doc$('openAdmin').hidden=data?.role!=='admin';
+  if(doc$('adminPageNotice'))doc$('adminPageNotice').textContent=data?.role==='admin'?'Administration : ouvrez les dossiers ou gérez les abonnements et frais ci-dessous.':'Accès réservé aux administrateurs. Vous pouvez revenir à l’accueil.';
 }
 window.refreshProfessionalAccess=refreshProfessionalAccess;
 async function getOwnCompany(){
@@ -72,11 +74,11 @@ async function uploadDocument(e){
   }catch(err){if(generation===professionalAccessGeneration)docMsg('documentNotice','Envoi impossible : '+err.message);}finally{btn.disabled=false;}
 }
 async function showAdmin(){
-  if(professionalProfile?.role!=='admin')return;
+  if(!adminPage||professionalProfile?.role!=='admin')return;
   doc$('adminDialog').showModal();await loadAdmin();
 }
 async function loadAdmin(){
-  if(professionalProfile?.role!=='admin')return;
+  if(!adminPage||professionalProfile?.role!=='admin')return;
   const generation=professionalAccessGeneration;
   doc$('adminNotice').hidden=true;const host=doc$('adminDossiers');host.replaceChildren();line(host,'p','Chargement des dossiers…');
   const [companies,docs]=await Promise.all([
@@ -143,18 +145,19 @@ async function loadAdmin(){
   }
 }
 doc$('openDocuments').addEventListener('click',()=>showMyDocuments().catch(()=>docMsg('documentNotice','Service momentanément inaccessible.')));
-doc$('openAdmin').addEventListener('click',()=>showAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.')));
-doc$('refreshAdmin').addEventListener('click',()=>loadAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.')));
+if(adminPage)doc$('openAdmin').addEventListener('click',event=>{event.preventDefault();showAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.'));});
+doc$('refreshAdmin')?.addEventListener('click',()=>loadAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.')));
 const renewalWarning=document.createElement('p');renewalWarning.className='muted';renewalWarning.id='documentRenewalWarning';
 renewalWarning.textContent='Renouvellement : la nouvelle pièce est prise en compte dès son dépôt. Tant qu’elle reste en attente de validation par 13 URGENT, vos nouvelles propositions et attributions peuvent être suspendues.';
 doc$('documentForm').before(renewalWarning);
 doc$('documentForm').addEventListener('submit',uploadDocument);
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>doc$(b.dataset.close).close()));
 function clearProfessionalViews(){
- for(const name of ['documentsDialog','adminDialog'])if(doc$(name).open)doc$(name).close();
- for(const name of ['myDocuments','adminDossiers'])doc$(name).replaceChildren();
+ if(doc$('adminPageNotice'))doc$('adminPageNotice').textContent='Connectez-vous avec votre compte administrateur pour accéder à la gestion.';
+ for(const name of ['documentsDialog','adminDialog'])if(doc$(name)?.open)doc$(name).close();
+ for(const name of ['myDocuments','adminDossiers'])doc$(name)?.replaceChildren();
  doc$('companyStatus').textContent='';doc$('documentForm').reset();
- for(const name of ['documentNotice','adminNotice']){doc$(name).textContent='';doc$(name).hidden=true;}
+ for(const name of ['documentNotice','adminNotice']){if(doc$(name)){doc$(name).textContent='';doc$(name).hidden=true;}}
 }
 sb?.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>{
  const id=session?.user?.id||null;
