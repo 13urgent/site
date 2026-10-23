@@ -119,3 +119,11 @@ NODE_PATH=/workspace/13urgent-tools/node_modules node tests/exported-production-
 ```
 
 Les contrôles inspectés ne montrent pas d'action d'administration accordée aux comptes ordinaires par ces RPC. L'audit ne couvre pas les sessions du tableau de bord Supabase, les clés de service externes, une revue d'intrusion complète ou les conditions juridiques et opérationnelles. La validation juridique, la politique de confidentialité, la présentation des tarifs et du double rôle CHRONOSS, ainsi que la recette réelle du mode commercial restent des sujets distincts à terminer.
+
+## Correction du sélecteur d'ouverture commerciale
+
+Après les tentatives utilisateur, l'ancien `clear()` remettait tous les formulaires à leur valeur par défaut ; le sélecteur repassait donc à false même après une activation enregistrée. La lecture de `urgent_commercial_status` ne répercutait pas le mode dans ce sélecteur. Ce retour visuel ne démontrait pas un échec de l'activation. L'état distant après les tentatives utilisateur n'a pas pu être lu depuis l'environnement (proxy refuse l'accès Supabase).
+
+Correctif de présentation : état actuel explicite près du formulaire ; synchronisation du sélecteur avec la configuration reçue ; placeholder sans état sélectionné pendant une vérification ou un échec de lecture ; confirmation locale après relecture de la configuration ; erreur explicite si l'enregistrement ou la relecture échoue. Le contrôle n'est disponible qu'après identification administrateur et lecture valide. Les contrôles serveur restent inchangés. Référence versionnée du script dans le HTML pour éviter une ancienne version en cache.
+
+Le test `manual-commerce-browser.cjs` couvre désormais le vrai formulaire d'activation/désactivation relié au SQL local, le rechargement, le rejet d'une confirmation incorrecte et le cas « écriture réussie mais lecture suivante en panne » sans faux succès ni retour affiché à false. Les parcours existants de frais, facture et régularisation restent passants. Aucune activation de la base réelle n'a été effectuée par cette correction ; lire le nouvel état confirmé avant de demander à nouveau une activation.
