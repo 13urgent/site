@@ -4,8 +4,8 @@ Les pages mentions-legales.html et confidentialite.html améliorent l’informat
 
 ## Identité et édition
 
-- Confirmer le nom et la qualité du directeur ou de la directrice de publication avant de l’ajouter. Le dépôt ne contient pas de référence documentaire suffisante pour publier cette mention avec certitude.
-- Confirmer le numéro de téléphone professionnel à publier et l’identité juridique complète, adresse et contact d’hébergement applicables au contrat GitHub Pages. Les noms de services techniques sont indiqués, sans inventer d’adresse contractuelle.
+- Directeur de publication confirmé par l’exploitant : HAECKEL HAMRI, publié le 23 octobre 2026.
+- Téléphone professionnel confirmé et publié : 04 91 82 63 12. Confirmer encore l’identité juridique complète, adresse et contact d’hébergement applicables au contrat GitHub Pages. Les noms de services techniques sont indiqués, sans inventer d’adresse contractuelle.
 - Identité reprise du Kbis fourni : CHRONOSS SASU, capital 12 600 €, siège 27 Boulevard Charles Moretti 13014 Marseille, RCS Marseille 918710393. Le rattachement du SIRET 91871039300052 et la validité TVA FR60918710393 restent à confirmer (déclarations exploitant).
 
 ## Données et prestataires

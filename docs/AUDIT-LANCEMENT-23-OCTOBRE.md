@@ -145,3 +145,9 @@ Corrections complémentaires côté site :
 - Consignes de déploiement corrigées pour conserver les inscriptions ouvertes, CNAME et vidéos ; contrôles mensuels intégrés à la suite groupée.
 
 Les tests restent locaux (PostgreSQL jetable et navigateur avec réseau simulé). Ils vérifient les parcours et les refus selon les fonctions exportées ; ils n'impliquent ni compte utilisateur réel nouvellement créé, ni course payante réelle, ni contrôle des sessions privées du tableau de bord Supabase. Le nom des prestataires ne suffit pas à établir leurs conditions contractuelles ou les transferts réels : voir `docs/juridique/INFORMATIONS-PUBLICATION-A-CONFIRMER.md`. Aucune certification de sécurité ou conformité juridique globale n'est revendiquée.
+
+## Dernier garde-fou comptable préparé
+
+Le contrôle parallèle a identifié une référence de facture pouvant être utilisée pour des entreprises différentes entre les abonnements et les frais, les contraintes ayant été séparées. `202610230005_invoice_reference_boundary.sql` ajoute une réservation privée commune et atomique par référence/entreprise. Une même facture peut regrouper abonnement et frais du même client ; les conflits historiques sont signalés sans effacement ni réécriture. Le test SQL couvre les deux sens, les modifications, les refus du RPC, les droits et la conservation des montants. Cette migration reste à appliquer par l’exploitant dans Supabase ; ne pas la présenter comme déjà active.
+
+Vérifications regroupées précédant publication : 17/17 réussies, audit des 39 fonctions exportées réussi, test navigateur du déploiement réussi. Le nouveau test de références est ajouté à la suite (18 contrôles). Aucune nouvelle migration n’est nécessaire pour les autres corrections de parcours publiées.
