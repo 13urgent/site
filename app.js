@@ -1,6 +1,13 @@
 (()=>{
 if(window.URGENT_MARKETPLACE_PILOT===true)return;
 'use strict';
+// En production, ne jamais enregistrer une demande localement si le service en ligne manque.
+if(window.URGENT_LOCAL_DEMO!==true||!['localhost','127.0.0.1','[::1]'].includes(location.hostname)){
+ const form=document.getElementById('shipmentForm');
+ form?.querySelectorAll('input,select,textarea,button').forEach(control=>control.disabled=true);
+ const notice=document.getElementById('courseCount');if(notice)notice.textContent='Le service de courses est momentanément indisponible. Actualisez la page avant de déposer votre demande.';
+ return;
+}
 const KEY='13urgent_demo_shipments_v1';
 const $=id=>document.getElementById(id);
 function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[]}catch{return []}}
