@@ -96,3 +96,26 @@ Le repli historique de `app.js` est désormais désactivé par défaut et interd
 Recette groupée locale `tools/check_launch.py` : **15 contrôles réussis sur 15**, couvrant verrouillage, lien document/fichier, alertes, inscription, trois rôles, attributions/frais/CSV, documents, effacement à déconnexion, retrait import, choix de forfait et absence de repli local en production. Un test de construction/déploiement vérifie également le domaine, le retour des e-mails, le logo et l'état des inscriptions. Les tests utilisent des bases et réseaux de simulation ; ils ne démontrent pas la totalité du comportement distant.
 
 Pour terminer la revue des RPC réellement installées sans multiplier les requêtes, `supabase/setup/audit-consolidated-production.sql` regroupe dans un seul résultat : fonctions SECURITY DEFINER et droits d'appel, RLS, politiques, droits de tables/colonnes, paramètres de stockage, vues, triggers et état commercial. Il est en lecture seule et n'exporte pas de lignes de comptes, budgets, notes, documents ou secrets Vault. Ne pas annoncer une sécurité complète ou une ouverture commerciale validée avant examen de cet export et des vérifications restantes listées plus haut.
+
+## Export consolidé réel : conclusions techniques et commerciales
+
+Export utilisateur `Untitled query (7)` : 39 fonctions SECURITY DEFINER, 39 jeux de privilèges de fonctions, 32 politiques, 23 tables avec RLS, 42 privilèges de table, 110 privilèges de colonne, trois triggers, un bucket et une configuration commerciale. Aucune vue publique n'est présente dans cet export.
+
+Les corps des **37 fonctions issues des migrations sont identiques** aux dernières définitions du dépôt après normalisation des espaces/commentaires. Les deux autres fonctions sont le déclencheur historique `create_user_profile` et `is_13urgent_admin`, examinés séparément. Le déclencheur attribue uniquement client ou carrier, jamais admin sur la base d'une métadonnée. La création des profils et le contrôle du rôle sont réalisés côté serveur. Les fonctions d'administration, abonnements, frais/avoirs, corrections de pièces, rapports et exercices fictifs disposent du contrôle administrateur ; les fonctions internes des alertes ne sont pas exécutables par anon/authenticated.
+
+**Mode commercial réellement exporté : `enabled=false`, conditions v3.** Les frais de 1,5 % ne sont donc pas activés pour les attributions réelles à cet instant. Aucun correctif de cet audit n'active la facturation. Ne pas confondre affichage des tarifs, présence des fonctions et activation effective.
+
+Deux durcissements supplémentaires regroupés dans `202610230003_access_and_upload_limits.sql` :
+
+- `companies` et l'ancienne table `offers` conservent des privilèges hérités très larges pour anon/authenticated, dont TRUNCATE et TRIGGER. Les règles RLS de lecture n'accordent pas pour autant toutes les opérations métier, et une exposition exploitable par l'API REST n'est pas démontrée. Ces privilèges restent inutiles et doivent être retirés : SELECT authentifié conservé sur companies avec sa RLS, ancienne table offers suspendue sans effacement. Le site et ses fonctions utilisent `urgent_offers`.
+- Bucket privé confirmé, mais `file_size_limit=null` et `allowed_mime_types=null` : les restrictions du formulaire ne sont pas imposées par la configuration de ce bucket. Configurer au maximum 10 485 760 octets et PDF/JPEG/PNG, sans élargir une éventuelle restriction préexistante plus stricte. Cela ne remplace pas une analyse du contenu ou de l'authenticité de la pièce.
+
+**Test supplémentaire sur l'export :** `tests/exported-production-guards.cjs` recharge les 39 fonctions, rejoue les politiques et privilèges des tables principales nécessaires et applique le durcissement préparé dans une base PGlite jetable. Il vérifie 22 refus explicites d'actions administrateur pour client/transporteur, les refus anonymes, la non-approbation directe d'une pièce par son propriétaire, la non-modification du rôle, les refus de TRUNCATE après révocation, l'absence de données privées dans la réponse de configuration publique, les limites du bucket, et une inscription avec métadonnée `role=admin` qui reste client. Les colonnes historiques non sollicitées par les fonctions peuvent être représentées de façon minimale pour rejouer les ACL ; ce n'est pas une copie du schéma ou des données de production. Aucun appel de mutation n'a été effectué sur Supabase réel.
+
+Commande de reproduction après conversion locale de l'export CSV en tableau JSON :
+
+```sh
+NODE_PATH=/workspace/13urgent-tools/node_modules node tests/exported-production-guards.cjs /workspace/supabase-audit-20261023.json
+```
+
+Les contrôles inspectés ne montrent pas d'action d'administration accordée aux comptes ordinaires par ces RPC. L'audit ne couvre pas les sessions du tableau de bord Supabase, les clés de service externes, une revue d'intrusion complète ou les conditions juridiques et opérationnelles. La validation juridique, la politique de confidentialité, la présentation des tarifs et du double rôle CHRONOSS, ainsi que la recette réelle du mode commercial restent des sujets distincts à terminer.
