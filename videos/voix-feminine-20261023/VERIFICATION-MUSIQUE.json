@@ -1,0 +1,12 @@
+{
+  "duration": 25,
+  "resolution": "1080x1920",
+  "fps": 30,
+  "decode": "PASS",
+  "video_stream_unchanged": true,
+  "music_normalized_target_LUFS": -23,
+  "music_ducked_during_speech": true,
+  "integrated_loudness_LUFS": "-16.98",
+  "true_peak_dBTP": "-1.50",
+  "sha256": "33e58a330b2184e2150fb8ccd1a103f32fc9f471700655aff60e5c5454fef9e5"
+}
