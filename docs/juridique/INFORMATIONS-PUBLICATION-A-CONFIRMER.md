@@ -27,3 +27,9 @@ Ces informations de l’exploitant et décisions juridiques/contractuelles ne pe
 ## Informations confirmées par l’exploitant le 23 octobre 2026
 
 Directeur de publication : HAECKEL HAMRI. Téléphone professionnel publié : 04 91 82 63 12. Ces deux informations ont été ajoutées aux mentions légales ; les autres vérifications contractuelles et durées de conservation restent distinctes.
+
+## Hébergement et conditions — contrôle complémentaire
+
+L’adresse GitHub, Inc., 88 Colin P. Kelly Jr. St., San Francisco, CA 94107, États-Unis, a été vérifiée dans le dépôt officiel GitHub de sa politique de confidentialité le 23 octobre 2026 et ajoutée aux mentions légales avec le portail de contact. Sources : https://github.com/github/site-policy/blob/main/Policies/privacy-policies/github-general-privacy-statement.md et https://github.com/github/site-policy/blob/main/Policies/github-terms/github-terms-of-service.md. Cela ne confirme pas les autres prestataires ni leurs régions et garanties de transfert.
+
+Les deux fichiers conditions-professionnelles.html et conditions-professionnelles-v3.html sont strictement identiques (SHA256 458c1bb0596eec98c3b0c342474added2c127570dbe9cc7b4dbc491130d75648). Tous les nouveaux liens pointent vers le document v3 ; l’alias historique reste disponible. Aucun contenu contractuel ni empreinte n’est modifié.
