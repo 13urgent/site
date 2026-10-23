@@ -1,0 +1,54 @@
+name: Vérifier le domaine public
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/verify-production.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Vérifier DNS et contenu HTTPS sans modifier le site
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request, urllib.error, socket, hashlib, json, os, time
+          targets = [
+            'https://13urgent.fr/',
+            'https://13urgent.fr/?controle=' + str(int(time.time())),
+            'https://13urgent.fr/conditions-professionnelles.html',
+            'https://13urgent.fr/mentions-legales.html',
+            'https://13urgent.fr/confidentialite.html',
+            'https://13urgent.github.io/site/',
+            'https://raw.githubusercontent.com/13urgent/site/gh-pages/index.html',
+            'https://raw.githubusercontent.com/13urgent/site/gh-pages/conditions-professionnelles.html',
+          ]
+          result={'dns':{},'pages':[]}
+          for name in ['13urgent.fr','www.13urgent.fr']:
+            try:result['dns'][name]=sorted(set(x[4][0] for x in socket.getaddrinfo(name,443)))
+            except Exception as error:result['dns'][name]={'error':str(error)}
+          for url in targets:
+            entry={'url':url}
+            try:
+              request=urllib.request.Request(url,headers={'User-Agent':'13URGENT-production-check/1.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(request,timeout=25) as response:
+                data=response.read(300000);body=data.decode('utf-8',errors='replace')
+                entry.update(status=response.status,final_url=response.url,server=response.headers.get('Server'),cache_control=response.headers.get('Cache-Control'),sha256=hashlib.sha256(data).hexdigest(),bytes=len(data),markers={
+                  'import_externe': 'Importer une mission externe' in body,
+                  'france_entiere': 'France entière' in body,
+                  'ancienne_presentation': '13 URGENT est une société de transport et une plateforme' in body,
+                  'lien_mentions': 'href="mentions-legales.html"' in body,
+                  'lien_confidentialite': 'href="confidentialite.html"' in body,
+                  'marseille': 'MARSEILLE ET SA RÉGION' in body,
+                })
+            except Exception as error:entry['error']=str(error)
+            result['pages'].append(entry)
+          # Only public metadata and booleans; never dump page bodies or credentials.
+          report=json.dumps(result,ensure_ascii=False,indent=2)
+          print(report)
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'w') as output:
+            output.write('# Diagnostic DNS et site public\n\n```json\n'+report+'\n```\n')
+          PY
