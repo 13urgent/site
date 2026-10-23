@@ -1,0 +1,9 @@
+{
+  "duration": 25,
+  "decode": "PASS",
+  "sha256": "63321002ee6c0f4113e7658f79df30c490a655fabe45da085b473d9948ce39e5",
+  "music": "Bande pop instrumentale originale de la vid\u00e9o commerciale CHRONOSS, sans voix off",
+  "music_source_sha256": "216c76a05202c19ff07025939ea645f1984667c51fbb5b6cf5eb6065d1945925",
+  "music_target_LUFS": -20,
+  "voice_target_LUFS": -16
+}
