@@ -161,6 +161,8 @@
  };
  $('courseFilters').onsubmit=e=>e.preventDefault();$('courseSearch').oninput=render;$('courseVehicle').onchange=render;
  $('exportShipments').textContent='Exporter les anciennes demandes locales';
+ let legacyRequests=null;try{legacyRequests=localStorage.getItem('13urgent_demo_shipments_v1');}catch{}
+ $('exportShipments').hidden=!legacyRequests||['[]','null'].includes(legacyRequests.trim());
  $('exportShipments').onclick=()=>{const raw=localStorage.getItem('13urgent_demo_shipments_v1')||'[]';const url=URL.createObjectURL(new Blob([raw],{type:'application/json'}));const a=make('a');a.href=url;a.download='13urgent-anciennes-demandes-locales.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  const testChoice=make('label',undefined,'professional-check wide');testChoice.id='testShipmentChoice';testChoice.hidden=true;
  const testInput=make('input');testInput.type='checkbox';testInput.id='testShipmentInput';testChoice.append(testInput,make('span','Créer un exercice fictif sans transport réel (administrateur uniquement).'));
