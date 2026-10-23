@@ -38,36 +38,38 @@ async function showMyDocuments(){
   if(!professionalProfile||professionalProfile.role!=='carrier')return;
   doc$('documentsDialog').showModal();
   try{
-    const c=await getOwnCompany();doc$('companyStatus').textContent=`${c.name} — Dossier : ${c.verification_status}`;
+    const c=await getOwnCompany();if(generation!==professionalAccessGeneration)return;doc$('companyStatus').textContent=`${c.name} — Dossier : ${c.verification_status}`;
     const {data,error}=await sb.from('carrier_documents').select('id,document_type,original_filename,review_status,expires_on,created_at').eq('company_id',c.id).order('created_at',{ascending:false});
     if(error)throw error;
     if(generation!==professionalAccessGeneration)return;
     const host=doc$('myDocuments');host.replaceChildren();
     if(!data?.length)line(host,'p','Aucun justificatif envoyé.');
     for(const d of data){const item=line(host,'div','', 'doc-item');line(item,'strong',d.original_filename||d.document_type);line(item,'span',`${documentLabel(d.document_type)} · ${d.review_status}${d.expires_on?' · expire le '+d.expires_on:''}`);}
-  }catch(e){docMsg('documentNotice','Erreur : '+e.message);}
+  }catch(e){if(generation===professionalAccessGeneration)docMsg('documentNotice','Erreur : '+e.message);}
 }
 async function uploadDocument(e){
-  e.preventDefault();const btn=e.submitter;btn.disabled=true;doc$('documentNotice').hidden=true;
+  e.preventDefault();const btn=e.submitter;const generation=professionalAccessGeneration;btn.disabled=true;doc$('documentNotice').hidden=true;
   try{
     if(professionalProfile?.role!=='carrier')throw Error('Connectez-vous avec un compte transporteur.');
-    const company=await getOwnCompany();const file=doc$('documentFile').files[0];
+    const company=await getOwnCompany();if(generation!==professionalAccessGeneration)return;const file=doc$('documentFile').files[0];
     if(!file)throw Error('Choisissez un fichier.');
     if(file.size>10*1024*1024)throw Error('Le fichier dépasse 10 Mo.');
     const allowed={'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png'};
     if(!allowed[file.type])throw Error('Formats autorisés : PDF, JPG et PNG.');
-    const kind=doc$('documentType').value;
-    if(kind!=='registration'&&!doc$('documentExpiry').value)throw Error('Renseignez la date de fin de validité figurant sur la licence ou l’assurance.');
+    const kind=doc$('documentType').value;const expiry=doc$('documentExpiry').value;
+    if(kind!=='registration'&&!expiry)throw Error('Renseignez la date de fin de validité figurant sur la licence ou l’assurance.');
     if(!['registration','transport_licence','insurance_rc','insurance_goods'].includes(kind))throw Error('Catégorie de document non prise en charge.');
     const path=`${company.id}/${crypto.randomUUID()}.${allowed[file.type]}`;
     const {error:uploadError}=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:file.type,upsert:false});
+    if(generation!==professionalAccessGeneration)return;
     if(uploadError)throw uploadError;
     const row={company_id:company.id,document_type:kind,storage_path:path,original_filename:file.name,review_status:'pending'};
-    if(doc$('documentExpiry').value)row.expires_on=doc$('documentExpiry').value;
+    if(expiry)row.expires_on=expiry;
     const {error}=await sb.from('carrier_documents').insert(row);
+    if(generation!==professionalAccessGeneration)return;
     if(error)throw Error('Fichier envoyé mais fiche non enregistrée : '+error.message+' (contactez 13 URGENT).');
-    doc$('documentFile').value='';await showMyDocuments();docMsg('documentNotice',`Document envoyé dans la catégorie « ${documentLabel(kind)} ». Il reste en attente de vérification par 13 URGENT.`);
-  }catch(err){docMsg('documentNotice','Envoi impossible : '+err.message);}finally{btn.disabled=false;}
+    doc$('documentFile').value='';await showMyDocuments();if(generation!==professionalAccessGeneration)return;docMsg('documentNotice',`Document envoyé dans la catégorie « ${documentLabel(kind)} ». Il reste en attente de vérification par 13 URGENT.`);
+  }catch(err){if(generation===professionalAccessGeneration)docMsg('documentNotice','Envoi impossible : '+err.message);}finally{btn.disabled=false;}
 }
 async function showAdmin(){
   if(professionalProfile?.role!=='admin')return;
@@ -113,16 +115,27 @@ async function loadAdmin(){
           }catch(e){docMsg('adminNotice','Correction impossible : '+e.message);}finally{submit.disabled=false;}
         };row.append(form);
       };
-      if(d.review_status==='pending'){
-        for(const [status,label] of [['approved','Accepter'],['rejected','Refuser']]){
+      if(d.review_status==='pending'||d.review_status==='approved'){
+        const decisions=d.review_status==='approved'?[['rejected','Retirer l’approbation']]:[['approved','Accepter'],['rejected','Refuser']];
+        for(const [status,label] of decisions){
           const b=line(buttons,'button',label,status==='approved'?'btn primary':'btn secondary');b.type='button';
           b.onclick=async()=>{
-            if(!confirm(`${label} ce document ?`))return;
+            const question=d.review_status==='approved'?'Retirer l’approbation de ce document ? Le transporteur ne pourra plus faire de nouvelles propositions ni recevoir d’attribution tant que son dossier ne sera pas valide.':`${label} ce document ?`;
+            if(!confirm(question))return;
+            const actionGeneration=professionalAccessGeneration;
             b.disabled=true;
-            const {data:{user}}=await sb.auth.getUser();
-            const {error}=await sb.from('carrier_documents').update({review_status:status,reviewed_at:new Date().toISOString(),reviewed_by:user.id}).eq('id',d.id);
-            if(error){docMsg('adminNotice','Validation impossible : '+error.message);b.disabled=false;return;}
-            await loadAdmin();docMsg('adminNotice',`Document ${status==='approved'?'accepté':'refusé'}. L’entreprise n’est pas automatiquement validée.`);
+            try{
+              const {data,error:authError}=await sb.auth.getUser();
+              if(actionGeneration!==professionalAccessGeneration)return;
+              if(authError||!data?.user||professionalProfile?.role!=='admin'||professionalProfile.id!==data.user.id)throw Error('Session administrateur expirée. Reconnectez-vous.');
+              const {error}=await sb.from('carrier_documents').update({review_status:status,reviewed_at:new Date().toISOString(),reviewed_by:data.user.id}).eq('id',d.id).select('id').single();
+              if(error)throw error;
+              if(actionGeneration!==professionalAccessGeneration)return;
+              await loadAdmin();
+              if(actionGeneration!==professionalAccessGeneration)return;
+              docMsg('adminNotice',d.review_status==='approved'?'Approbation retirée. Le dossier sera de nouveau contrôlé lors des prochaines propositions et attributions.':`Document ${status==='approved'?'accepté':'refusé'}. L’entreprise n’est pas automatiquement validée.`);
+            }catch(e){if(actionGeneration===professionalAccessGeneration)docMsg('adminNotice','Validation impossible : '+e.message);}
+            finally{b.disabled=false;}
           };
         }
       }
@@ -132,12 +145,16 @@ async function loadAdmin(){
 doc$('openDocuments').addEventListener('click',()=>showMyDocuments().catch(()=>docMsg('documentNotice','Service momentanément inaccessible.')));
 doc$('openAdmin').addEventListener('click',()=>showAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.')));
 doc$('refreshAdmin').addEventListener('click',()=>loadAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.')));
+const renewalWarning=document.createElement('p');renewalWarning.className='muted';renewalWarning.id='documentRenewalWarning';
+renewalWarning.textContent='Renouvellement : la nouvelle pièce est prise en compte dès son dépôt. Tant qu’elle reste en attente de validation par 13 URGENT, vos nouvelles propositions et attributions peuvent être suspendues.';
+doc$('documentForm').before(renewalWarning);
 doc$('documentForm').addEventListener('submit',uploadDocument);
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>doc$(b.dataset.close).close()));
 function clearProfessionalViews(){
  for(const name of ['documentsDialog','adminDialog'])if(doc$(name).open)doc$(name).close();
  for(const name of ['myDocuments','adminDossiers'])doc$(name).replaceChildren();
  doc$('companyStatus').textContent='';doc$('documentForm').reset();
+ for(const name of ['documentNotice','adminNotice']){doc$(name).textContent='';doc$(name).hidden=true;}
 }
 sb?.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>{
  const id=session?.user?.id||null;
