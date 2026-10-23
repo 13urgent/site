@@ -61,3 +61,18 @@ Des prix d'abonnement sont définis dans le code commercial et les conditions ; 
 3. Mettre en cohérence tous les textes et tarifs avec le mode réellement ouvert.
 4. Finaliser le cadre juridique et la politique de confidentialité avec les informations vérifiées.
 5. Réaliser une recette complète avec les premiers professionnels locaux, puis seulement engager le budget publicitaire.
+
+## Résultats transmis depuis Supabase après le verrouillage
+
+L'utilisateur a confirmé le succès de la migration. Un résultat SQL montre ensuite la RLS active sur les sept tables contrôlées et le bucket `carrier-documents` non public. Le CSV des politiques fourni dans le chat confirme :
+
+- `urgent_external_drafts_suspended`, RESTRICTIVE, ALL, rôles anon/authenticated, USING false / WITH CHECK false : l'accès par ces rôles est effectivement suspendu indépendamment des anciennes politiques permissives.
+- Profils : lecture limitée au compte courant ou à l'administration par la frontière restrictive ajoutée ; l'ancienne politique UPDATE `Update own basic profile` reste installée. Elle ne doit pas être confondue avec un privilège effectif : la migration révoque les droits d'écriture. Contrôler les privilèges réellement installés ; cette politique serait dangereuse pour les rôles et rattachements si les droits d'écriture étaient réintroduits sans contrôle des colonnes.
+- Companies : lecture propriétaire/administrateur ; aucune politique d'écriture fournie dans le CSV.
+- Documents : propriétaire/administrateur en lecture ; ajout par un carrier de sa propre société, statut pending et champs de revue non renseignés ; mise à jour via politique administrateur. La politique INSERT ne valide pas elle-même la concordance de `storage_path` avec le dossier de l'entreprise. Il reste à inspecter contraintes et triggers avant de conclure à un défaut exploitable ou de proposer le correctif.
+- Storage : SELECT au dossier de l'entreprise transporteur ou administrateur ; INSERT au dossier de l'entreprise transporteur ; aucune politique UPDATE/DELETE fournie dans le CSV.
+- Offres : lectures limitées au transporteur auteur, au propriétaire de la course et à l'administration ; coordonnées privées et courses dépendent de fonctions de contrôle à relire dans leur version réellement installée.
+
+Les captures des privilèges des fonctions montrent les RPC métier appelables par authenticated ; cela n'accorde pas automatiquement les droits administrateur, qui doivent être vérifiés dans chaque fonction. Les workers d'alerte et fonctions internes visibles ne sont pas exécutables par anon/authenticated. `urgent_commercial_status` est appelable anonymement ; vérifier sa sortie limitée à la configuration publique et à l'acceptation du compte courant avant de l'identifier comme fuite. Aucun incident ni extraction de données privées n'est démontré par ces métadonnées.
+
+Étape suivante : `supabase/setup/audit-profile-document-guards.sql` rassemble les fonctions de contrôle de rôle/entreprise/partie, privilèges effectifs et contraintes/triggers documentaires dans un seul tableau, sans données métier. L'audit des fonctions de mutation et les tests négatifs avec identités distinctes restent nécessaires pour une conclusion globale.
