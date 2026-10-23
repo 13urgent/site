@@ -1,0 +1,8 @@
+13 URGENT — Vidéo explicative, 23 octobre 2026.
+Visuels et animation créés pour CHRONOSS. Exemples fictifs.
+Logo fourni par CHRONOSS. Musique originale synthétisée pour ce projet.
+Voix de synthèse : Piper / SIWIS fr_FR medium, exécutée localement via sherpa-onnx.
+Source modèle : https://github.com/k2-fsa/sherpa-onnx/releases/tag/tts-models
+Corpus SIWIS : https://datashare.is.ed.ac.uk/handle/10283/2353 — CC BY 4.0.
+Licence : https://creativecommons.org/licenses/by/4.0/
+Aucun client réel montré. Suivi déclaratif, sans géolocalisation.
