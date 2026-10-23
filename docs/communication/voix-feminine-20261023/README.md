@@ -13,3 +13,9 @@ Travail conservé dans `/workspace/13urgent-social-voix-naturelle-20261023`, dé
 Livrables : MP4, MP3 de narration seule, SRT/VTT, couverture, texte de publication actualisé, crédits et rapport technique. Les MP4/MP3 sont conservés uniquement dans le dossier de travail et sur gh-pages sous `videos/voix-feminine-20261023/`, pas sur main. Les versions précédentes restent disponibles pour comparaison.
 
 Contrôles : décodage intégral, dimensions/codecs/durée/fréquence, niveau audio et crête, lecture du lecteur et téléchargement, absence de débordement mobile. Le caractère naturel de la voix reste à apprécier à l’écoute par l’exploitant avant publication sociale.
+
+## Correction du niveau musical
+
+L’exploitant signale que la musique est inaudible. Le premier mix multipliait par 0,45 une source instrumentale déjà très faible (mesurée à -41,19 LUFS). `remix_music.py`, à exécuter après `revoice.py`, normalise la musique à -23 LUFS avant une compression pilotée par la voix : la musique baisse pendant les paroles puis remonte dans les pauses. La voix et le flux vidéo sont conservés ; le MP4 corrigé utilise un nouveau nom pour éviter un téléchargement depuis un ancien cache : `donneurs-ordre-voix-feminine-musique.mp4`.
+
+Contrôle mesuré pendant la pause finale, de 24 à 24,5 secondes : musique passée de -58,0 à -32,9 dB moyens (fondu de fin inclus). Le mix complet est mesuré à -16,98 LUFS et -1,50 dBTP ; décodage intégral réussi et flux vidéo identique à la version précédente. La page de livraison pointe désormais vers la version corrigée.
