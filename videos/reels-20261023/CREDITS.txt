@@ -1,0 +1,9 @@
+13 URGENT / CHRONOSS — Kit TikTok et Instagram, 23 octobre 2026.
+Logo fourni par CHRONOSS. Graphismes et musique instrumentale originaux créés pour le projet.
+Capture du formulaire du site : données fictives, présentation recadrée, aucune demande envoyée.
+Voix française synthétique réutilisée avec un nouveau montage depuis la vidéo explicative du projet.
+Piper/SIWIS fr_FR medium ; corpus SIWIS CC BY 4.0 : https://datashare.is.ed.ac.uk/handle/10283/2353 ; https://creativecommons.org/licenses/by/4.0/
+Source modèle : https://github.com/k2-fsa/sherpa-onnx/releases/tag/tts-models
+Source vidéo : https://13urgent.fr/videos/explication/13urgent-explication-reseaux.mp4
+Empreinte source SHA256 : 04ddcd5212a6973795d1df639e1028fced99b86c6195222dcedce843c6a765c3
+Aucun compte réel, aucune offre réelle, aucune promesse de disponibilité ou de revenu.
