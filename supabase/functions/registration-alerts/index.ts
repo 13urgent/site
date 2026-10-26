@@ -19,8 +19,8 @@ export async function registrationAlertsHandler(request, env, fetcher=fetch) {
  const secret=env.REGISTRATION_ALERTS_SECRET;
  if(!secret||secret.length<32)return json(503,{error:'not_configured'});
  if(request.headers.get('authorization')!==`Bearer ${secret}`)return json(401,{error:'unauthorized'});
- const alertsEnabled=env.REGISTRATION_ALERTS_ENABLED==='true',monthlyEnabled=env.MONTHLY_REPORTS_ENABLED==='true';
- if(!alertsEnabled&&!monthlyEnabled)return json(200,{enabled:false});
+ const alertsEnabled=env.REGISTRATION_ALERTS_ENABLED==='true',monthlyEnabled=env.MONTHLY_REPORTS_ENABLED==='true',statsEnabled=env.SITE_STATS_REPORTS_ENABLED==='true';
+ if(!alertsEnabled&&!monthlyEnabled&&!statsEnabled)return json(200,{enabled:false});
  let base;
  try{base=new URL(env.SUPABASE_URL);if(base.protocol!=='https:'||base.pathname!=='/')throw Error();}catch{return json(503,{error:'not_configured'});}
  if(!env.SUPABASE_SERVICE_ROLE_KEY||!env.RESEND_API_KEY||!/^.+<[^<>\s@]+@[^<>\s@]+>$/.test(env.REGISTRATION_ALERTS_FROM||'')||/[\r\n]/.test(env.REGISTRATION_ALERTS_FROM))return json(503,{error:'not_configured'});
@@ -29,6 +29,7 @@ export async function registrationAlertsHandler(request, env, fetcher=fetch) {
   if(!response.ok)throw Error('database_error');return response.json();
  };
  const monthly=monthlyEnabled?await sendMonthlyReport(env,fetcher,rpc):null;
+ const stats=statsEnabled?await sendSiteReport(env,fetcher,rpc):null;
  let rows;
  try{rows=alertsEnabled?await rpc('urgent_claim_registration_alerts',{}):[];if(!Array.isArray(rows))throw Error();}catch{return json(502,{error:'database_error'});}
  let sent=0,retry=0;
@@ -44,7 +45,7 @@ export async function registrationAlertsHandler(request, env, fetcher=fetch) {
   try{const done=await rpc('urgent_finish_registration_alert',{p_alert_id:row.alert_id,p_lease_token:row.lease_token,p_success:success,p_provider_id:providerId,p_error_code:success?null:errorCode});if(done!==true)throw Error();}catch{return json(502,{error:'acknowledgement_failed'});}
   if(success)sent++;else retry++;
  }
- return json(monthly?.error?502:200,{enabled:true,sent,retry,...(monthly?{monthly}:{})});
+ return json(monthly?.error||stats?.error?502:200,{enabled:true,sent,retry,...(monthly?{monthly}:{}),...(stats?{stats}:{})});
 }
 
 // Récapitulatif mensuel interne : aucune émission de facture ou modification de frais.
@@ -88,6 +89,35 @@ async function sendMonthlyReport(env,fetcher,rpc){
  }catch(error){if(['report_too_large','invalid_report'].includes(error.message)){code=error.message;permanent=true;}else code='provider_network_error';}
  try{const done=await rpc('urgent_finish_monthly_report',{p_report_id:job.report_id,p_lease_token:job.lease_token,p_success:success,p_provider_id:provider,p_error_code:success?null:code,p_permanent:permanent});if(done!==true)throw Error();}catch{return {error:'monthly_acknowledgement_failed'};}
  return {sent:success?1:0,retry:success||permanent?0:1,...(permanent?{error:code}:{})};
+}
+
+export function siteStatisticsEmail(job){
+ const d=job.snapshot;
+ if(!d||d.day!==job.day||!/^\d{4}-\d{2}-\d{2}$/.test(d.day)||!['page_views','known_accounts','new_accounts','new_requests'].every(k=>Number.isSafeInteger(d[k])&&d[k]>=0)||!['sources','pages','people'].every(k=>Array.isArray(d[k]))||d.people.length>50)throw Error('invalid_site_report');
+ const note='Mesure facultative après accord, sur les pages instrumentées. Les pages vues ne sont pas des visiteurs uniques et peuvent inclure des robots ou des rechargements. Les visiteurs anonymes ne sont pas identifiables. Les refus et bloqueurs ne sont pas comptés. Inscriptions et demandes proviennent séparément des données du service.';
+ const rows=[['Pages vues mesurées',d.page_views],['Comptes connectés observés',d.known_accounts],['Nouvelles inscriptions',d.new_accounts],['Nouvelles demandes hors exercices fictifs',d.new_requests]];
+ const table=(values)=>'<table cellpadding="8" style="border-collapse:collapse">'+values.map(row=>'<tr>'+row.map(v=>'<td style="border:1px solid #ccc">'+escape(v)+'</td>').join('')+'</tr>').join('')+'</table>';
+ const sourceNames={direct:'Direct / provenance inconnue',linkedin:'LinkedIn',instagram:'Instagram',tiktok:'TikTok',facebook:'Facebook',google:'Google',bing:'Bing',autre:'Autre'};
+ const sources=d.sources.map(r=>{if(!Number.isSafeInteger(r.count)||r.count<0)throw Error('invalid_site_report');return[sourceNames[r.source]||'Autre',r.count];});
+ const pages=d.pages.map(r=>{if(!Number.isSafeInteger(r.count)||r.count<0)throw Error('invalid_site_report');return[clean(r.page),r.count];});
+ const roleNames={client:'Donneur d’ordre',carrier:'Transporteur',admin:'Administration'};
+ const people=d.people.map(r=>{if(!Number.isFinite(new Date(r.last_seen).getTime()))throw Error('invalid_site_report');return[clean(r.company_name)||'Entreprise non renseignée',clean(r.email),roleNames[r.role]||'Compte professionnel',reportDate(r.last_seen)];});
+ const detail=d.known_accounts>people.length?`Affichage limité à ${people.length} comptes sur ${d.known_accounts}.`:'Comptes observés uniquement après accord et connexion ; aucun nom n’est déduit d’une visite anonyme.';
+ const text=`Statistiques du ${d.day} (journée Europe/Paris).\n${rows.map(([k,v])=>k+' : '+v).join('\n')}\n\nProvenance des pages vues :\n${sources.map(([k,v])=>k+' : '+v).join('\n')||'Aucune mesure'}\n\nComptes connectés observés :\n${people.map(r=>r.join(' · ')).join('\n')||'Aucun compte observé'}\n${detail}\n\n${note}\n${SITE}admin.html`;
+ const html=`<!doctype html><html lang="fr"><meta charset="utf-8"><body style="font:16px Arial,sans-serif;color:#171923;max-width:800px;margin:auto;padding:24px"><h1>13 URGENT · Statistiques du ${escape(d.day)}</h1><p>Journée complète en heure de Paris.</p>${table(rows)}<h2>D’où viennent les pages vues ?</h2>${sources.length?table(sources):'<p>Aucune mesure.</p>'}<h2>Pages consultées</h2>${pages.length?table(pages):'<p>Aucune mesure.</p>'}<h2>Comptes connectés observés</h2>${people.length?table([['Entreprise','E-mail du compte','Rôle','Dernière observation (Paris)'],...people]):'<p>Aucun compte observé.</p>'}<p>${escape(detail)}</p><p>${escape(note)}</p><p>Rapport interne réservé à CHRONOSS. Aucun e-mail envoyé aux visiteurs.</p><p><a href="${SITE}admin.html">Ouvrir l’administration</a></p></body></html>`;
+ if(new TextEncoder().encode(text+html).length>1000000)throw Error('invalid_site_report');
+ return{subject:`[13 URGENT] ${d.test===true?'TEST — ':''}Statistiques du site — ${d.day}`,text:(d.test===true?'TEST D’ACTIVATION — les mesures de visite peuvent être vides.\n\n':'')+text,html:(d.test===true?'<p><strong>TEST D’ACTIVATION — aucun visiteur fictif créé.</strong></p>':'')+html};
+}
+async function sendSiteReport(env,fetcher,rpc){
+ let jobs;try{jobs=await rpc('urgent_claim_site_report',{});if(!Array.isArray(jobs))throw Error();}catch{return{error:'site_database_error'};}
+ if(!jobs.length)return{sent:0,retry:0};const job=jobs[0];if(!uuid.test(job.report_id)||!uuid.test(job.lease_token))return{error:'invalid_site_job'};
+ let success=false,provider=null,code='send_error',permanent=false;
+ try{
+  const mail=siteStatisticsEmail(job);const response=await fetcher('https://api.resend.com/emails',{method:'POST',headers:{authorization:`Bearer ${env.RESEND_API_KEY}`,'content-type':'application/json','Idempotency-Key':`site-stats/${job.report_id}`},body:JSON.stringify({from:env.REGISTRATION_ALERTS_FROM,to:[RECIPIENT],...mail}),signal:AbortSignal.timeout(10000)});
+  if(response.ok){const result=await response.json();if(typeof result.id==='string'&&result.id){success=true;provider=result.id;}else code='provider_invalid_response';}else code=`provider_http_${response.status}`;
+ }catch(error){if(error.message==='invalid_site_report'){permanent=true;code=error.message;}else code='provider_network_error';}
+ try{if(await rpc('urgent_finish_site_report',{p_report_id:job.report_id,p_lease_token:job.lease_token,p_success:success,p_provider_id:provider,p_error_code:success?null:code,p_permanent:permanent})!==true)throw Error();}catch{return{error:'site_acknowledgement_failed'};}
+ return{sent:success?1:0,retry:success||permanent?0:1,...(permanent?{error:code}:{})};
 }
 
 if(typeof Deno!=='undefined')Deno.serve(request=>registrationAlertsHandler(request,Deno.env.toObject()));

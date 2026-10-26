@@ -47,6 +47,10 @@ Le commutateur JavaScript historique `URGENT_MARKETPLACE_PILOT` ouvre le module 
 
 Factures et avoirs sont émis dans l'outil CHRONOSS existant. Le relevé mensuel distingue frais, régularisations, références déjà facturées et suivi des abonnements pour éviter une double facturation. La TVA doit être déterminée dans l'outil de facturation selon la situation réelle. Les conditions professionnelles acceptées sont versionnées ; ne pas modifier rétroactivement leur document immuable sans nouvelle version et procédure d'acceptation.
 
+## Statistiques privées
+
+Le module de mesure facultative et le rapport quotidien à 08:00 Paris sont préparés. Ils nécessitent une activation Supabase distincte ; la présence du code ne prouve pas la collecte ou la réception d’un e-mail. [Installation et contrôle des statistiques](docs/STATISTIQUES-DU-SITE.md). Aucun compteur de clients ou de chiffre d’affaires n’est ajouté à l’accueil.
+
 ## Vérifications
 
 ```sh
