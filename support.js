@@ -23,6 +23,11 @@
  }
  function readable(error){if(error.message==='session_timeout')return 'La vérification de votre connexion prend trop de temps. Fermez puis rouvrez votre espace de connexion avant de réessayer. Votre texte est conservé dans le formulaire.';if(error.message==='large_document')return 'Ce fichier dépasse la limite de préanalyse de 5 Mo. Le dépôt reste possible jusqu’à 10 Mo ; demandez son examen à l’administration.';if(error.message==='document_unreadable')return 'Le fichier ne peut pas être analysé. Vérifiez son format et sa lisibilité, ou demandez un examen à l’administration.';return error.message==='signin'?'Connectez-vous pour accéder à votre dossier privé.':error.message==='limit'?'La limite de demandes a été atteinte. Vous pouvez toujours utiliser les réponses rapides ou contacter l’administration.':'Le service de suivi n’est pas disponible pour le moment. Les réponses rapides restent accessibles. Contactez contact@13urgent.fr si vous êtes bloqué.';}
  function feedback(node,text){node.textContent=text;node.hidden=false;requestAnimationFrame(()=>{if(dialog.open)node.scrollIntoView({block:'nearest'});});}
+ function adminDiagnostic(data){
+  const d=data?.admin_diagnostic;if(!d||!Number.isInteger(d.http_status)||d.http_status<400||d.http_status>599)return '';
+  const labels={quota_exhausted:'Crédit ou plafond de facturation API insuffisant : vérifier la facturation OpenAI.',authentication_failed:'Clé API refusée : vérifier OPENAI_API_KEY dans les secrets Supabase.',rate_limited:'Limite temporaire de requêtes API atteinte.',access_denied:'Droits de la clé ou du projet insuffisants.',model_unavailable:'Modèle IA configuré non accessible.',invalid_request:'Format de requête refusé par l’API : le service doit être vérifié.',provider_unavailable:'API IA momentanément indisponible.',provider_rejected:'Appel refusé par l’API IA.'};
+  return Object.hasOwn(labels,d.category)?'\n\nDiagnostic administrateur : '+labels[d.category]+' (HTTP '+d.http_status+').':'';
+ }
  const dialog=make('dialog');dialog.id='supportDialog';dialog.setAttribute('aria-labelledby','supportTitle');
  const header=make('div',undefined,'support-header');const title=make('h2','Assistance 13 URGENT');title.id='supportTitle';
  const close=make('button','Fermer','btn secondary');close.type='button';close.onclick=()=>dialog.close();header.append(title,close);
@@ -78,7 +83,7 @@
    const ready=capabilities||await status();if(version!==generation)return;
    if(!ready){const text='Je n’ai pas de réponse fiable à cette question dans les réponses rapides. Vous pouvez écrire à contact@13urgent.fr pour qu’une personne vous accompagne.';message(text);feedback(questionStatus,text);return;}
    const data=await invoke({action:'ask',question});if(version!==generation)return;
-   if(typeof data.answer!=='string'||!data.answer.trim())throw Error('unavailable');message(data.answer);input.value='';feedback(questionStatus,data.answer);
+   if(typeof data.answer!=='string'||!data.answer.trim())throw Error('unavailable');const answer=data.answer+adminDiagnostic(data);message(answer);input.value='';feedback(questionStatus,answer);
    if(data.escalate)message('Pour un examen de votre situation, utilisez « Transmettre mon problème ». Une demande n’est enregistrée qu’après votre confirmation.');
   }catch(e){if(version===generation){message(readable(e));feedback(questionStatus,readable(e));}}finally{busy=false;send.disabled=false;send.textContent='Envoyer ma question';}
  };
@@ -104,7 +109,7 @@
   if(!dialog.open)dialog.showModal();const version=generation;
   try{const ready=capabilities||await status();if(version!==generation)return;if(!ready){message('La préanalyse du contenu n’est pas encore disponible. Les contrôles techniques et la validation par l’administration restent accessibles.');return;}
    message('Préanalyse en cours. Cet avis ne vaut pas approbation du document.');const data=await invoke({action:'review_document',document_id:documentId});if(version!==generation)return;
-   const review=data.review;if(!review||typeof review.summary!=='string')throw Error('unavailable');message(review.summary+'\n'+(Array.isArray(review.issues)?review.issues.join('\n'):'')+'\n'+(Array.isArray(review.unknowns)?review.unknowns.join('\n'):'')+'\nValidation finale réservée à l’administration.');
+   const review=data.review;if(!review||typeof review.summary!=='string')throw Error('unavailable');message(review.summary+'\n'+(Array.isArray(review.issues)?review.issues.join('\n'):'')+'\n'+(Array.isArray(review.unknowns)?review.unknowns.join('\n'):'')+'\nValidation finale réservée à l’administration.'+adminDiagnostic(data));
   }catch(e){if(version===generation)message(readable(e));}
  }});
  window.addEventListener('urgent-support-issue',event=>window.urgentSupport.issue(event.detail?.code));

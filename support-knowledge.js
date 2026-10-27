@@ -9,7 +9,7 @@
   validation:{label:'Pourquoi mon dossier bloque',answer:'Une pièce peut être manquante, en attente, refusée, sans date requise ou expirée. Une nouvelle version en attente peut bloquer le dossier même si une ancienne pièce était approuvée. Pour proposer un prix, il faut aussi un établissement validé et des droits d’accès actifs. Un abonnement payé ne remplace pas des documents valides. Utilisez « Vérifier mon dossier » pour lire les informations accessibles à votre compte.',action:'diagnostic'},
   offres:{label:'Proposer un transport',answer:'Consultez les courses avec votre compte professionnel. Un transporteur peut proposer son prix lorsque son établissement, ses justificatifs et ses droits d’accès sont validés. Les propositions sont confidentielles. Le donneur d’ordre choisit parmi les offres reçues ; aucune mission ni attribution n’est garantie. Après attribution, les parties suivent les étapes de la course, et le donneur d’ordre confirme la réalisation.',action:'courses'},
   tarifs:{label:'Prix et frais',answer:'Le dépôt d’une demande est gratuit. Lors d’une attribution commerciale confirmée, les frais de mise en relation sont de 1,5 % du prix HT du transport, avec TVA applicable en sus, facturés par CHRONOSS distinctement du transport. Le donneur d’ordre règle le transport directement au transporteur. Les forfaits transporteurs sont Start gratuit (1 transport/mois), Drive 12,50 € HT/mois (5), Boost 33,33 € HT/mois (30), Premium 62,50 € HT/mois (illimité). Les forfaits payants sont activés après vérification du virement et du dossier ; pas de prélèvement automatique.',action:'tarifs'},
-  plateforme:{label:'CHRONOSS et 13 URGENT',answer:'13 URGENT est une plateforme de mise en relation entre professionnels, exploitée par CHRONOSS. CHRONOSS exerce aussi une activité de transport, mais ne prend pas automatiquement en charge une demande sans proposition. Pour un transport confié à un transporteur indépendant, les parties concluent et règlent directement le transport.',action:'fonctionnement'}
+  plateforme:{label:'CHRONOSS et 13 URGENT',answer:'13 URGENT met en relation les entreprises qui ont un transport à confier et les transporteurs professionnels. Pour expédier : créez votre compte, confirmez votre e-mail, faites valider votre établissement, puis déposez gratuitement votre besoin avec le trajet, la date et le chargement. Consultez les propositions confidentielles reçues, choisissez celle qui vous convient après présentation du prix et des frais, puis suivez la course. Pour proposer un transport : votre dossier et vos droits d’accès doivent être validés. CHRONOSS exploite la plateforme et peut aussi intervenir comme transporteur identifié, sans prise en charge automatique des demandes. Aucune proposition ni mission n’est garantie.',action:'fonctionnement'}
  };
  const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
  function match(question){const q=normalize(question);
@@ -19,9 +19,9 @@
   if(/tarif|prix|cout|frais|abonn|forfait|virement|factur|commission|prelevement/.test(q))return 'tarifs';
   if(/expir|valid|bloqu|refus|attente|manqu/.test(q))return 'validation';
   if(/document|justific|assurance|licence|kbis|pdf/.test(q))return 'documents';
-  if(/depos|publier|publication|demande.*course|creer.*demande/.test(q))return 'depot';
+  if(/depos|publier|publication|demande.*course|creer.*demande|trouver.*transporteur|besoin.*transport|expedier|envoyer.*(?:colis|palette)/.test(q))return 'depot';
   if(/offre|propos|mission|fret|trouver.*course/.test(q))return 'offres';
-  if(/chronoss|kronos|plateforme|qui etes/.test(q))return 'plateforme';
+  if(/comment.*(?:fonctionne|marche).*(?:site|plateforme)|comment (?:ca |cela )?(?:marche|fonctionne)[ ?!.]*$|utilis(?:er|ation).*(?:site|plateforme)|chronoss|kronos|plateforme|qui etes|13\s*urgent/.test(q))return 'plateforme';
   return null;
  }
  window.urgentSupportKnowledge=Object.freeze({topics,match});

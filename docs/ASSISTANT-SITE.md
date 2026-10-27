@@ -131,3 +131,15 @@ sans requête réseau. Progression, connexion requise, erreurs et référence de
 confirmation sont affichées près du bouton ; un texte en échec reste disponible
 pour correction. Une notification acceptée par le prestataire ne prouve pas sa
 livraison en boîte de réception.
+
+## Diagnostic d’un refus du fournisseur IA
+
+La présence des secrets ne valide ni la clé ni le crédit API. Un compte API en
+essai gratuit avec un solde nul doit être approvisionné séparément de ChatGPT.
+Après mise à jour de la fonction serveur, ses logs contiennent un événement
+`support_ai_provider_error` en cas de refus HTTP : phase, statut et catégorie
+fixes, sans clé, question, contenu de document ni message brut du fournisseur.
+Le diagnostic est aussi rendu uniquement aux comptes administrateurs ; les
+autres utilisateurs gardent un message général et la possibilité de solliciter
+l’administration. Une question de fonctionnement général est traitée par la
+FAQ locale même lorsque le fournisseur IA est indisponible.

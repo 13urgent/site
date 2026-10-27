@@ -5,7 +5,7 @@ const fs=require('fs');const assert=require('node:assert/strict');
  const uid=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
  const env={SUPABASE_URL:'https://project.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'private-service-key',SUPABASE_ANON_KEY:'public-key'};
  const request=(body,token='user-token',origin='https://13urgent.fr')=>new Request('https://project.supabase.co/functions/v1/support-assistant',{method:'POST',headers:{origin,authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify(body)});
- function mock({foreign=false,reserved=true,ai=null,provider=200,large=false,role='carrier'}={}){
+ function mock({foreign=false,reserved=true,ai=null,aiStatus=200,aiError=null,provider=200,large=false,role='carrier'}={}){
   const calls=[];const fetcher=async(url,options={})=>{
    let body;try{body=JSON.parse(options.body);}catch{}
    calls.push({url,options,body});
@@ -19,7 +19,7 @@ const fs=require('fs');const assert=require('node:assert/strict');
    if(url.includes('/rest/v1/carrier_documents?'))return Response.json([{id:uid(30),company_id:foreign?uid(4):uid(3),document_type:'insurance_rc',storage_path:(foreign?uid(4):uid(3))+'/file.png',review_status:'pending',expires_on:'2020-01-01'}]);
    if(url.endsWith('/rest/v1/urgent_document_prechecks'))return new Response(null,{status:204});
    if(url.includes('/storage/v1/object/'))return new Response(new Uint8Array([137,80,78,71,13,10,26,10,1]),{headers:{'content-type':'image/png',...(large?{'content-length':'6000000'}:{})}});
-   if(url==='https://api.openai.com/v1/responses')return Response.json({output_text:JSON.stringify(ai||{answer:'Une situation individuelle doit être examinée par l’administration.',escalate:true})});
+   if(url==='https://api.openai.com/v1/responses')return Response.json(aiStatus===200?{output_text:JSON.stringify(ai||{answer:'Une situation individuelle doit être examinée par l’administration.',escalate:true})}:aiError||{error:{code:'server_error'}},{status:aiStatus});
    if(url==='https://api.resend.com/emails')return Response.json(provider===200?{id:'mail-id'}:{error:'provider_rejected'},{status:provider});
    throw Error('Unexpected request '+url);
   };return{calls,fetcher};
@@ -30,8 +30,12 @@ const fs=require('fs');const assert=require('node:assert/strict');
  assert.equal((await handler(request({action:'status'},'user-token','https://evil.example'),env,m.fetcher)).status,403);
  assert.equal((await handler(request({action:'status'}),{...env,SUPPORT_ASSISTANT_ENABLED:'false'},m.fetcher)).status,503);
  r=await handler(request({action:'ask',question:'Signups not allowed for otp'}),env,m.fetcher);assert.equal(r.status,200);assert.match((await r.json()).answer,/Créer mon compte/);assert(!m.calls.some(c=>c.url.includes('openai.com')));
+ for(const question of ['Comment fonctionne le site ?','Comment ça marche ?','Pouvez-vous présenter l’utilisation de la plateforme ?','Présentation de la plateforme']){
+  const general=mock();const result=await handler(request({action:'ask',question}),{...env,SUPPORT_AI_ENABLED:'true',OPENAI_API_KEY:'ai-private'},general.fetcher);const answer=await result.json();assert.equal(answer.source,'faq');assert.match(answer.answer,/met en relation/);assert(!general.calls.some(c=>c.url.includes('openai.com')));
+ }
  r=await handler(request({action:'ask',question:'Mon contrat particulier nécessite un examen'}),env,m.fetcher);assert.equal((await r.json()).source,'human');
  m=mock();r=await handler(request({action:'ask',question:'Mon contexte privé, numéro 0612345678, +33 6 12 34 56 78, nom@example.com'}),{...env,SUPPORT_AI_ENABLED:'true',OPENAI_API_KEY:'ai-private'},m.fetcher);assert.equal(r.status,200);let aiCall=m.calls.find(c=>c.url.includes('openai.com'));assert.equal(aiCall.body.store,false);assert.equal(aiCall.body.max_output_tokens,500);assert(!aiCall.body.input.includes('nom@example.com'));assert(!aiCall.body.input.includes('0612345678'));assert(!aiCall.body.input.includes('+33 6'));
+ await providerErrorChecks();
  m=mock({foreign:true});r=await handler(request({action:'review_document',document_id:uid(30)}),env,m.fetcher);assert.equal(r.status,404);assert(!m.calls.some(c=>c.url.includes('/storage/')));assert(!m.calls.some(c=>c.url.endsWith('urgent_support_reserve')));
  m=mock();r=await handler(request({action:'review_document',document_id:uid(30)}),env,m.fetcher);let data=await r.json();assert.equal(r.status,200);assert.equal(data.review.engine,'metadata');assert.equal(data.review.verdict,'needs_attention');assert(data.review.issues.some(x=>x.includes('expiré')));assert.equal(data.saved,true);assert(!m.calls.some(c=>c.url.includes('/storage/')));
  assert(!m.calls.some(c=>/carrier_documents/.test(c.url)&&['PATCH','POST'].includes(c.options.method)));
@@ -43,7 +47,38 @@ const fs=require('fs');const assert=require('node:assert/strict');
  assert.equal((await handler(request({action:'ask',question:'x'.repeat(1501)}),env,m.fetcher)).status,400);
  assert.equal((await handler(request({action:'ask',question:'x'.repeat(13000)}),env,m.fetcher)).status,413);
  await sqlChecks();
- console.log('PASS assistant : JWT réel vérifié, propriété documentaire, quotas, aucun droit métier modifié, limites fichiers, IA opt-in sans stockage, tickets privés et notification fixe/idempotente, SQL RLS et purge.');
+ console.log('PASS assistant : JWT réel vérifié, propriété documentaire, quotas, aucun droit métier modifié, limites fichiers, IA opt-in sans stockage, erreurs fournisseur diagnostiquées sans secret, FAQ générale sans IA, tickets privés et notification fixe/idempotente, SQL RLS et purge.');
+ async function providerErrorChecks(){
+  const originalWarn=console.warn;const logs=[];console.warn=(...args)=>logs.push(args.join(' '));
+  try{
+   const aiEnv={...env,SUPPORT_AI_ENABLED:'true',SUPPORT_DOCUMENT_AI_ENABLED:'true',OPENAI_API_KEY:'ai-private'};
+   const cases=[
+    [401,'invalid_api_key','authentication_failed'],
+    [429,'insufficient_quota','quota_exhausted'],
+    [429,'rate_limit_exceeded','rate_limited'],
+    [403,'insufficient_permissions','access_denied'],
+    [400,'unsupported_parameter','invalid_request'],
+    [404,'model_not_found','model_unavailable'],
+    [503,'server_error','provider_unavailable']
+   ];
+   for(const[http,code,category]of cases)for(const role of ['carrier','admin']){
+    const provider=mock({role,aiStatus:http,aiError:{error:{code,message:'Never log ai-private nor the question: SITUATION-PRIVEE',type:'untrusted-type-ai-private'}}});
+    const response=await handler(request({action:'ask',question:'SITUATION-PRIVEE à examiner personnellement.'}),aiEnv,provider.fetcher);assert.equal(response.status,200);const body=await response.json();assert.equal(body.source,'human');assert.equal(body.escalate,true);
+    if(role==='admin')assert.deepEqual(body.admin_diagnostic,{category,http_status:http});else assert.equal(body.admin_diagnostic,undefined);
+    const entry=JSON.parse(logs.at(-1));assert.deepEqual(entry,{event:'support_ai_provider_error',phase:'ask',http_status:http,category,code});assert(!JSON.stringify(body).includes('ai-private'));assert(!JSON.stringify(body).includes('SITUATION-PRIVEE'));
+   }
+   const malicious=mock({role:'admin',aiStatus:400,aiError:{error:{code:'ai-private',type:'SITUATION-PRIVEE',message:'ai-private'}}});
+   await handler(request({action:'ask',question:'SITUATION-PRIVEE à examiner personnellement.'}),aiEnv,malicious.fetcher);assert.equal(JSON.parse(logs.at(-1)).code,'unknown');
+   // Un document dont l'IA est refusée reste en contrôle de métadonnées, sans approbation.
+   for(const role of ['carrier','admin']){
+    const provider=mock({role,aiStatus:429,aiError:{error:{code:'insufficient_quota',message:'ai-private SITUATION-PRIVEE'}}});
+    const response=await handler(request({action:'review_document',document_id:uid(30)}),aiEnv,provider.fetcher);const body=await response.json();assert.equal(response.status,200);assert.equal(body.review.engine,'metadata');assert.notEqual(body.review.verdict,'approved');assert.equal(body.saved,true);
+    if(role==='admin')assert.deepEqual(body.admin_diagnostic,{category:'quota_exhausted',http_status:429});else assert.equal(body.admin_diagnostic,undefined);
+    assert.equal(JSON.parse(logs.at(-1)).phase,'review_document');assert(!provider.calls.some(c=>c.url.includes('carrier_documents')&&c.options.method==='PATCH'));assert(!JSON.stringify(body).includes('ai-private'));assert(!JSON.stringify(body).includes('SITUATION-PRIVEE'));
+   }
+   assert(!JSON.stringify(logs).includes('ai-private'));assert(!JSON.stringify(logs).includes('SITUATION-PRIVEE'));assert(!JSON.stringify(logs).includes('untrusted-type'));
+  }finally{console.warn=originalWarn;}
+ }
 })().catch(e=>{console.error(e);process.exit(1)});
 async function sqlChecks(){
  const{createDatabase,uid}=require('./helpers/pilot-database.cjs');const{db,actor}=await createDatabase({includeBilling:false});
