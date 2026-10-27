@@ -1,6 +1,7 @@
 "use strict";
 const accountDialog=document.getElementById('accountDialog');
 const authNotice=document.getElementById('authNotice');
+const authLinkExpired=[location.search.slice(1),location.hash.slice(1)].some(value=>new URLSearchParams(value).get('error_code')==='otp_expired');
 const configured=Boolean(window.URGENT_SUPABASE_URL&&window.URGENT_SUPABASE_PUBLISHABLE_KEY&&window.supabase);
 window.URGENT_SUPABASE_CONFIGURED=configured;
 const sb=configured?window.supabase.createClient(window.URGENT_SUPABASE_URL,window.URGENT_SUPABASE_PUBLISHABLE_KEY):null;
@@ -147,4 +148,4 @@ if(sb)sb.auth.onAuthStateChange((event,session)=>{
  if(event==='PASSWORD_RECOVERY'){passwordRecoveryUser=session?.user?.id||null;accountDialog.showModal();}
  else if(event==='SIGNED_OUT'||event==='SIGNED_IN'){passwordRecoveryUser=null;}
  authView++;setTimeout(()=>{document.getElementById('newPassword').value='';document.getElementById('confirmPassword').value='';updateAuth().catch(()=>notify('Impossible de vérifier la session.'));},0);});
-updateAuth().catch(()=>notify('Le service de connexion est momentanément inaccessible.'));
+updateAuth().then(()=>{if(authLinkExpired){accountDialog.showModal();notify('Ce lien a expiré ou n’est plus valide. Pour réinitialiser votre mot de passe, demandez un nouveau lien avec « Mot de passe oublié ? ». Si vous attendiez une confirmation d’inscription, contactez contact@13urgent.fr.');}}).catch(()=>notify('Le service de connexion est momentanément inaccessible.'));

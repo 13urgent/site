@@ -1,0 +1,36 @@
+{
+  "budget_supplementaire_eur": 0,
+  "publication_automatique_active": false,
+  "comptes": [
+    {
+      "reseau": "linkedin",
+      "identifiant": "97890364",
+      "url": "https://www.linkedin.com/company/97890364/",
+      "type": "page_entreprise",
+      "connecte": false
+    },
+    {
+      "reseau": "tiktok",
+      "identifiant": "13urgentsite",
+      "url": "https://www.tiktok.com/@13urgentsite",
+      "connecte": false
+    },
+    {
+      "reseau": "instagram",
+      "identifiant": "13urgentsite",
+      "url": "https://www.instagram.com/13urgentsite/",
+      "connecte": false
+    }
+  ],
+  "premiere_publication": {
+    "sujet": "Présentation de 13 URGENT",
+    "statut": "publication_manuelle_confirmee_par_le_proprietaire",
+    "reseaux": [
+      "linkedin",
+      "instagram",
+      "tiktok"
+    ],
+    "relais_profil_linkedin": "confirme_par_le_proprietaire",
+    "verifie_par_api": false
+  }
+}

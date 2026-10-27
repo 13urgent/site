@@ -5,7 +5,7 @@ const fs=require('fs');const assert=require('node:assert/strict');
  const uid=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
  const env={SUPABASE_URL:'https://project.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'private-service-key',SUPABASE_ANON_KEY:'public-key'};
  const request=(body,token='user-token',origin='https://13urgent.fr')=>new Request('https://project.supabase.co/functions/v1/support-assistant',{method:'POST',headers:{origin,authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify(body)});
- function mock({foreign=false,reserved=true,ai=null,aiStatus=200,aiError=null,provider=200,large=false,role='carrier',saveStatus=201,replySaveStatus=204}={}){
+ function mock({foreign=false,reserved=true,ai=null,aiStatus=200,aiError=null,provider=200,large=false,role='carrier',saveStatus=201,replySaveStatus=204,closeStatus=204}={}){
   const calls=[];let savedReply='Réponse de contrôle';const fetcher=async(url,options={})=>{
    let body;try{body=JSON.parse(options.body);}catch{}
    calls.push({url,options,body});
@@ -16,7 +16,7 @@ const fs=require('fs');const assert=require('node:assert/strict');
    if(url.endsWith('urgent_support_ready'))return Response.json(true);
    if(url.endsWith('urgent_support_reserve'))return Response.json(reserved);
    if(url.endsWith('urgent_support_create_ticket'))return Response.json(uid(90));
-   if(url.endsWith('urgent_support_reply')){savedReply=body.p_reply;return new Response(null,{status:replySaveStatus});}
+   if(url.endsWith('urgent_support_reply')){savedReply=body.p_reply;return new Response(null,{status:body.p_status==='resolved'?closeStatus:replySaveStatus});}
    if(url.includes('/rest/v1/urgent_support_tickets?'))return Response.json([{id:uid(90),created_by:uid(4),subject:'Question',admin_reply:savedReply}]);
    if(url.includes('/auth/v1/admin/users/'))return Response.json({id:uid(4),email:'client@example.com',email_confirmed_at:'2026-10-27T00:00:00Z'});
    if(url.includes('/rest/v1/carrier_documents?'))return Response.json([{id:uid(30),company_id:foreign?uid(4):uid(3),document_type:'insurance_rc',storage_path:(foreign?uid(4):uid(3))+'/file.png',review_status:'pending',expires_on:'2020-01-01'}]);
@@ -27,11 +27,12 @@ const fs=require('fs');const assert=require('node:assert/strict');
    throw Error('Unexpected request '+url);
   };return{calls,fetcher};
  }
- let m=mock();let r=await handler(request({action:'status'}),env,m.fetcher);assert.equal(r.status,200);assert.deepEqual(await r.json(),{enabled:true,ai_available:false,document_ai_available:false,tickets_available:true,version:'20261027-replies'});
+ let m=mock();let r=await handler(request({action:'status'}),env,m.fetcher);assert.equal(r.status,200);assert.deepEqual(await r.json(),{enabled:true,ai_available:false,document_ai_available:false,tickets_available:true,version:'20261027-audit'});
  assert.equal((await handler(request({action:'ask',question:'Bonjour'},'forged-token'),env,m.fetcher)).status,401);
  assert.equal((await handler(request({action:'ask',question:'Bonjour'},env.SUPABASE_SERVICE_ROLE_KEY),env,m.fetcher)).status,401);
  assert.equal((await handler(request({action:'status'},'user-token','https://evil.example'),env,m.fetcher)).status,403);
  assert.equal((await handler(request({action:'status'}),{...env,SUPPORT_ASSISTANT_ENABLED:'false'},m.fetcher)).status,503);
+ r=await handler(request({action:'ask',question:'J’ai oublié mon mot de passe'}),env,m.fetcher);assert.equal(r.status,200);assert.match((await r.json()).answer,/lien de réinitialisation/);
  r=await handler(request({action:'ask',question:'Signups not allowed for otp'}),env,m.fetcher);assert.equal(r.status,200);assert.match((await r.json()).answer,/Créer mon compte/);assert(!m.calls.some(c=>c.url.includes('openai.com')));
  for(const question of ['Comment fonctionne le site ?','Comment ça marche ?','Pouvez-vous présenter l’utilisation de la plateforme ?','Présentation de la plateforme']){
   const general=mock();const result=await handler(request({action:'ask',question}),{...env,SUPPORT_AI_ENABLED:'true',OPENAI_API_KEY:'ai-private'},general.fetcher);const answer=await result.json();assert.equal(answer.source,'faq');assert.match(answer.answer,/met en relation/);assert(!general.calls.some(c=>c.url.includes('openai.com')));
@@ -57,9 +58,10 @@ const fs=require('fs');const assert=require('node:assert/strict');
  const replyBody={action:'reply_ticket',ticket_id:uid(90),reply:'Votre dossier a été examiné.',to:'evil@example.com'};
  m=mock();assert.equal((await handler(request(replyBody),env,m.fetcher)).status,403);assert(!m.calls.some(c=>c.url.includes('resend.com')));
  const replyEnv={...env,RESEND_API_KEY:'mail-private',REGISTRATION_ALERTS_FROM:'13 URGENT <support@example.com>'};
- m=mock({role:'admin'});r=await handler(request(replyBody),replyEnv,m.fetcher);data=await r.json();assert.equal(data.saved,true);assert.equal(data.notified,true);const replyMail=m.calls.find(c=>c.url.includes('resend.com'));assert.deepEqual(replyMail.body.to,['client@example.com']);assert(replyMail.body.text.includes(replyBody.reply));assert.equal(m.calls.find(c=>c.url.endsWith('urgent_support_reply')).options.headers.authorization,'Bearer user-token');
+ m=mock({role:'admin'});r=await handler(request(replyBody),replyEnv,m.fetcher);data=await r.json();assert.equal(data.saved,true);assert.equal(data.notified,true);assert.equal(data.status,'resolved');assert.equal(m.calls.find(c=>c.url.endsWith('urgent_support_reply')).body.p_status,'in_progress');const replyMail=m.calls.find(c=>c.url.includes('resend.com'));assert.deepEqual(replyMail.body.to,['client@example.com']);assert(replyMail.body.text.includes(replyBody.reply));assert.equal(m.calls.find(c=>c.url.endsWith('urgent_support_reply')).options.headers.authorization,'Bearer user-token');
  const repeated=mock({role:'admin'});await handler(request(replyBody),replyEnv,repeated.fetcher);assert.equal(repeated.calls.find(c=>c.url.includes('resend.com')).options.headers['Idempotency-Key'],replyMail.options.headers['Idempotency-Key']);
  m=mock({role:'admin',provider:500});data=await(await handler(request(replyBody),replyEnv,m.fetcher)).json();assert.equal(data.saved,true);assert.equal(data.notified,false);assert.equal(data.notification_status,'provider_http_500');assert.equal(m.calls.filter(c=>c.url.endsWith('urgent_support_reply')).at(-1).body.p_status,'in_progress');
+ m=mock({role:'admin',closeStatus:503});data=await(await handler(request(replyBody),replyEnv,m.fetcher)).json();assert.equal(data.notified,true);assert.equal(data.status,'in_progress');
  m=mock({role:'admin',replySaveStatus:403});assert.equal((await handler(request(replyBody),replyEnv,m.fetcher)).status,503);assert(!m.calls.some(c=>c.url.includes('resend.com')));
  await sqlChecks();
  console.log('PASS assistant : JWT réel vérifié, propriété documentaire, quotas, aucun droit métier modifié, limites fichiers, IA opt-in sans stockage, erreurs fournisseur diagnostiquées sans secret, FAQ générale sans IA, tickets privés et notification fixe/idempotente, SQL RLS et purge.');
