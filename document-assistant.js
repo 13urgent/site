@@ -61,6 +61,7 @@
    else if(reason==='missing')message='Pièce manquante : déposez ce justificatif.';
    else if(reason==='not_approved')message=row?.review_status==='rejected'?'Pièce refusée : contactez 13 URGENT pour connaître la correction attendue.':'Pièce en attente de vérification par 13 URGENT.';
    else if(reason==='expiry_missing')message='Date de fin de validité manquante : vérifiez la date figurant sur le document.';
+   else if(reason==='renewal_due')message='Actualisation semestrielle requise : déposez un justificatif à jour.';
    else if(reason==='expired')message='Pièce expirée : déposez un justificatif à jour.';
    else if(reason==='valid'&&row?.review_status==='approved'){
     const problem=expiryIssue(kind,row.expires_on||'');
