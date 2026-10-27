@@ -14,12 +14,36 @@
  const publicationMessage=make('p');const publicationLogin=button('Connexion / inscription',()=>{$('openAccount').click();});
  publicationAccess.append(publicationMessage,publicationLogin);$('shipmentForm').before(publicationAccess);
  function publicationStatus(message,login=false){publicationAccess.hidden=!message;publicationMessage.textContent=message;publicationLogin.hidden=!login;}
- const ownReview=button('Vérifier / valider mon établissement',async()=>{
-  if(state.profile?.role!=='admin')return;
-  if(document.body.dataset.adminPage!=='true'){location.href='admin.html#validation-etablissement';return;}
-  $('openAdmin').click();if($('pilotAdmin'))$('pilotAdmin').hidden=false;const profile=state.profile;const result=await sb.from('urgent_business_access').select('siret,plan,registry_checked,pilot_enabled').eq('company_id',profile.company_id).maybeSingle();if(state.profile?.id!==profile.id)return;const form=$('pilotAccessForm');form.elements.companyId.value=profile.company_id;form.elements.siret.value=result.data?.siret||state.user?.user_metadata?.business_siret||'';form.elements.plan.value=result.data?.plan||'basics';form.elements.enabled.value='true';form.elements.registryChecked.checked=result.data?.registry_checked===true;form.scrollIntoView({block:'center'});notice('pilotAccessNotice','Validez uniquement après contrôle du SIRET et de la qualité du représentant. Cette décision autorise la publication pour cet établissement, sans valider les justificatifs transporteur ni activer de forfait payé.');
- });ownReview.hidden=true;$('shipmentForm').before(ownReview);
- const reset=()=>{ownReview.hidden=true;publicationStatus('Vérification de votre accès au formulaire…');if($('pilotAdmin'))$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.canPublish=false;state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
+ const adminPage=document.body.dataset.adminPage==='true';
+ const ownReview=$('openBusinessValidation')||make('button','Vérifier / valider mon établissement','btn secondary');
+ ownReview.type='button';
+ ownReview.onclick=async()=>{
+  ownReview.disabled=true;
+  try{
+   if(!adminPage){location.href='admin.html#validation-etablissement';return;}
+   if(!sb)throw Error('Service de connexion indisponible.');
+   // Rafraîchir le profil documentaire avant d’ouvrir sa fenêtre : les deux modules chargent indépendamment.
+   await window.refreshProfessionalAccess?.();
+   const current=await sb.auth.getUser();
+   if(current.error||!current.data?.user){notice('adminPageNotice','Connectez-vous avec votre compte administrateur pour valider l’établissement.');$('openAccount').click();return;}
+   const profile=await sb.from('profiles').select('id,role,company_id').eq('id',current.data.user.id).single();
+   if(profile.error)throw profile.error;
+   if(profile.data?.role!=='admin')throw Error('Le compte connecté '+current.data.user.email+' n’a pas le rôle administrateur. Aucune validation effectuée.');
+   if(!profile.data.company_id)throw Error('Aucun établissement lié à ce compte. Contactez l’administration.');
+   const result=await sb.from('urgent_business_access').select('siret,plan,registry_checked,pilot_enabled').eq('company_id',profile.data.company_id).maybeSingle();
+   if(result.error)throw result.error;
+   const latest=await sb.auth.getUser();if(latest.data?.user?.id!==current.data.user.id)throw Error('La session a changé. Reconnectez-vous avant de valider.');
+   $('openAdmin').click();
+   if(!$('adminDialog').open)throw Error('La fenêtre d’administration n’a pas pu être ouverte. Réessayez.');
+   $('pilotAdmin').hidden=false;
+   const form=$('pilotAccessForm');form.elements.companyId.value=profile.data.company_id;form.elements.siret.value=result.data?.siret||current.data.user.user_metadata?.business_siret||'';form.elements.plan.value=result.data?.plan||'basics';form.elements.enabled.value='true';form.elements.registryChecked.checked=result.data?.registry_checked===true;
+   notice('pilotAccessNotice','Établissement du compte '+current.data.user.email+'. Vous prenez la décision finale. Confirmez votre contrôle puis enregistrez pour autoriser la publication de demandes. Cette décision ne modifie pas les avis documentaires ni les abonnements payés.');form.scrollIntoView({block:'center'});
+  }catch(e){notice('adminPageNotice','Validation non effectuée : '+e.message);}
+  finally{ownReview.disabled=false;}
+ };
+ if(!adminPage){ownReview.hidden=true;$('shipmentForm').before(ownReview);}
+
+ const reset=()=>{ownReview.hidden=!adminPage;publicationStatus('Vérification de votre accès au formulaire…');if($('pilotAdmin'))$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.canPublish=false;state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
  async function rpc(name,args){if(!sb)throw Error('Service de connexion indisponible.');const result=await sb.rpc(name,args);if(result.error)throw result.error;return result.data;}
  function button(text,action,cls='btn secondary'){
   const b=make('button',text,cls);b.type='button';b.onclick=async()=>{b.disabled=true;try{await action();}catch(e){notice('trackingNotice','Opération non confirmée : '+e.message);}finally{b.disabled=false;}};return b;
@@ -53,7 +77,7 @@
    if(generation!==state.generation)return;
    if(profile.error)throw profile.error;
    if(!profile.data||!['client','carrier','admin'].includes(profile.data.role))throw Error('Profil professionnel indisponible.');
-   state.user=current.data.user;state.profile=profile.data;ownReview.hidden=profile.data.role!=='admin';if(profile.data.role==='admin'&&location.hash==='#validation-etablissement'){history.replaceState(null,'',location.pathname);setTimeout(()=>ownReview.click(),0);}
+   state.user=current.data.user;state.profile=profile.data;ownReview.hidden=!adminPage&&profile.data.role!=='admin';if(profile.data.role==='admin'&&location.hash==='#validation-etablissement'){history.replaceState(null,'',location.pathname);setTimeout(()=>ownReview.click(),0);}
    const canPublish=['client','carrier','admin'].includes(profile.data.role);state.canPublish=canPublish;
    $('testShipmentChoice').hidden=profile.data.role!=='admin';
    $('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=!canPublish);
