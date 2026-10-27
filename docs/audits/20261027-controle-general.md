@@ -9,6 +9,8 @@ Les tests locaux ne contactent pas les comptes réels et n’envoient pas de mai
 ## Vérifications réellement réalisées en ligne
 
 - 25 fichiers HTML/JS/CSS : réponses HTTPS 200 et contenu identique à la branche publiée avant corrections ; contrôle répété après publication pour les fichiers modifiés.
+- chronoss.fr et www.chronoss.fr : réponses 200, redirection HTTPS vers www ; le lien vers 13 URGENT et les trois pages de stockage liées depuis l’accueil répondent 200. Le contenu et les formulaires complets de ce site externe ne sont pas validés par cette seule lecture.
+- Empreinte SHA-256 du document contractuel public identique à celle déclarée par le serveur commercial.
 - 24 liens et ressources de l’accueil, administration et pages d’information : réponses HTTP 200. Ces réponses ne constituent pas une lecture complète de chaque vidéo.
 - Assistance : statut 200 ; service IA, préanalyse et tickets annoncés disponibles. Version serveur observée : `20261027-replies`.
 - Renouvellement documentaire : RPC publique répondant `months=6`, `enabled=true`.
