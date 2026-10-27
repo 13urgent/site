@@ -120,3 +120,14 @@ rapides locales restent utilisables. `SUPPORT_AI_ENABLED=false` et
 La migration prévoit une purge quotidienne lorsque `pg_cron` est disponible :
 tickets après 180 jours sans mise à jour, avis après 90 jours et quotas après
 8 jours. Les copies d’e-mails nécessitent leur propre gestion de conservation.
+
+## Retour visible après un clic d’envoi
+
+Le bouton « Envoyer ma question » affiche une réponse dans l’assistant ; il ne
+crée pas de ticket ni d’alerte. « Transmettre mon problème », puis
+« Enregistrer ma demande d’assistance », crée le suivi privé et tente l’alerte.
+Un texte de moins de 10 caractères, même prérempli, affiche un message explicite
+sans requête réseau. Progression, connexion requise, erreurs et référence de
+confirmation sont affichées près du bouton ; un texte en échec reste disponible
+pour correction. Une notification acceptée par le prestataire ne prouve pas sa
+livraison en boîte de réception.
