@@ -46,7 +46,7 @@ async function showMyDocuments(){
     if(generation!==professionalAccessGeneration)return;
     const host=doc$('myDocuments');host.replaceChildren();
     if(!data?.length)line(host,'p','Aucun justificatif envoyé.');
-    for(const d of data){const item=line(host,'div','', 'doc-item');line(item,'strong',d.original_filename||d.document_type);line(item,'span',`${documentLabel(d.document_type)} · ${d.review_status}${d.expires_on?' · expire le '+d.expires_on:''}`);if(window.urgentSupport){const help=line(item,'button','Demander une préanalyse','btn secondary');help.type='button';help.onclick=()=>window.urgentSupport.reviewDocument(d.id);}}
+    for(const d of data){const item=line(host,'div','', 'doc-item');line(item,'strong',d.original_filename||d.document_type);line(item,'span',`${documentLabel(d.document_type)} · ${d.review_status}${d.expires_on?' · expire le '+d.expires_on:''}`);if(window.urgentDossiers){const due=window.urgentDossiers.renewalDate(d.created_at);line(item,'span',due?'Actualisation semestrielle avant le '+due:'Date de dépôt à vérifier auprès de l’administration.');}if(window.urgentSupport){const help=line(item,'button','Demander une préanalyse','btn secondary');help.type='button';help.onclick=()=>window.urgentSupport.reviewDocument(d.id);}}
     if(typeof sb.rpc==='function'&&window.urgentDocumentAssistant){try{const checklist=await sb.rpc('urgent_document_checklist',{p_company:c.id});if(generation!==professionalAccessGeneration)return;if(!checklist.error&&Array.isArray(checklist.data)){const report=window.urgentDocumentAssistant.analyseChecklist(checklist.data);const panel=line(host,'div',report.message,'support-file-report');for(const item of report.items)line(panel,'p',item.label+' : '+item.message);}}catch{/* Le diagnostic ne bloque pas l’accès aux pièces. */}}
   }catch(e){if(generation===professionalAccessGeneration)docMsg('documentNotice','Erreur : '+e.message);}
 }
@@ -83,20 +83,30 @@ async function loadAdmin(){
   if(!adminPage||professionalProfile?.role!=='admin')return;
   const generation=professionalAccessGeneration;
   doc$('adminNotice').hidden=true;const host=doc$('adminDossiers');host.replaceChildren();line(host,'p','Chargement des dossiers…');
+  async function readAll(table,columns,filter){
+    const query=()=>{let q=sb.from(table).select(columns);if(filter)q=q.in('company_type',filter);return q.order('created_at',{ascending:false});};
+    const first=query();if(typeof first.range!=='function')return await first;
+    const rows=[];for(let offset=0;;offset+=200){const result=await query().order('id').range(offset,offset+199);if(generation!==professionalAccessGeneration)return{data:[]};if(result.error)return result;rows.push(...result.data||[]);if((result.data||[]).length<200)return{data:rows};}
+  }
   const [companies,docs]=await Promise.all([
-    sb.from('companies').select('id,name,company_type,verification_status').in('company_type',['carrier','both']).order('created_at',{ascending:false}),
-    sb.from('carrier_documents').select('id,company_id,document_type,storage_path,original_filename,review_status,expires_on,created_at').order('created_at',{ascending:false})
+    readAll('companies','id,name,company_type,verification_status',['carrier','both']),
+    readAll('carrier_documents','id,company_id,document_type,storage_path,original_filename,review_status,expires_on,created_at')
   ]);
   if(generation!==professionalAccessGeneration)return;
   if(companies.error||docs.error){docMsg('adminNotice','Lecture impossible : '+(companies.error?.message||docs.error?.message));host.replaceChildren();return;}
   host.replaceChildren();if(!companies.data?.length){line(host,'p','Aucun transporteur enregistré.');return;}
+  const folders=window.urgentDossiers?.folders(host,[['review','Nouveaux documents à examiner'],['renew','Dossiers à compléter ou à actualiser'],['validated','Dossiers documentaires validés']]);
   for(const c of companies.data){
-    const card=line(host,'article','', 'dossier');line(card,'h3',c.name);line(card,'p',`Entreprise : ${c.verification_status} · ${c.id}`);
+    const companyDocs=(docs.data||[]).filter(d=>d.company_id===c.id);const folder=window.urgentDossiers?.classify(companyDocs)||'review';
+    const card=line(folders?.containers[folder]||host,'article','', 'dossier');line(card,'h3',c.name);line(card,'p',`Entreprise : ${c.verification_status} · ${c.id}`);
     const items=(docs.data||[]).filter(d=>d.company_id===c.id);
     if(!items.length)line(card,'p','Aucun document déposé.');
+    const latestIds=new Set((window.urgentDossiers?.latestDocuments(items)||items).map(d=>d.id));
+    let oldVersions=null;if(items.some(d=>!latestIds.has(d.id))){oldVersions=document.createElement('details');line(oldVersions,'summary','Anciennes versions conservées ('+items.filter(d=>!latestIds.has(d.id)).length+')');card.append(oldVersions);}
     for(const d of items){
-      const row=line(card,'div','', 'doc-item');line(row,'strong',`${documentLabel(d.document_type)} — ${d.original_filename||'fichier'}`);
+      const historical=!latestIds.has(d.id);const row=line(historical?oldVersions:card,'div','', 'doc-item');line(row,'strong',`${documentLabel(d.document_type)} — ${d.original_filename||'fichier'}`);
       line(row,'span',`Statut : ${d.review_status}${d.expires_on?' · Expiration : '+d.expires_on:''}`);
+      if(window.urgentDossiers){const due=window.urgentDossiers.renewalDate(d.created_at);line(row,'span',due?'Actualisation semestrielle avant le '+due:'Date de dépôt à vérifier.');}
       const buttons=line(row,'div','', 'doc-actions');
       if(window.urgentSupport){const help=line(buttons,'button','Avis de l’assistant','btn secondary');help.type='button';help.onclick=()=>window.urgentSupport.reviewDocument(d.id);}
       const view=line(buttons,'button','Voir le fichier','btn secondary');view.type='button';view.onclick=async()=>{
@@ -104,6 +114,7 @@ async function loadAdmin(){
         if(error){docMsg('adminNotice','Fichier inaccessible : '+error.message);return;}
         window.open(data.signedUrl,'_blank','noopener,noreferrer');
       };
+      if(historical)continue;
       const edit=line(buttons,'button','Corriger la catégorie / la date','btn secondary');edit.type='button';
       edit.onclick=()=>{
         if(row.querySelector('.document-correction'))return;
@@ -146,12 +157,13 @@ async function loadAdmin(){
       }
     }
   }
+  folders?.update();
 }
 doc$('openDocuments').addEventListener('click',()=>showMyDocuments().catch(()=>docMsg('documentNotice','Service momentanément inaccessible.')));
 if(adminPage)doc$('openAdmin').addEventListener('click',event=>{event.preventDefault();showAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.'));});
 doc$('refreshAdmin')?.addEventListener('click',()=>loadAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.')));
 const renewalWarning=document.createElement('p');renewalWarning.className='muted';renewalWarning.id='documentRenewalWarning';
-renewalWarning.textContent='Renouvellement : la nouvelle pièce est prise en compte dès son dépôt. Tant qu’elle reste en attente de validation par 13 URGENT, vos nouvelles propositions et attributions peuvent être suspendues.';
+renewalWarning.textContent='Actualisez vos quatre catégories de justificatifs tous les six mois à compter de leur dépôt, ou plus tôt si leur validité expire. Renouvellement : la nouvelle pièce est prise en compte dès son dépôt. Tant qu’elle reste en attente de validation par 13 URGENT, vos nouvelles propositions et attributions peuvent être suspendues.';
 doc$('documentForm').before(renewalWarning);
 doc$('documentForm').addEventListener('submit',uploadDocument);
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>doc$(b.dataset.close).close()));

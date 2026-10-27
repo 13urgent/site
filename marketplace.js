@@ -3,7 +3,7 @@
  if(window.URGENT_MARKETPLACE_PILOT!==true)return;
  const $=id=>document.getElementById(id);
  const make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
- const state={user:null,profile:null,shipments:[],offers:[],private:[],events:[],incidents:[],generation:0};
+ const state={user:null,profile:null,shipments:[],offers:[],private:[],events:[],incidents:[],generation:0,canPublish:false};
  const labels={published:'Course publiée',offer_submitted:'Offre enregistrée',offer_withdrawn:'Offre retirée',assigned_commercial_manual:'Mise en relation confirmée — frais mensuels CHRONOSS',assigned_pilot_no_charge:'Attribution pilote gratuite',incident_reported:'Incident signalé',incident_resolved:'Signalement clôturé',open:'Ouverte',assigned:'Attribuée',heading_pickup:'En route vers l’enlèvement',at_pickup:'Arrivé au chargement',loaded:'Marchandise chargée',delivery_reported:'Livraison déclarée — confirmation client attendue',completed:'Réalisation confirmée par le client',cancelled:'Annulée'};
  const next={assigned:'heading_pickup',heading_pickup:'at_pickup',at_pickup:'loaded',loaded:'delivery_reported'};
  const notice=(id,text)=>{$(id).hidden=false;$(id).textContent=text;};
@@ -14,7 +14,12 @@
  const publicationMessage=make('p');const publicationLogin=button('Connexion / inscription',()=>{$('openAccount').click();});
  publicationAccess.append(publicationMessage,publicationLogin);$('shipmentForm').before(publicationAccess);
  function publicationStatus(message,login=false){publicationAccess.hidden=!message;publicationMessage.textContent=message;publicationLogin.hidden=!login;}
- const reset=()=>{publicationStatus('Vérification de votre accès au formulaire…');if($('pilotAdmin'))$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
+ const ownReview=button('Vérifier / valider mon établissement',async()=>{
+  if(state.profile?.role!=='admin')return;
+  if(document.body.dataset.adminPage!=='true'){location.href='admin.html#validation-etablissement';return;}
+  $('openAdmin').click();if($('pilotAdmin'))$('pilotAdmin').hidden=false;const profile=state.profile;const result=await sb.from('urgent_business_access').select('siret,plan,registry_checked,pilot_enabled').eq('company_id',profile.company_id).maybeSingle();if(state.profile?.id!==profile.id)return;const form=$('pilotAccessForm');form.elements.companyId.value=profile.company_id;form.elements.siret.value=result.data?.siret||state.user?.user_metadata?.business_siret||'';form.elements.plan.value=result.data?.plan||'basics';form.elements.enabled.value='true';form.elements.registryChecked.checked=result.data?.registry_checked===true;form.scrollIntoView({block:'center'});notice('pilotAccessNotice','Validez uniquement après contrôle du SIRET et de la qualité du représentant. Cette décision autorise la publication pour cet établissement, sans valider les justificatifs transporteur ni activer de forfait payé.');
+ });ownReview.hidden=true;$('shipmentForm').before(ownReview);
+ const reset=()=>{ownReview.hidden=true;publicationStatus('Vérification de votre accès au formulaire…');if($('pilotAdmin'))$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.canPublish=false;state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
  async function rpc(name,args){if(!sb)throw Error('Service de connexion indisponible.');const result=await sb.rpc(name,args);if(result.error)throw result.error;return result.data;}
  function button(text,action,cls='btn secondary'){
   const b=make('button',text,cls);b.type='button';b.onclick=async()=>{b.disabled=true;try{await action();}catch(e){notice('trackingNotice','Opération non confirmée : '+e.message);}finally{b.disabled=false;}};return b;
@@ -48,11 +53,14 @@
    if(generation!==state.generation)return;
    if(profile.error)throw profile.error;
    if(!profile.data||!['client','carrier','admin'].includes(profile.data.role))throw Error('Profil professionnel indisponible.');
-   state.user=current.data.user;state.profile=profile.data;
-   const canPublish=['client','carrier','admin'].includes(profile.data.role);
+   state.user=current.data.user;state.profile=profile.data;ownReview.hidden=profile.data.role!=='admin';if(profile.data.role==='admin'&&location.hash==='#validation-etablissement'){history.replaceState(null,'',location.pathname);setTimeout(()=>ownReview.click(),0);}
+   const canPublish=['client','carrier','admin'].includes(profile.data.role);state.canPublish=canPublish;
    $('testShipmentChoice').hidden=profile.data.role!=='admin';
    $('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=!canPublish);
    publicationStatus(profile.data.role==='carrier'?'Vous déposez cette course comme donneur d’ordre. En mode commercial, les frais de mise en relation de 1,5 % HT, TVA applicable en sus, s’ajoutent à votre abonnement lors de la confirmation d’une proposition. Le dépôt seul reste gratuit.':'');
+   // Prévenir le professionnel avant la saisie, plutôt que seulement au refus serveur.
+   try{const access=sb.from('urgent_business_access').select('registry_checked,pilot_enabled').eq('company_id',profile.data.company_id);if(typeof access.maybeSingle==='function'){const result=await access.maybeSingle();if(generation!==state.generation)return;if(!result.error&&(result.data===null||(typeof result.data?.registry_checked==='boolean'&&typeof result.data?.pilot_enabled==='boolean'))){state.canPublish=result.data?.registry_checked===true&&result.data?.pilot_enabled===true;if(!state.canPublish){$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);if(profile.data.role==='admin')$('testShipmentInput').disabled=false;publicationStatus('Compte connecté : '+current.data.user.email+'. Votre établissement doit être validé par 13 URGENT avant publication. '+(profile.data.role==='admin'?'Utilisez « Vérifier / valider mon établissement » ci-dessus.':'Votre demande de validation doit être examinée par l’administration.'));}}}}
+   catch{/* Le contrôle décisif reste effectué par le serveur lors de la publication. */}
    if($('pilotAdmin'))$('pilotAdmin').hidden=profile.data.role!=='admin';
    const results=await Promise.all([
     readRows('urgent_shipments',generation),
@@ -135,19 +143,21 @@
  async function renderPilotDirectory(){
   const generation=state.generation;
   const host=$('pilotDirectory');host.replaceChildren();
-  try{const rows=await rpc('urgent_pilot_directory',{});
+  try{const rows=[];for(let offset=0;;offset+=200){const request=sb.rpc('urgent_pilot_directory',{});const ranged=typeof request.range==='function';const result=await(ranged?request.range(offset,offset+199):request);if(generation!==state.generation)return;if(result.error)throw result.error;rows.push(...result.data||[]);if(!ranged||(result.data||[]).length<200)break;}
    if(generation!==state.generation||state.profile?.role!=='admin')return;
-   for(const row of rows){const card=make('div',undefined,'doc-item');card.append(make('strong',`${row.company_name} · ${row.account_role==='carrier'?'transporteur':'donneur d’ordre'}`),make('span',`SIRET déclaré à contrôler : ${row.declared_siret||'non fourni'} · Pilote : ${row.pilot_enabled?'autorisé':'non autorisé'} · Dossier transporteur : ${row.carrier_ready?'admissible au pilote':'non admissible ou sans objet'}`));
+   const folders=window.urgentDossiers?.folders(host,[['review','Établissements à vérifier'],['validated','Établissements validés — classés']]);
+   for(const row of rows){const target=folders?.containers[row.pilot_enabled?'validated':'review']||host;const card=make('div',undefined,'doc-item');card.append(make('strong',`${row.company_name} · ${row.account_role==='carrier'?'transporteur':'donneur d’ordre'}`),make('span',`SIRET déclaré à contrôler : ${row.declared_siret||'non fourni'} · Pilote : ${row.pilot_enabled?'autorisé':'non autorisé'} · Dossier transporteur : ${row.carrier_ready?'admissible au pilote':'non admissible ou sans objet'}`));
     if(row.account_role==='carrier')card.append(button('Voir les pièces qui bloquent',async()=>{
       const generation=state.generation;const rows=await rpc('urgent_document_checklist',{p_company:row.company_id});if(generation!==state.generation)return;
       card.querySelector('.document-checklist')?.remove();const list=make('ul',undefined,'document-checklist');
       const names={registration:'Kbis / immatriculation',transport_licence:'Licence',insurance_rc:'Assurance RC',insurance_goods:'Assurance marchandises'};
-      const reasons={missing:'pièce manquante',not_approved:'en attente ou refusée',expiry_missing:'date de validité manquante',expired:'pièce expirée',valid:'pièce approuvée et date valide'};
+      const reasons={missing:'pièce manquante',not_approved:'en attente ou refusée',expiry_missing:'date de validité manquante',expired:'pièce expirée',renewal_due:'actualisation semestrielle requise',valid:'pièce approuvée et date valide'};
       for(const item of rows)list.append(make('li',`${names[item.document_type]||item.document_type} : ${reasons[item.reason]||item.reason}${item.expires_on?' — échéance '+item.expires_on:''}`));card.append(list);
     }));
     if(row.account_role==='carrier'&&window.urgentCommerce?.ready)card.append(button('Enregistrer une période après virement',async()=>{window.dispatchEvent(new CustomEvent('urgent-commercial-company',{detail:{company_id:row.company_id,plan:row.requested_plan||row.pilot_plan}}));}));
-    card.append(button('Préparer la décision pour cet établissement',async()=>{const form=$('pilotAccessForm');form.elements.companyId.value=row.company_id;form.elements.siret.value=row.declared_siret||'';form.elements.plan.value=row.pilot_plan||row.requested_plan||'basics';form.elements.registryChecked.checked=false;form.elements.enabled.value=row.pilot_enabled?'false':'true';form.scrollIntoView({block:'center'});}));host.append(card);
+    card.append(button('Préparer la décision pour cet établissement',async()=>{const form=$('pilotAccessForm');form.elements.companyId.value=row.company_id;form.elements.siret.value=row.declared_siret||'';form.elements.plan.value=row.pilot_plan||row.requested_plan||'basics';form.elements.registryChecked.checked=false;form.elements.enabled.value=row.pilot_enabled?'false':'true';form.scrollIntoView({block:'center'});}));target.append(card);
    }
+   folders?.update();
   }catch(e){notice('pilotAccessNotice','Annuaire pilote indisponible : '+e.message);}
  }
  if($('pilotAccessForm')){
@@ -158,7 +168,7 @@
  });
  $('pilotAccessForm').onsubmit=async event=>{
   event.preventDefault();const b=event.submitter;b.disabled=true;const f=new FormData(event.currentTarget);
-  try{await rpc('urgent_review_pilot',{p_company:f.get('companyId'),p_siret:f.get('siret'),p_plan:f.get('plan'),p_enabled:f.get('enabled')==='true',p_registry_checked:f.get('registryChecked')==='on'});await renderPilotDirectory();notice('pilotAccessNotice','Décision pilote enregistrée. Aucun abonnement payé activé. Les documents sont contrôlés à chaque offre et attribution.');}catch(e){notice('pilotAccessNotice','Décision refusée : '+e.message);}finally{b.disabled=false;}
+  try{await rpc('urgent_review_pilot',{p_company:f.get('companyId'),p_siret:f.get('siret'),p_plan:f.get('plan'),p_enabled:f.get('enabled')==='true',p_registry_checked:f.get('registryChecked')==='on'});await renderPilotDirectory();await refresh();notice('pilotAccessNotice',f.get('enabled')==='true'?'Établissement autorisé après votre validation. Vous pouvez reprendre la publication. Aucun abonnement payé ni justificatif transporteur n’est automatiquement validé.':'Accès de l’établissement suspendu.');}catch(e){notice('pilotAccessNotice','Décision refusée : '+e.message);}finally{b.disabled=false;}
  };
  }
  $('courseFilters').onsubmit=e=>e.preventDefault();$('courseSearch').oninput=render;$('courseVehicle').onchange=render;
@@ -169,6 +179,7 @@
  const testChoice=make('label',undefined,'professional-check wide');testChoice.id='testShipmentChoice';testChoice.hidden=true;
  const testInput=make('input');testInput.type='checkbox';testInput.id='testShipmentInput';testChoice.append(testInput,make('span','Créer un exercice fictif sans transport réel (administrateur uniquement).'));
  $('shipmentForm').prepend(testChoice);
+ testInput.addEventListener('change',()=>{const allowed=state.canPublish||(state.profile?.role==='admin'&&testInput.checked);$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=!allowed);if(state.profile?.role==='admin')testInput.disabled=false;});
  const shipmentSiret=$('shipmentForm').elements.siret;shipmentSiret.required=false;shipmentSiret.closest('label').hidden=true;
  const refreshButton=button('Actualiser les courses et le suivi',refresh);$('courseFilters').after(refreshButton);
  const banner=make('p','13 URGENT — Transport express et mise en relation entre professionnels.','pilot-banner');document.querySelector('main').prepend(banner);

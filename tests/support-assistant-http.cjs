@@ -5,8 +5,8 @@ const fs=require('fs');const assert=require('node:assert/strict');
  const uid=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
  const env={SUPABASE_URL:'https://project.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'private-service-key',SUPABASE_ANON_KEY:'public-key'};
  const request=(body,token='user-token',origin='https://13urgent.fr')=>new Request('https://project.supabase.co/functions/v1/support-assistant',{method:'POST',headers:{origin,authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify(body)});
- function mock({foreign=false,reserved=true,ai=null,aiStatus=200,aiError=null,provider=200,large=false,role='carrier',saveStatus=201}={}){
-  const calls=[];const fetcher=async(url,options={})=>{
+ function mock({foreign=false,reserved=true,ai=null,aiStatus=200,aiError=null,provider=200,large=false,role='carrier',saveStatus=201,replySaveStatus=204}={}){
+  const calls=[];let savedReply='Réponse de contrôle';const fetcher=async(url,options={})=>{
    let body;try{body=JSON.parse(options.body);}catch{}
    calls.push({url,options,body});
    if(url.endsWith('/auth/v1/user'))return Response.json(options.headers.authorization==='Bearer user-token'?{id:uid(3)}:{error:'bad_jwt'},{status:options.headers.authorization==='Bearer user-token'?200:401});
@@ -16,6 +16,9 @@ const fs=require('fs');const assert=require('node:assert/strict');
    if(url.endsWith('urgent_support_ready'))return Response.json(true);
    if(url.endsWith('urgent_support_reserve'))return Response.json(reserved);
    if(url.endsWith('urgent_support_create_ticket'))return Response.json(uid(90));
+   if(url.endsWith('urgent_support_reply')){savedReply=body.p_reply;return new Response(null,{status:replySaveStatus});}
+   if(url.includes('/rest/v1/urgent_support_tickets?'))return Response.json([{id:uid(90),created_by:uid(4),subject:'Question',admin_reply:savedReply}]);
+   if(url.includes('/auth/v1/admin/users/'))return Response.json({id:uid(4),email:'client@example.com',email_confirmed_at:'2026-10-27T00:00:00Z'});
    if(url.includes('/rest/v1/carrier_documents?'))return Response.json([{id:uid(30),company_id:foreign?uid(4):uid(3),document_type:'insurance_rc',storage_path:(foreign?uid(4):uid(3))+'/file.png',review_status:'pending',expires_on:'2020-01-01'}]);
    if(url.endsWith('/rest/v1/urgent_document_prechecks'))return new Response(null,{status:saveStatus});
    if(url.includes('/storage/v1/object/'))return new Response(new Uint8Array([137,80,78,71,13,10,26,10,1]),{headers:{'content-type':'image/png',...(large?{'content-length':'6000000'}:{})}});
@@ -24,7 +27,7 @@ const fs=require('fs');const assert=require('node:assert/strict');
    throw Error('Unexpected request '+url);
   };return{calls,fetcher};
  }
- let m=mock();let r=await handler(request({action:'status'}),env,m.fetcher);assert.equal(r.status,200);assert.deepEqual(await r.json(),{enabled:true,ai_available:false,document_ai_available:false,tickets_available:true,version:'20261027-doc-save'});
+ let m=mock();let r=await handler(request({action:'status'}),env,m.fetcher);assert.equal(r.status,200);assert.deepEqual(await r.json(),{enabled:true,ai_available:false,document_ai_available:false,tickets_available:true,version:'20261027-replies'});
  assert.equal((await handler(request({action:'ask',question:'Bonjour'},'forged-token'),env,m.fetcher)).status,401);
  assert.equal((await handler(request({action:'ask',question:'Bonjour'},env.SUPABASE_SERVICE_ROLE_KEY),env,m.fetcher)).status,401);
  assert.equal((await handler(request({action:'status'},'user-token','https://evil.example'),env,m.fetcher)).status,403);
@@ -50,6 +53,14 @@ const fs=require('fs');const assert=require('node:assert/strict');
  m=mock({provider:500});r=await handler(request({action:'ticket',subject:'Inscription bloquée',message:'Je souhaite être accompagné pour mon inscription.'}),{...env,RESEND_API_KEY:'mail-private',REGISTRATION_ALERTS_FROM:'13 URGENT <support@example.com>'},m.fetcher);assert.deepEqual(await r.json(),{ticket_id:uid(90),notified:false});
  assert.equal((await handler(request({action:'ask',question:'x'.repeat(1501)}),env,m.fetcher)).status,400);
  assert.equal((await handler(request({action:'ask',question:'x'.repeat(13000)}),env,m.fetcher)).status,413);
+ // Réponse administrateur : destinataire déduit du vrai auteur, jamais du corps.
+ const replyBody={action:'reply_ticket',ticket_id:uid(90),reply:'Votre dossier a été examiné.',to:'evil@example.com'};
+ m=mock();assert.equal((await handler(request(replyBody),env,m.fetcher)).status,403);assert(!m.calls.some(c=>c.url.includes('resend.com')));
+ const replyEnv={...env,RESEND_API_KEY:'mail-private',REGISTRATION_ALERTS_FROM:'13 URGENT <support@example.com>'};
+ m=mock({role:'admin'});r=await handler(request(replyBody),replyEnv,m.fetcher);data=await r.json();assert.equal(data.saved,true);assert.equal(data.notified,true);const replyMail=m.calls.find(c=>c.url.includes('resend.com'));assert.deepEqual(replyMail.body.to,['client@example.com']);assert(replyMail.body.text.includes(replyBody.reply));assert.equal(m.calls.find(c=>c.url.endsWith('urgent_support_reply')).options.headers.authorization,'Bearer user-token');
+ const repeated=mock({role:'admin'});await handler(request(replyBody),replyEnv,repeated.fetcher);assert.equal(repeated.calls.find(c=>c.url.includes('resend.com')).options.headers['Idempotency-Key'],replyMail.options.headers['Idempotency-Key']);
+ m=mock({role:'admin',provider:500});data=await(await handler(request(replyBody),replyEnv,m.fetcher)).json();assert.equal(data.saved,true);assert.equal(data.notified,false);assert.equal(data.notification_status,'provider_http_500');assert.equal(m.calls.filter(c=>c.url.endsWith('urgent_support_reply')).at(-1).body.p_status,'in_progress');
+ m=mock({role:'admin',replySaveStatus:403});assert.equal((await handler(request(replyBody),replyEnv,m.fetcher)).status,503);assert(!m.calls.some(c=>c.url.includes('resend.com')));
  await sqlChecks();
  console.log('PASS assistant : JWT réel vérifié, propriété documentaire, quotas, aucun droit métier modifié, limites fichiers, IA opt-in sans stockage, erreurs fournisseur diagnostiquées sans secret, FAQ générale sans IA, tickets privés et notification fixe/idempotente, SQL RLS et purge.');
  async function providerErrorChecks(){
