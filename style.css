@@ -40,3 +40,5 @@
 .footer-contact a{text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}.footer-contact a:hover{color:#fff}.footer-contact a:focus-visible{outline:2px solid currentColor;outline-offset:4px}
 
 #manualCommerce form{margin:24px 0}#manualCommerce h3{margin-top:32px}#manualCommerce .professional-check{display:flex;gap:10px;align-items:flex-start;margin:16px 0}#manualCommerce>p{max-width:850px}#commercialReport{max-height:420px;overflow:auto}#commercialOwn p,#commercialPeriods p,#commercialReport label{overflow-wrap:anywhere}
+
+.account-action-group{border-top:1px solid #d7d9de;margin-top:20px;padding-top:14px}.account-action-group p{margin:0 0 12px}.account-action-group[hidden]{display:none}

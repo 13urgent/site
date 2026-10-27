@@ -30,6 +30,7 @@ async function updateAuth(){
  accountDialog.querySelector('h2').textContent=user?'Mon compte':'Connexion / inscription';
  for(const id of ['authEmail','authPassword','accountType'])document.getElementById(id).closest('label').hidden=Boolean(user);
  for(const id of ['signUp','signIn','magicLink'])document.getElementById(id).hidden=Boolean(user);
+ for(const id of ['registrationAction','loginActions']){const group=document.getElementById(id);if(group)group.hidden=Boolean(user)||(id==='registrationAction'&&window.URGENT_ALLOW_REGISTRATION===false);}
  if(window.URGENT_ALLOW_REGISTRATION===false){document.getElementById('signUp').hidden=true;document.getElementById('accountType').closest('label').hidden=true;}
  document.getElementById('passwordSettings').hidden=!user;
  document.getElementById('businessRegistration').hidden=Boolean(user)||window.URGENT_ALLOW_REGISTRATION===false;
@@ -75,8 +76,17 @@ document.getElementById('magicLink').addEventListener('click',()=>runAuthOperati
  if(!['http:','https:'].includes(location.protocol)){notify('Ouvrez le site avec le serveur local HTTP ou son adresse HTTPS.');return;}
  try{
   const {error}=await sb.auth.signInWithOtp({email:emailInput.value.trim(),options:{shouldCreateUser:false,emailRedirectTo:authReturnUrl()}});
-  if(error){notify('Envoi impossible : '+error.message);return;}
-  notify('Si ce compte peut se connecter, un lien vient d’être envoyé. Ouvrez le dernier e-mail dans ce navigateur et gardez le serveur local lancé.');
+  if(error){
+   const code=String(error.code||'');
+   if(code==='otp_disabled'||code==='signup_disabled'||/signups? not allowed for otp/i.test(error.message||'')){
+    notify(window.URGENT_ALLOW_REGISTRATION===false?'Ce lien est réservé aux comptes déjà créés. Vérifiez l’adresse e-mail de votre compte ou contactez contact@13urgent.fr.':'Ce lien sert à vous connecter à un compte déjà créé. Pour une première inscription, renseignez vos informations professionnelles puis cliquez sur « Créer mon compte ». Si vous êtes déjà inscrit, vérifiez l’adresse e-mail utilisée.');
+    if(window.URGENT_ALLOW_REGISTRATION!==false)setTimeout(()=>{if(accountDialog.open)document.getElementById('signUp').focus();},0);
+   }else if(['over_email_send_rate_limit','over_request_rate_limit'].includes(code)||error.status===429){notify('Trop de demandes de lien ont été effectuées. Patientez quelques minutes avant de réessayer.');}
+   else if(code==='email_address_invalid'){notify('Vérifiez votre adresse e-mail avant de demander un lien de connexion.');}
+   else{notify('Le lien de connexion n’a pas pu être envoyé. Réessayez dans quelques minutes ou contactez contact@13urgent.fr.');}
+   return;
+  }
+  notify('Si cette adresse correspond à un compte autorisé, un lien de connexion vient d’être envoyé. Consultez votre boîte e-mail et vos courriers indésirables, puis ouvrez le lien le plus récent.');
  }catch{notify('Service inaccessible. Aucun envoi ne peut être confirmé.');}
 },'Service inaccessible. Aucun envoi ne peut être confirmé.'));
 
