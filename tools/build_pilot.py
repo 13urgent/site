@@ -16,7 +16,7 @@ if output == root or root in output.parents or output in root.parents:
 output.mkdir(parents=True, exist_ok=True)
 if any(output.iterdir()):
     raise SystemExit('Le dossier de sortie doit être vide pour préserver les fichiers existants.')
-files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js','manual-commerce.js','conditions-professionnelles.html','conditions-professionnelles-v3.html','conditions-professionnelles-v4.html','mentions-legales.html','confidentialite.html','billing.js','documents.js','imports.js','terms-links.js','audience.js','audience.css','google-ads.js','robots.txt','sitemap.xml']
+files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js','manual-commerce.js','conditions-professionnelles.html','conditions-professionnelles-v3.html','conditions-professionnelles-v4.html','mentions-legales.html','confidentialite.html','billing.js','documents.js','imports.js','terms-links.js','audience.js','audience.css','google-ads.js','support.js','support-knowledge.js','support.css','document-assistant.js','robots.txt','sitemap.xml']
 for name in files:
     shutil.copy2(root / name, output / name)
 (output / 'admin.html').write_text(build_admin())

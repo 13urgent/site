@@ -46,7 +46,8 @@ async function showMyDocuments(){
     if(generation!==professionalAccessGeneration)return;
     const host=doc$('myDocuments');host.replaceChildren();
     if(!data?.length)line(host,'p','Aucun justificatif envoyé.');
-    for(const d of data){const item=line(host,'div','', 'doc-item');line(item,'strong',d.original_filename||d.document_type);line(item,'span',`${documentLabel(d.document_type)} · ${d.review_status}${d.expires_on?' · expire le '+d.expires_on:''}`);}
+    for(const d of data){const item=line(host,'div','', 'doc-item');line(item,'strong',d.original_filename||d.document_type);line(item,'span',`${documentLabel(d.document_type)} · ${d.review_status}${d.expires_on?' · expire le '+d.expires_on:''}`);if(window.urgentSupport){const help=line(item,'button','Demander une préanalyse','btn secondary');help.type='button';help.onclick=()=>window.urgentSupport.reviewDocument(d.id);}}
+    if(typeof sb.rpc==='function'&&window.urgentDocumentAssistant){try{const checklist=await sb.rpc('urgent_document_checklist',{p_company:c.id});if(generation!==professionalAccessGeneration)return;if(!checklist.error&&Array.isArray(checklist.data)){const report=window.urgentDocumentAssistant.analyseChecklist(checklist.data);const panel=line(host,'div',report.message,'support-file-report');for(const item of report.items)line(panel,'p',item.label+' : '+item.message);}}catch{/* Le diagnostic ne bloque pas l’accès aux pièces. */}}
   }catch(e){if(generation===professionalAccessGeneration)docMsg('documentNotice','Erreur : '+e.message);}
 }
 async function uploadDocument(e){
@@ -61,6 +62,7 @@ async function uploadDocument(e){
     const kind=doc$('documentType').value;const expiry=doc$('documentExpiry').value;
     if(kind!=='registration'&&!expiry)throw Error('Renseignez la date de fin de validité figurant sur la licence ou l’assurance.');
     if(!['registration','transport_licence','insurance_rc','insurance_goods'].includes(kind))throw Error('Catégorie de document non prise en charge.');
+    if(window.urgentDocumentAssistant){const inspection=await window.urgentDocumentAssistant.inspectFile(file,{kind,expiry});if(generation!==professionalAccessGeneration)return;if(!inspection.ok)throw Error(inspection.message);}
     const path=`${company.id}/${crypto.randomUUID()}.${allowed[file.type]}`;
     const {error:uploadError}=await sb.storage.from(DOC_BUCKET).upload(path,file,{contentType:file.type,upsert:false});
     if(generation!==professionalAccessGeneration)return;
@@ -96,6 +98,7 @@ async function loadAdmin(){
       const row=line(card,'div','', 'doc-item');line(row,'strong',`${documentLabel(d.document_type)} — ${d.original_filename||'fichier'}`);
       line(row,'span',`Statut : ${d.review_status}${d.expires_on?' · Expiration : '+d.expires_on:''}`);
       const buttons=line(row,'div','', 'doc-actions');
+      if(window.urgentSupport){const help=line(buttons,'button','Avis de l’assistant','btn secondary');help.type='button';help.onclick=()=>window.urgentSupport.reviewDocument(d.id);}
       const view=line(buttons,'button','Voir le fichier','btn secondary');view.type='button';view.onclick=async()=>{
         const {data,error}=await sb.storage.from(DOC_BUCKET).createSignedUrl(d.storage_path,60);
         if(error){docMsg('adminNotice','Fichier inaccessible : '+error.message);return;}

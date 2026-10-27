@@ -78,6 +78,7 @@ document.getElementById('magicLink').addEventListener('click',()=>runAuthOperati
   const {error}=await sb.auth.signInWithOtp({email:emailInput.value.trim(),options:{shouldCreateUser:false,emailRedirectTo:authReturnUrl()}});
   if(error){
    const code=String(error.code||'');
+   if(code==='otp_disabled'||/signups? not allowed for otp/i.test(error.message||''))window.dispatchEvent(new CustomEvent('urgent-support-issue',{detail:{code:'otp_registration'}}));
    if(code==='otp_disabled'||code==='signup_disabled'||/signups? not allowed for otp/i.test(error.message||'')){
     notify(window.URGENT_ALLOW_REGISTRATION===false?'Ce lien est réservé aux comptes déjà créés. Vérifiez l’adresse e-mail de votre compte ou contactez contact@13urgent.fr.':'Ce lien sert à vous connecter à un compte déjà créé. Pour une première inscription, renseignez vos informations professionnelles puis cliquez sur « Créer mon compte ». Si vous êtes déjà inscrit, vérifiez l’adresse e-mail utilisée.');
     if(window.URGENT_ALLOW_REGISTRATION!==false)setTimeout(()=>{if(accountDialog.open)document.getElementById('signUp').focus();},0);

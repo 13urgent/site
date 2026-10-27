@@ -1,0 +1,112 @@
+'use strict';
+(()=>{
+ const knowledge=window.urgentSupportKnowledge;if(!knowledge)return;
+ const isAdmin=document.body.dataset.adminPage==='true';
+ if(!isAdmin&&!['/','/index.html'].includes(location.pathname))return;
+ const make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
+ let generation=0,busy=false,capabilities=null;
+ const client=()=>typeof sb!=='undefined'?sb:null;
+ async function invoke(body){
+  if(!window.URGENT_SUPABASE_URL||!window.URGENT_SUPABASE_PUBLISHABLE_KEY)throw Error('unavailable');
+  const headers={apikey:window.URGENT_SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'};
+  if(body.action!=='status'){
+   const session=await client()?.auth?.getSession();const token=session?.data?.session?.access_token;if(!token)throw Error('signin');headers.Authorization='Bearer '+token;
+  }
+  const response=await fetch(window.URGENT_SUPABASE_URL+'/functions/v1/support-assistant',{method:'POST',headers,body:JSON.stringify(body),credentials:'omit',signal:AbortSignal.timeout(body.action==='status'?6000:60000)});
+  if(!response.ok){if(response.status===401)throw Error('signin');if(response.status===429)throw Error('limit');if(response.status===413)throw Error('large_document');if(response.status===422)throw Error('document_unreadable');throw Error('unavailable');}
+  const result=await response.json();return result;
+ }
+ async function status(){try{const data=await invoke({action:'status'});capabilities=data.enabled===true?data:null;}catch{capabilities=null;}return capabilities;}
+ async function currentProfile(){
+  const api=client();if(!api)throw Error('signin');const auth=await api.auth.getUser();if(auth.error||!auth.data?.user)throw Error('signin');
+  const profile=await api.from('profiles').select('id,role,company_id').eq('id',auth.data.user.id).single();if(profile.error||!profile.data)throw Error('profile');return profile.data;
+ }
+ function readable(error){if(error.message==='large_document')return 'Ce fichier dépasse la limite de préanalyse de 5 Mo. Le dépôt reste possible jusqu’à 10 Mo ; demandez son examen à l’administration.';if(error.message==='document_unreadable')return 'Le fichier ne peut pas être analysé. Vérifiez son format et sa lisibilité, ou demandez un examen à l’administration.';return error.message==='signin'?'Connectez-vous pour accéder à votre dossier privé.':error.message==='limit'?'La limite de demandes a été atteinte. Vous pouvez toujours utiliser les réponses rapides ou contacter l’administration.':'Le service de suivi n’est pas disponible pour le moment. Les réponses rapides restent accessibles. Contactez contact@13urgent.fr si vous êtes bloqué.';}
+ const dialog=make('dialog');dialog.id='supportDialog';dialog.setAttribute('aria-labelledby','supportTitle');
+ const header=make('div',undefined,'support-header');const title=make('h2','Assistance 13 URGENT');title.id='supportTitle';
+ const close=make('button','Fermer','btn secondary');close.type='button';close.onclick=()=>dialog.close();header.append(title,close);
+ const content=make('div',undefined,'support-content');content.append(make('p','Réponses immédiates aux questions courantes. Ne transmettez jamais de mot de passe, de code reçu par e-mail ou de lien de confirmation.','support-note'));
+ const topics=make('div',undefined,'support-topics');const log=make('div');log.id='supportLog';log.setAttribute('role','log');log.setAttribute('aria-live','polite');log.setAttribute('aria-relevant','additions');
+ function message(text,who='assistant'){
+  const node=make('div',String(text).slice(0,7000),'support-message '+who);log.append(node);while(log.children.length>20)log.firstElementChild.remove();return node;
+ }
+ function welcome(){log.replaceChildren();message('Bonjour, je peux vous guider pour créer votre compte, déposer une demande, proposer un transport ou préparer vos justificatifs. Que souhaitez-vous faire ?');}
+ function navigate(action){dialog.close();
+  if(action==='account')document.getElementById('openAccount')?.click();
+  else if(action==='documents'){const b=document.getElementById('openDocuments');if(b&&!b.hidden)b.click();else document.getElementById('openAccount')?.click();}
+  else if(action==='diagnostic')openDiagnostic();
+  else location.hash=action;
+ }
+ function answerTopic(key){const topic=knowledge.topics[key];if(!topic)return;const node=message(topic.answer);if(topic.action){const action=make('button',topic.action==='diagnostic'?'Vérifier mon dossier':'Ouvrir cette rubrique','btn secondary');action.type='button';action.onclick=()=>navigate(topic.action);node.append(make('br'),action);}}
+ for(const[key,topic]of Object.entries(knowledge.topics)){const b=make('button',topic.label,'btn secondary');b.type='button';b.onclick=()=>answerTopic(key);topics.append(b);}
+ content.append(topics,log);
+ const form=make('form',undefined,'support-form');const label=make('label','Votre question');const input=make('textarea');input.id='supportQuestion';input.rows=3;input.maxLength=1500;input.required=true;label.append(input);const send=make('button','Envoyer ma question','btn primary');send.type='submit';form.append(label,send);content.append(form);
+ const controls=make('div',undefined,'support-controls');
+ function control(text,fn){const b=make('button',text,'btn secondary');b.type='button';b.onclick=fn;controls.append(b);return b;}
+ const contact=make('a','Écrire à l’administration','btn secondary');contact.href='mailto:contact@13urgent.fr?subject=Assistance%2013%20URGENT';controls.append(contact);
+ const diagnostic=control('Vérifier mon dossier',openDiagnostic);
+ const ticket=control('Transmettre mon problème',()=>{ticketForm.hidden=!ticketForm.hidden;if(!ticketForm.hidden)ticketText.focus();});ticket.hidden=true;
+ const historyButton=control('Mes échanges avec l’administration',()=>loadTickets(false));historyButton.hidden=true;
+ content.append(controls);
+ const ticketForm=make('form',undefined,'support-form');ticketForm.hidden=true;const ticketLabel=make('label','Décrivez le problème à transmettre à l’administration');const ticketText=make('textarea');ticketText.id='supportTicketText';ticketText.maxLength=1500;ticketText.rows=4;ticketText.required=true;ticketText.minLength=10;ticketLabel.append(ticketText);const ticketSubmit=make('button','Enregistrer ma demande d’assistance','btn primary');ticketSubmit.type='submit';ticketForm.append(ticketLabel,ticketSubmit);content.append(ticketForm);
+ const tickets=make('div',undefined,'support-tickets');tickets.id='supportTickets';tickets.hidden=true;content.append(tickets);
+ dialog.append(header,content);document.body.append(dialog);
+ const launcher=make('button','Besoin d’aide ?','support-launcher');launcher.id='supportLauncher';launcher.type='button';launcher.setAttribute('aria-haspopup','dialog');launcher.setAttribute('aria-controls','supportDialog');launcher.onclick=()=>open();document.body.append(launcher);
+ for(const[id,topic]of [['accountDialog','connexion'],['documentsDialog','documents']]){const modal=document.getElementById(id);if(!modal)continue;const help=make('button','Besoin d’aide ?','btn secondary');help.type='button';help.classList.add('support-modal-help');help.onclick=()=>open(topic);(modal.querySelector('.modal')||modal).append(help);}
+ async function open(key){if(!dialog.open)dialog.showModal();if(!log.childElementCount)welcome();if(key)answerTopic(key);const version=generation;const ready=await status();if(version!==generation)return;ticket.hidden=!ready?.tickets_available;historyButton.hidden=!ready?.tickets_available;}
+ async function openDiagnostic(){
+  if(!dialog.open)dialog.showModal();const version=generation;diagnostic.disabled=true;
+  try{
+   const profile=await currentProfile();if(version!==generation)return;
+   const company=await client().from('companies').select('name,verification_status').eq('id',profile.company_id).single();if(version!==generation)return;if(company.error)throw Error('unavailable');
+   const statusNames={pending:'en attente d’examen',approved:'approuvé',verified:'vérifié',rejected:'refusé'};
+   message('Établissement : '+(company.data?.name||'non renseigné')+'\nÉtat du dossier : '+(statusNames[company.data?.verification_status]||'à vérifier auprès de l’administration')+'.\nCet état ne suffit pas à prouver l’ensemble des droits de publication ou de proposition.');
+   if(profile.role==='carrier'){
+    const result=await client().rpc('urgent_document_checklist',{p_company:profile.company_id});if(version!==generation)return;if(result.error)throw Error('unavailable');
+    const analysis=window.urgentDocumentAssistant?.analyseChecklist(result.data||[]);if(analysis)message(analysis.message+'\n'+analysis.items.map(x=>x.label+' : '+x.message).join('\n'));
+   }else message('Pour un donneur d’ordre, la validation de l’établissement par 13 URGENT reste nécessaire avant publication. Une inscription et une confirmation d’e-mail ne remplacent pas cette validation.');
+  }catch(e){if(version===generation)message(readable(e));}finally{diagnostic.disabled=false;}
+ }
+ form.onsubmit=async event=>{
+  event.preventDefault();if(busy)return;const question=input.value.trim();if(!question)return;
+  // Ne pas transmettre de jeton ni de mot de passe saisi par erreur.
+  if(/(?:bearer\s+\S+|eyJ[A-Za-z0-9_-]{15,}\.|(?:mot de passe|password)\s*[:=]\s*\S+)/i.test(question)){message('Retirez les mots de passe, jetons et codes privés avant d’envoyer votre question.');return;}
+  message(question,'user');ticketText.value=question;input.value='';const key=knowledge.match(question);if(key){answerTopic(key);return;}
+  const version=generation;busy=true;send.disabled=true;
+  try{
+   const ready=capabilities||await status();if(version!==generation)return;
+   if(!ready){message('Je n’ai pas de réponse fiable à cette question dans les réponses rapides. Vous pouvez écrire à contact@13urgent.fr pour qu’une personne vous accompagne.');return;}
+   const data=await invoke({action:'ask',question});if(version!==generation)return;
+   if(typeof data.answer!=='string'||!data.answer.trim())throw Error('unavailable');message(data.answer);
+   if(data.escalate)message('Pour un examen de votre situation, utilisez « Transmettre mon problème ». Une demande n’est enregistrée qu’après votre confirmation.');
+  }catch(e){if(version===generation)message(readable(e));}finally{busy=false;send.disabled=false;}
+ };
+ ticketForm.onsubmit=async event=>{
+  event.preventDefault();if(ticketSubmit.disabled)return;const text=ticketText.value.trim();if(text.length<10)return;if(/(?:bearer\s+\S+|eyJ[A-Za-z0-9_-]{15,}\.|(?:mot de passe|password)\s*[:=]\s*\S+)/i.test(text)){message('Retirez les mots de passe et jetons de votre demande.');return;}const version=generation;ticketSubmit.disabled=true;
+  try{const data=await invoke({action:'ticket',subject:'Assistance depuis le site',message:text});if(version!==generation)return;if(typeof data.ticket_id!=='string')throw Error('unavailable');ticketForm.hidden=true;ticketText.value='';message('Votre demande est enregistrée sous la référence '+data.ticket_id+'. '+(data.notified?'Une alerte a été transmise à l’administration.':'L’envoi de l’alerte n’est pas confirmé ; votre demande reste consultable dans le suivi.'));}
+  catch(e){if(version===generation)message(readable(e));}finally{ticketSubmit.disabled=false;}
+ };
+ async function loadTickets(admin=false){
+  const version=generation;const host=admin?adminList:tickets;host.hidden=false;host.replaceChildren(make('p','Chargement des échanges…'));
+  try{const profile=await currentProfile();if(version!==generation)return;if(admin&&profile.role!=='admin')throw Error('signin');
+   let query=client().from('urgent_support_tickets').select('id,created_by,company_id,subject,message,status,admin_reply,created_at,updated_at');if(!admin)query=query.eq('created_by',profile.id);const result=await query.order('created_at',{ascending:false}).limit(30);if(version!==generation)return;if(result.error)throw Error('unavailable');host.replaceChildren();
+   if(!result.data?.length)host.append(make('p','Aucune demande d’assistance enregistrée.'));
+   for(const row of result.data||[]){const card=make('article',undefined,'support-ticket');card.append(make('strong',row.subject),make('p','Référence : '+row.id+' · '+({open:'À traiter',in_progress:'En cours',resolved:'Traitée'}[row.status]||'À vérifier')),make('p',row.message));if(row.admin_reply)card.append(make('p','Réponse de l’administration :\n'+row.admin_reply));
+    if(admin){const reply=make('form',undefined,'support-form');const l=make('label','Réponse au client');const field=make('textarea');field.required=true;field.maxLength=2500;field.value=row.admin_reply||'';l.append(field);const b=make('button','Enregistrer la réponse et clôturer','btn primary');b.type='submit';reply.append(l,b);reply.onsubmit=async e=>{e.preventDefault();const v=generation;b.disabled=true;try{const data=await client().rpc('urgent_support_reply',{p_ticket:row.id,p_reply:field.value.trim(),p_status:'resolved'});if(v!==generation)return;if(data.error)throw Error('unavailable');await loadTickets(true);}catch(err){if(v===generation)card.append(make('p',readable(err)));}finally{b.disabled=false;}};card.append(reply);}
+    host.append(card);
+   }
+  }catch(e){if(version===generation)host.replaceChildren(make('p',readable(e)));}
+ }
+ let adminList;
+ if(isAdmin){const section=make('section',undefined,'support-admin');section.id='supportAdmin';section.append(make('h2','Demandes d’assistance'));const b=make('button','Actualiser les demandes d’assistance','btn secondary');b.type='button';b.onclick=()=>loadTickets(true);adminList=make('div');section.append(b,adminList);document.querySelector('main')?.append(section);}
+ window.urgentSupport=Object.freeze({open,issue(code){if(code==='otp_registration'){launcher.textContent='Besoin d’aide pour vous inscrire ?';launcher.dataset.topic='connexion';launcher.onclick=()=>open('connexion');}},async reviewDocument(documentId){
+  if(!dialog.open)dialog.showModal();const version=generation;
+  try{const ready=capabilities||await status();if(version!==generation)return;if(!ready){message('La préanalyse du contenu n’est pas encore disponible. Les contrôles techniques et la validation par l’administration restent accessibles.');return;}
+   message('Préanalyse en cours. Cet avis ne vaut pas approbation du document.');const data=await invoke({action:'review_document',document_id:documentId});if(version!==generation)return;
+   const review=data.review;if(!review||typeof review.summary!=='string')throw Error('unavailable');message(review.summary+'\n'+(Array.isArray(review.issues)?review.issues.join('\n'):'')+'\n'+(Array.isArray(review.unknowns)?review.unknowns.join('\n'):'')+'\nValidation finale réservée à l’administration.');
+  }catch(e){if(version===generation)message(readable(e));}
+ }});
+ window.addEventListener('urgent-support-issue',event=>window.urgentSupport.issue(event.detail?.code));
+ client()?.auth?.onAuthStateChange?.(event=>{if(!['SIGNED_IN','SIGNED_OUT','USER_DELETED'].includes(event))return;generation++;capabilities=null;input.value='';ticketText.value='';tickets.replaceChildren();tickets.hidden=true;ticketForm.hidden=true;ticket.hidden=true;historyButton.hidden=true;adminList?.replaceChildren();launcher.textContent='Besoin d’aide ?';launcher.onclick=()=>open();welcome();});
+ welcome();
+})();
