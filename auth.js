@@ -7,6 +7,7 @@ const sb=configured?window.supabase.createClient(window.URGENT_SUPABASE_URL,wind
 function notify(msg){authNotice.hidden=false;authNotice.textContent=msg;}
 let authOperationPending=false;
 let authView=0;
+let passwordRecoveryUser=null;
 async function runAuthOperation(operation,errorMessage){
  if(authOperationPending)return;
  authOperationPending=true;
@@ -29,10 +30,12 @@ async function updateAuth(){
  document.getElementById('openAccount').textContent=user?'Mon compte':'Connexion / Inscription';
  accountDialog.querySelector('h2').textContent=user?'Mon compte':'Connexion / inscription';
  for(const id of ['authEmail','authPassword','accountType'])document.getElementById(id).closest('label').hidden=Boolean(user);
- for(const id of ['signUp','signIn','magicLink'])document.getElementById(id).hidden=Boolean(user);
+ for(const id of ['signUp','signIn'])document.getElementById(id).hidden=Boolean(user);
  for(const id of ['registrationAction','loginActions']){const group=document.getElementById(id);if(group)group.hidden=Boolean(user)||(id==='registrationAction'&&window.URGENT_ALLOW_REGISTRATION===false);}
  if(window.URGENT_ALLOW_REGISTRATION===false){document.getElementById('signUp').hidden=true;document.getElementById('accountType').closest('label').hidden=true;}
- document.getElementById('passwordSettings').hidden=!user;
+ document.getElementById('passwordSettings').hidden=!user||passwordRecoveryUser!==user.id;
+ document.getElementById('magicLink').hidden=Boolean(user&&passwordRecoveryUser===user.id);
+ if(user?.email)document.getElementById('authEmail').value=user.email;
  document.getElementById('businessRegistration').hidden=Boolean(user)||window.URGENT_ALLOW_REGISTRATION===false;
  document.getElementById('accountIdentity').textContent=user?.email||'';
  await updateSubscriptionRequest(user);
@@ -68,42 +71,34 @@ document.getElementById('signOut').addEventListener('click',()=>runAuthOperation
 
 // Conserve le sous-dossier d’hébergement, sans recopier les jetons de l’URL.
 function authReturnUrl(){const target=new URL('.',location.href);return target.pathname==='/'?target.origin:target.href;}
-// Le lien ouvre la même origine HTTP(S) que celle utilisée pour la demande.
+// Réinitialisation par e-mail ; aucun compte n’est créé par cette action.
 document.getElementById('magicLink').addEventListener('click',()=>runAuthOperation(async()=>{
- const emailInput=document.getElementById('authEmail');
- if(!emailInput.reportValidity())return;
- if(!sb){notify('Service de connexion indisponible.');return;}
- if(!['http:','https:'].includes(location.protocol)){notify('Ouvrez le site avec le serveur local HTTP ou son adresse HTTPS.');return;}
+ const input=document.getElementById('authEmail');if(!input.reportValidity())return;
+ if(!sb){notify('Service momentanément indisponible.');return;}
  try{
-  const {error}=await sb.auth.signInWithOtp({email:emailInput.value.trim(),options:{shouldCreateUser:false,emailRedirectTo:authReturnUrl()}});
-  if(error){
-   const code=String(error.code||'');
-   if(code==='otp_disabled'||/signups? not allowed for otp/i.test(error.message||''))window.dispatchEvent(new CustomEvent('urgent-support-issue',{detail:{code:'otp_registration'}}));
-   if(code==='otp_disabled'||code==='signup_disabled'||/signups? not allowed for otp/i.test(error.message||'')){
-    notify(window.URGENT_ALLOW_REGISTRATION===false?'Ce lien est réservé aux comptes déjà créés. Vérifiez l’adresse e-mail de votre compte ou contactez contact@13urgent.fr.':'Ce lien sert à vous connecter à un compte déjà créé. Pour une première inscription, renseignez vos informations professionnelles puis cliquez sur « Créer mon compte ». Si vous êtes déjà inscrit, vérifiez l’adresse e-mail utilisée.');
-    if(window.URGENT_ALLOW_REGISTRATION!==false)setTimeout(()=>{if(accountDialog.open)document.getElementById('signUp').focus();},0);
-   }else if(['over_email_send_rate_limit','over_request_rate_limit'].includes(code)||error.status===429){notify('Trop de demandes de lien ont été effectuées. Patientez quelques minutes avant de réessayer.');}
-   else if(code==='email_address_invalid'){notify('Vérifiez votre adresse e-mail avant de demander un lien de connexion.');}
-   else{notify('Le lien de connexion n’a pas pu être envoyé. Réessayez dans quelques minutes ou contactez contact@13urgent.fr.');}
-   return;
-  }
-  notify('Si cette adresse correspond à un compte autorisé, un lien de connexion vient d’être envoyé. Consultez votre boîte e-mail et vos courriers indésirables, puis ouvrez le lien le plus récent.');
+  const {error}=await sb.auth.resetPasswordForEmail(input.value.trim(),{redirectTo:authReturnUrl()});
+  if(error){notify(error.status===429||['over_email_send_rate_limit','over_request_rate_limit'].includes(error.code)?'Trop de demandes. Patientez quelques minutes avant de réessayer.':'Le lien de réinitialisation n’a pas pu être envoyé. Réessayez plus tard ou contactez contact@13urgent.fr.');return;}
+  notify('Si un compte correspond à cette adresse, vous recevrez un e-mail pour réinitialiser votre mot de passe. Consultez aussi vos courriers indésirables et ouvrez le lien le plus récent.');
  }catch{notify('Service inaccessible. Aucun envoi ne peut être confirmé.');}
 },'Service inaccessible. Aucun envoi ne peut être confirmé.'));
 
 // Un mot de passe ne peut être défini que pour la session authentifiée courante.
 const passwordSettings=document.createElement('section');passwordSettings.id='passwordSettings';passwordSettings.hidden=true;
-passwordSettings.innerHTML='<p id="accountIdentity"></p><h3>Définir mon mot de passe</h3><p>Choisissez un mot de passe personnel pour vos prochaines connexions.</p><label>Nouveau mot de passe<input id="newPassword" type="password" minlength="12" autocomplete="new-password"></label><label>Confirmer le mot de passe<input id="confirmPassword" type="password" minlength="12" autocomplete="new-password"></label><button id="savePassword" class="btn primary" type="button">Enregistrer mon mot de passe</button>';
+const accountIdentity=document.createElement('p');accountIdentity.id='accountIdentity';authNotice.before(accountIdentity);
+accountIdentity.after(document.getElementById('magicLink'));
+passwordSettings.innerHTML='<h3>Réinitialiser mon mot de passe</h3><p>Choisissez votre nouveau mot de passe.</p><label>Nouveau mot de passe<input id="newPassword" type="password" minlength="12" autocomplete="new-password"></label><label>Confirmer le mot de passe<input id="confirmPassword" type="password" minlength="12" autocomplete="new-password"></label><button id="savePassword" class="btn primary" type="button">Enregistrer mon mot de passe</button>';
 authNotice.before(passwordSettings);
 document.getElementById('savePassword').addEventListener('click',()=>runAuthOperation(async()=>{
+ const recoveryUser=passwordRecoveryUser;
+ if(!recoveryUser){notify('Utilisez « Mot de passe oublié ? » et ouvrez le lien reçu par e-mail.');return;}
  const field=document.getElementById('newPassword'), confirmation=document.getElementById('confirmPassword');
  if(field.value.length<12){notify('Choisissez au moins 12 caractères.');return;}
  if(field.value!==confirmation.value){notify('Les deux mots de passe doivent être identiques.');return;}
  try{
   if(!sb)throw Error('Service indisponible.');const {data,error}=await sb.auth.getUser();
-  if(error||!data?.user){notify('Reconnectez-vous avant de définir votre mot de passe.');return;}
+  if(error||data?.user?.id!==recoveryUser||passwordRecoveryUser!==recoveryUser){notify('Le lien a expiré ou la session a changé. Demandez un nouveau lien de réinitialisation.');return;}
   const result=await sb.auth.updateUser({password:field.value});if(result.error){notify('Modification refusée : '+result.error.message);return;}
-  field.value='';confirmation.value='';notify('Mot de passe enregistré. Vous pourrez vous connecter avec votre e-mail et ce mot de passe.');
+  passwordRecoveryUser=null;passwordSettings.hidden=true;field.value='';confirmation.value='';notify('Mot de passe enregistré. Vous pourrez vous connecter avec votre e-mail et ce mot de passe.');
  }catch{notify('Modification non confirmée. Le service est inaccessible.');}
 },'Modification non confirmée. Le service est inaccessible.'));
 // Choix déclaratif uniquement : ne confère ni abonnement actif ni validation entreprise.
@@ -148,5 +143,8 @@ saveSubscription.addEventListener('click',()=>runAuthOperation(async()=>{
   notify('Choix enregistré dans votre compte. Aucun paiement effectué ; votre abonnement et votre dossier ne sont pas activés.');
  }catch{notify('Demande non confirmée. Vérifiez votre connexion et réessayez.');}
 },'Demande non confirmée. Vérifiez votre connexion et réessayez.'));
-if(sb)sb.auth.onAuthStateChange(()=>{authView++;setTimeout(()=>{document.getElementById('newPassword').value='';document.getElementById('confirmPassword').value='';updateAuth().catch(()=>notify('Impossible de vérifier la session.'));},0);});
+if(sb)sb.auth.onAuthStateChange((event,session)=>{
+ if(event==='PASSWORD_RECOVERY'){passwordRecoveryUser=session?.user?.id||null;accountDialog.showModal();}
+ else if(event==='SIGNED_OUT'||event==='SIGNED_IN'){passwordRecoveryUser=null;}
+ authView++;setTimeout(()=>{document.getElementById('newPassword').value='';document.getElementById('confirmPassword').value='';updateAuth().catch(()=>notify('Impossible de vérifier la session.'));},0);});
 updateAuth().catch(()=>notify('Le service de connexion est momentanément inaccessible.'));

@@ -14,7 +14,7 @@ async function verifyAuthConcurrency(){
    window.supabase={createClient:()=>({from:()=>({select(){return this},eq(){return this},maybeSingle:async()=>({data:{role:'client'}})}),auth:{
     onAuthStateChange:()=>{},getUser:()=>{if(window.failUserRead){window.failUserRead=false;return Promise.reject(new Error('network'))}return window.pendingUsers?new Promise(resolve=>pendingUsers.push(resolve)):Promise.resolve({data:{user:null}})},
     signInWithPassword:()=>{signins++;return new Promise((resolve,reject)=>{window.finishSignIn=resolve;window.failSignIn=reject})},
-    signUp:async()=>{signups++;return{}},signInWithOtp:()=>{otpCalls++;return new Promise(resolve=>window.finishOtp=resolve)}
+    signUp:async()=>{signups++;return{}},resetPasswordForEmail:()=>{otpCalls++;return new Promise(resolve=>window.finishOtp=resolve)}
    }})};
   `}));
   await page.goto('http://127.0.0.1:8010/index.html');await page.locator('#openAccount').click();
@@ -35,6 +35,6 @@ async function verifyAuthConcurrency(){
   await page.evaluate(()=>{window.pendingUsers=[];window.firstView=updateAuth();window.secondView=updateAuth();});
   await page.evaluate(async()=>{pendingUsers[1]({data:{user:null}});await secondView;pendingUsers[0]({data:{user:{id:'old-user',email:'old@example.com'}}});await firstView;});
   assert.equal(await page.locator('#accountIdentity').textContent(),'');assert.equal(await page.locator('#signOut').isVisible(),false);
-  console.log('PASS auth navigateur : requêtes concurrentes et doubles clics bloqués, erreur réseau/API récupérable, lien magique sérialisé, ancienne lecture de session ignorée');
+  console.log('PASS auth navigateur : requêtes concurrentes et doubles clics bloqués, erreur réseau/API récupérable, réinitialisation sérialisée, ancienne lecture de session ignorée');
  }finally{await browser.close();}
 }
