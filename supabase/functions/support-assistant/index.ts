@@ -67,13 +67,13 @@ export async function supportAssistantHandler(request,env,fetcher=fetch){
  if(!body||Array.isArray(body)||typeof body!=='object'||!['status','ask','review_document','ticket'].includes(body.action))return reply(400,{error:'invalid_action'});
  if(Number(request.headers.get('content-length'))>12000||JSON.stringify(body).length>12000)return reply(413,{error:'request_too_large'});
  const base=env.SUPABASE_URL.replace(/\/$/,'');const serverHeaders={apikey:env.SUPABASE_SERVICE_ROLE_KEY,authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY,'Content-Type':'application/json'};
- const api=async(path,options={})=>{const r=await fetcher(base+path,{...options,headers:{...serverHeaders,...options.headers},signal:AbortSignal.timeout(12000)});if(!r.ok)throw Error('database_unavailable');return r.status===204?null:r.json();};
+ const api=async(path,options={})=>{const r=await fetcher(base+path,{...options,headers:{...serverHeaders,...options.headers},signal:AbortSignal.timeout(12000)});if(!r.ok)throw Error('database_unavailable');if(r.status===204)return null;const text=await r.text();return text.trim()?JSON.parse(text):null;};
  const rpc=(name,args)=>api('/rest/v1/rpc/'+name,{method:'POST',body:JSON.stringify(args)});
  const ai=env.SUPPORT_AI_ENABLED==='true'&&Boolean(env.OPENAI_API_KEY),docAI=env.SUPPORT_DOCUMENT_AI_ENABLED==='true'&&Boolean(env.OPENAI_API_KEY);
  try{
   if(body.action==='status'){
    if(await rpc('urgent_support_ready',{})!==true)return reply(503,{error:'support_not_installed'});
-   return reply(200,{enabled:true,ai_available:ai,document_ai_available:docAI,tickets_available:true});
+   return reply(200,{enabled:true,ai_available:ai,document_ai_available:docAI,tickets_available:true,version:'20261027-doc-save'});
   }
   const authorization=request.headers.get('authorization')||'';if(!/^Bearer [A-Za-z0-9._~-]+$/.test(authorization)||authorization==='Bearer '+env.SUPABASE_SERVICE_ROLE_KEY)return reply(401,{error:'sign_in_required'});
   const auth=await fetcher(base+'/auth/v1/user',{headers:{apikey:env.SUPABASE_ANON_KEY||env.SUPABASE_SERVICE_ROLE_KEY,authorization},signal:AbortSignal.timeout(10000)});

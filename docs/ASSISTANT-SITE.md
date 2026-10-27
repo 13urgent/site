@@ -143,3 +143,14 @@ Le diagnostic est aussi rendu uniquement aux comptes administrateurs ; les
 autres utilisateurs gardent un message général et la possibilité de solliciter
 l’administration. Une question de fonctionnement général est traitée par la
 FAQ locale même lorsque le fournisseur IA est indisponible.
+
+## Correctif de confirmation de sauvegarde documentaire
+
+PostgREST peut renvoyer `201 Created` avec un corps vide lors de l’insertion
+d’un avis avec `Prefer: return=minimal`. Le service accepte désormais ce succès
+sans tenter de lire du JSON inexistant ; les réponses `200` vides et `204` sont
+également traitées. Une vraie erreur d’écriture ne renvoie jamais `saved:true`.
+Ce correctif nécessite de redéployer uniquement `support-assistant`, sans
+rejouer la migration ni modifier `bright-service`. Les tests couvrent le défaut
+reproduit (ancienne réponse 503 après insertion réussie), les succès minimaux
+et le refus d’écriture. Aucune approbation documentaire n’est modifiée.

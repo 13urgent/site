@@ -5,7 +5,7 @@ const fs=require('fs');const assert=require('node:assert/strict');
  const uid=n=>'00000000-0000-0000-0000-'+String(n).padStart(12,'0');
  const env={SUPABASE_URL:'https://project.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'private-service-key',SUPABASE_ANON_KEY:'public-key'};
  const request=(body,token='user-token',origin='https://13urgent.fr')=>new Request('https://project.supabase.co/functions/v1/support-assistant',{method:'POST',headers:{origin,authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify(body)});
- function mock({foreign=false,reserved=true,ai=null,aiStatus=200,aiError=null,provider=200,large=false,role='carrier'}={}){
+ function mock({foreign=false,reserved=true,ai=null,aiStatus=200,aiError=null,provider=200,large=false,role='carrier',saveStatus=201}={}){
   const calls=[];const fetcher=async(url,options={})=>{
    let body;try{body=JSON.parse(options.body);}catch{}
    calls.push({url,options,body});
@@ -17,14 +17,14 @@ const fs=require('fs');const assert=require('node:assert/strict');
    if(url.endsWith('urgent_support_reserve'))return Response.json(reserved);
    if(url.endsWith('urgent_support_create_ticket'))return Response.json(uid(90));
    if(url.includes('/rest/v1/carrier_documents?'))return Response.json([{id:uid(30),company_id:foreign?uid(4):uid(3),document_type:'insurance_rc',storage_path:(foreign?uid(4):uid(3))+'/file.png',review_status:'pending',expires_on:'2020-01-01'}]);
-   if(url.endsWith('/rest/v1/urgent_document_prechecks'))return new Response(null,{status:204});
+   if(url.endsWith('/rest/v1/urgent_document_prechecks'))return new Response(null,{status:saveStatus});
    if(url.includes('/storage/v1/object/'))return new Response(new Uint8Array([137,80,78,71,13,10,26,10,1]),{headers:{'content-type':'image/png',...(large?{'content-length':'6000000'}:{})}});
    if(url==='https://api.openai.com/v1/responses')return Response.json(aiStatus===200?{output_text:JSON.stringify(ai||{answer:'Une situation individuelle doit être examinée par l’administration.',escalate:true})}:aiError||{error:{code:'server_error'}},{status:aiStatus});
    if(url==='https://api.resend.com/emails')return Response.json(provider===200?{id:'mail-id'}:{error:'provider_rejected'},{status:provider});
    throw Error('Unexpected request '+url);
   };return{calls,fetcher};
  }
- let m=mock();let r=await handler(request({action:'status'}),env,m.fetcher);assert.equal(r.status,200);assert.deepEqual(await r.json(),{enabled:true,ai_available:false,document_ai_available:false,tickets_available:true});
+ let m=mock();let r=await handler(request({action:'status'}),env,m.fetcher);assert.equal(r.status,200);assert.deepEqual(await r.json(),{enabled:true,ai_available:false,document_ai_available:false,tickets_available:true,version:'20261027-doc-save'});
  assert.equal((await handler(request({action:'ask',question:'Bonjour'},'forged-token'),env,m.fetcher)).status,401);
  assert.equal((await handler(request({action:'ask',question:'Bonjour'},env.SUPABASE_SERVICE_ROLE_KEY),env,m.fetcher)).status,401);
  assert.equal((await handler(request({action:'status'},'user-token','https://evil.example'),env,m.fetcher)).status,403);
@@ -39,6 +39,10 @@ const fs=require('fs');const assert=require('node:assert/strict');
  m=mock({foreign:true});r=await handler(request({action:'review_document',document_id:uid(30)}),env,m.fetcher);assert.equal(r.status,404);assert(!m.calls.some(c=>c.url.includes('/storage/')));assert(!m.calls.some(c=>c.url.endsWith('urgent_support_reserve')));
  m=mock();r=await handler(request({action:'review_document',document_id:uid(30)}),env,m.fetcher);let data=await r.json();assert.equal(r.status,200);assert.equal(data.review.engine,'metadata');assert.equal(data.review.verdict,'needs_attention');assert(data.review.issues.some(x=>x.includes('expiré')));assert.equal(data.saved,true);assert(!m.calls.some(c=>c.url.includes('/storage/')));
  assert(!m.calls.some(c=>/carrier_documents/.test(c.url)&&['PATCH','POST'].includes(c.options.method)));
+ // PostgREST renvoie 201 vide avec Prefer:return=minimal ; 204 reste aussi accepté.
+ assert.equal(m.calls.find(c=>c.url.endsWith('/rest/v1/urgent_document_prechecks')).options.headers.Prefer,'return=minimal');
+ for(const saveStatus of [200,201,204]){const minimal=mock({saveStatus,ai:{summary:'Avis préparatoire sauvegardé.',issues:[],unknowns:['Authenticité à contrôler.']}});const response=await handler(request({action:'review_document',document_id:uid(30)}),{...env,SUPPORT_DOCUMENT_AI_ENABLED:'true',OPENAI_API_KEY:'ai-private'},minimal.fetcher);assert.equal(response.status,200);const result=await response.json();assert.equal(result.saved,true);assert.equal(result.review.engine,'openai');assert.equal(minimal.calls.filter(c=>c.url.endsWith('/rest/v1/urgent_document_prechecks')).length,1);assert(!minimal.calls.some(c=>/carrier_documents/.test(c.url)&&['PATCH','POST'].includes(c.options.method)));}
+ const rejectedSave=mock({saveStatus:403});assert.equal((await handler(request({action:'review_document',document_id:uid(30)}),env,rejectedSave.fetcher)).status,503);
  m=mock({ai:{summary:'Pièce à rapprocher du dossier.',issues:[],unknowns:['Authenticité à contrôler.']}});r=await handler(request({action:'review_document',document_id:uid(30)}),{...env,SUPPORT_DOCUMENT_AI_ENABLED:'true',OPENAI_API_KEY:'ai-private'},m.fetcher);data=await r.json();assert.equal(data.review.engine,'openai');assert.notEqual(data.review.verdict,'approved');aiCall=m.calls.find(c=>c.url.includes('openai.com'));assert.equal(aiCall.body.store,false);assert.equal(aiCall.body.max_output_tokens,700);assert.equal(aiCall.body.input[0].content[1].type,'input_image');assert(aiCall.body.input[0].content[0].text.includes('Entreprise de référence'));assert(aiCall.body.input[0].content[0].text.includes('91871039300052'));assert(aiCall.body.input[0].content[0].text.includes('Date actuelle Europe/Paris'));assert(!m.calls.some(c=>c.url.includes('/files')));
  m=mock({large:true});r=await handler(request({action:'review_document',document_id:uid(30)}),{...env,SUPPORT_DOCUMENT_AI_ENABLED:'true',OPENAI_API_KEY:'ai-private'},m.fetcher);assert.equal(r.status,413);assert(!m.calls.some(c=>c.url.includes('openai.com')));
  m=mock({reserved:false});assert.equal((await handler(request({action:'ask',question:'Comment publier une demande ?'}),env,m.fetcher)).status,429);
