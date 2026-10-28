@@ -1,4 +1,4 @@
-// Assistant borné : aucune mutation de rôle, d'approbation, d'abonnement ou de course.
+// Assistant borné : notifications administratives, sans mutation des droits métier.
 const ORIGIN='https://13urgent.fr';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const KNOWLEDGE=`13 URGENT est une plateforme de mise en relation B2B exploitée par CHRONOSS. CHRONOSS n'est pas obligé de réaliser les transports sans transporteur. Une publication ne garantit pas une proposition. Le dépôt est gratuit. Frais plateforme à l'attribution commerciale confirmée : 1,5 % HT du prix HT du transport, TVA applicable en sus, facturation mensuelle distincte. Le transport est facturé directement par le transporteur. Inscription : raison sociale, SIRET 14 chiffres, usage professionnel, e-mail et mot de passe. Connexion par e-mail et mot de passe. En cas d’oubli, cliquer sur Mot de passe oublié ? pour recevoir un lien de réinitialisation ; le nouveau mot de passe est choisi après ouverture de ce lien. Aucune création de compte par cette action. Une première inscription utilise Créer mon compte. Confirmer l'e-mail puis se connecter. Établissement validé par administration avant publication. Un transporteur doit avoir immatriculation/Kbis, licence de transport, RC professionnelle, assurance marchandises, dates valides et approbations ; les droits d'accès sont contrôlés séparément. Forfaits : Start gratuit 1 transport/mois ; Drive 12,50 EUR HT/mois 5 transports ; Boost 33,33 EUR HT/mois 30 transports ; Premium 62,50 EUR HT/mois illimité. Forfait demandé sans activation automatique. Paiement par virement après instructions de CHRONOSS puis activation après rapprochement et validation. Aucun prélèvement automatique. Documents PDF/JPEG/PNG 10 Mo maximum, catégorie correcte, dates de fin de validité exigées pour licences et assurances. Actualiser les quatre catégories tous les six mois après dépôt, ou avant si la pièce expire plus tôt. Pas de validation finale ni authenticité certifiée par l'assistant. Contact : contact@13urgent.fr, 04 91 82 63 12. Ne jamais promettre de délai de réponse, transport, remboursement ou activation.`;
@@ -64,7 +64,7 @@ export async function supportAssistantHandler(request,env,fetcher=fetch){
  if(env.SUPPORT_ASSISTANT_ENABLED==='false')return reply(503,{error:'support_disabled'});
  if(!env.SUPABASE_URL||!env.SUPABASE_SERVICE_ROLE_KEY)return reply(503,{error:'support_not_configured'});
  let body;try{body=JSON.parse(new TextDecoder().decode(await readBounded(request,12000)));}catch(error){return reply(error.message==='document_too_large'?413:400,{error:error.message==='document_too_large'?'request_too_large':'invalid_json'});}
- if(!body||Array.isArray(body)||typeof body!=='object'||!['status','ask','review_document','ticket','reply_ticket'].includes(body.action))return reply(400,{error:'invalid_action'});
+ if(!body||Array.isArray(body)||typeof body!=='object'||!['status','ask','review_document','ticket','reply_ticket','notify_business_validation'].includes(body.action))return reply(400,{error:'invalid_action'});
  if(Number(request.headers.get('content-length'))>12000||JSON.stringify(body).length>12000)return reply(413,{error:'request_too_large'});
  const base=env.SUPABASE_URL.replace(/\/$/,'');const serverHeaders={apikey:env.SUPABASE_SERVICE_ROLE_KEY,authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY,'Content-Type':'application/json'};
  const api=async(path,options={})=>{const r=await fetcher(base+path,{...options,headers:{...serverHeaders,...options.headers},signal:AbortSignal.timeout(12000)});if(!r.ok)throw Error('database_unavailable');if(r.status===204)return null;const text=await r.text();return text.trim()?JSON.parse(text):null;};
@@ -73,13 +73,43 @@ export async function supportAssistantHandler(request,env,fetcher=fetch){
  try{
   if(body.action==='status'){
    if(await rpc('urgent_support_ready',{})!==true)return reply(503,{error:'support_not_installed'});
-   return reply(200,{enabled:true,ai_available:ai,document_ai_available:docAI,tickets_available:true,version:'20261027-audit'});
+   return reply(200,{enabled:true,ai_available:ai,document_ai_available:docAI,tickets_available:true,version:'20261028-validation-mail'});
   }
   const authorization=request.headers.get('authorization')||'';if(!/^Bearer [A-Za-z0-9._~-]+$/.test(authorization)||authorization==='Bearer '+env.SUPABASE_SERVICE_ROLE_KEY)return reply(401,{error:'sign_in_required'});
   const auth=await fetcher(base+'/auth/v1/user',{headers:{apikey:env.SUPABASE_ANON_KEY||env.SUPABASE_SERVICE_ROLE_KEY,authorization},signal:AbortSignal.timeout(10000)});
   if(!auth.ok)return reply(401,{error:'sign_in_required'});const user=await auth.json();if(!UUID.test(user.id||''))return reply(401,{error:'sign_in_required'});
   const profiles=await api('/rest/v1/profiles?select=id,role,company_id&id=eq.'+encodeURIComponent(user.id));const profile=profiles[0];
   if(!profile||!['client','carrier','admin'].includes(profile.role))return reply(403,{error:'professional_profile_required'});
+  if(body.action==='notify_business_validation'){
+   if(profile.role!=='admin')return reply(403,{error:'administration_required'});
+   if(!UUID.test(body.company_id||''))return reply(400,{error:'invalid_company'});
+   const actorHeaders={authorization,apikey:env.SUPABASE_ANON_KEY||env.SUPABASE_SERVICE_ROLE_KEY};
+   const accessRows=await api('/rest/v1/urgent_business_access?select=registry_checked,pilot_enabled,plan,reviewed_at&company_id=eq.'+encodeURIComponent(body.company_id),{headers:actorHeaders});const access=accessRows?.[0];
+   if(!access?.registry_checked||!access?.pilot_enabled)return reply(200,{notified:false,eligible:false,notification_status:'establishment_not_approved'});
+   const ready=await api('/rest/v1/rpc/urgent_carrier_ready',{method:'POST',headers:actorHeaders,body:JSON.stringify({p_company:body.company_id})});
+   if(typeof ready!=='boolean')throw Error('database_unavailable');
+   if(!ready&&body.notify_pending!==true)return reply(200,{notified:false,eligible:false,notification_status:'not_ready'});
+   if(!env.RESEND_API_KEY||!env.REGISTRATION_ALERTS_FROM)return reply(200,{notified:false,eligible:ready,notification_status:'not_configured'});
+   const members=await api('/rest/v1/profiles?select=id&company_id=eq.'+encodeURIComponent(body.company_id)+'&role=eq.carrier&order=id.asc&limit=10');
+   if(!Array.isArray(members)||!members.length||members.length>=10)return reply(200,{notified:false,eligible:ready,notification_status:'recipient_unavailable'});
+   const companies=await api('/rest/v1/companies?select=name&id=eq.'+encodeURIComponent(body.company_id));
+   const docs=await api('/rest/v1/carrier_documents?select=id,document_type,created_at&company_id=eq.'+encodeURIComponent(body.company_id)+'&order=created_at.desc,id.desc&limit=1000');
+   const latest=new Map();for(const doc of docs||[])if(['registration','transport_licence','insurance_rc','insurance_goods'].includes(doc.document_type)&&!latest.has(doc.document_type))latest.set(doc.document_type,doc.id);
+   const names={registration:'Immatriculation / Kbis',transport_licence:'Licence de transport',insurance_rc:'Assurance responsabilité civile',insurance_goods:'Assurance marchandises'};
+   let remaining='';if(!ready){const checklist=await api('/rest/v1/rpc/urgent_document_checklist',{method:'POST',headers:actorHeaders,body:JSON.stringify({p_company:body.company_id})});for(const doc of Array.isArray(checklist)?checklist:[])if(doc.reason!=='valid')remaining+='\n- '+(names[doc.document_type]||'Justificatif')+' : à compléter, faire approuver ou actualiser.';}
+   let accepted=0,failed=0;const recipients=[];
+   await Promise.all(members.map(async member=>{
+    if(!UUID.test(member.id||'')){failed++;return;}
+    try{
+     const recipient=await api('/auth/v1/admin/users/'+encodeURIComponent(member.id));if(!recipient?.email_confirmed_at||typeof recipient.email!=='string'||!recipient.email.includes('@')){failed++;return;}
+     const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify([body.company_id,access.reviewed_at,access.plan,ready,[...latest].sort(),recipient.email])));const key=Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
+     const text='Bonjour,\n\nVotre établissement '+String(companies?.[0]?.name||'')+' a été autorisé par l’administration de 13 URGENT.\n\n'+(ready?'Votre dossier et vos droits d’accès actuels permettent de proposer sur les courses disponibles, dans les limites applicables à votre forfait.':'Votre inscription est encore à compléter avant de pouvoir proposer des transports. Vérifiez vos justificatifs, les conditions professionnelles et la confirmation de votre forfait.'+remaining)+'\n\nUn changement de forfait demandé depuis votre compte ne modifie pas vos droits actifs : il doit être confirmé par l’administration. Les forfaits payants sont activés après vérification du virement reçu.\n\nConnectez-vous : https://13urgent.fr/\nBesoin d’aide : contact@13urgent.fr\n\nCHRONOSS / 13 URGENT';
+     const mail=await fetcher('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':'business-validation/'+key},body:JSON.stringify({from:env.REGISTRATION_ALERTS_FROM,to:[recipient.email],subject:ready?'[13 URGENT] Votre accès transporteur est validé':'[13 URGENT] Votre établissement est autorisé — inscription à compléter',text}),signal:AbortSignal.timeout(10000)});
+     if(mail.ok&&typeof (await mail.json()).id==='string'){accepted++;recipients.push(recipient.email);}else failed++;
+    }catch{failed++;}
+   }));
+   return reply(200,{eligible:ready,notified:accepted>0&&failed===0,accepted,failed,recipient_emails:recipients,notification_status:accepted>0?(failed?'partial':'accepted'):'notification_failed'});
+  }
   if(body.action==='reply_ticket'){
    if(profile.role!=='admin')return reply(403,{error:'administration_required'});
    if(!UUID.test(body.ticket_id||'')||typeof body.reply!=='string'||body.reply.trim().length<1||body.reply.length>2500||!['open','in_progress','resolved'].includes(body.status||'resolved'))return reply(400,{error:'invalid_reply'});

@@ -16,6 +16,7 @@ const assert=require('assert/strict');
  window.supabase={createClient:()=>({
   auth:{getUser:async()=>({data:{user:sessionExpired?null:{id:'admin-test',email:'test@example.com',user_metadata:{}}}}),onAuthStateChange:()=>{}},
   rpc:async(name,args)=>{
+   if(name==='urgent_pilot_directory')return{data:[{company_id:'company-test',pilot_enabled:true,carrier_ready:false}]};
    if(name==='urgent_commercial_status')return{data:{enabled:false,terms_version:'PRO-B2B-2026-10-20-v3',terms_accepted:false}};
    reviewCalls.push({name,args});Object.assign(testDoc,{document_type:args.p_kind,expires_on:args.p_expiry,review_status:'pending'});return{};
   },
@@ -25,9 +26,9 @@ const assert=require('assert/strict');
    order:async()=>({data:table==='companies'?[{id:'company-test',name:'Test transporteur',verification_status:'pending'}]:[{...testDoc}]})};return q;}
  })};`}));
  const errors=[];p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());
- await p.goto('http://127.0.0.1:8010/admin.html');await p.locator('#openAdmin').click();
+ await p.goto('http://127.0.0.1:8010/admin.html');await p.evaluate(()=>{window.validationMails=[];window.urgentSupport={reviewDocument:()=>{},notifyBusinessValidation:async(companyId,pending)=>{validationMails.push({companyId,pending});return{notified:true,eligible:false,recipient_emails:['carrier@example.com']}}};});await p.locator('#openAdmin').click();await p.getByRole('button',{name:'Notifier la décision au transporteur',exact:true}).click();await p.waitForFunction(()=>validationMails.length===1&&document.querySelector('#adminDossiers').textContent.includes('accepté la notification à carrier@example.com'));assert.deepEqual(await p.evaluate(()=>validationMails),[{companyId:'company-test',pending:true}]);assert.equal(await p.evaluate(()=>updateCalls.length),0);
  const revoke=p.getByRole('button',{name:'Retirer l’approbation',exact:true});
- await revoke.waitFor();await p.evaluate(()=>sessionExpired=true);await revoke.click();
+ await revoke.waitFor();assert.match(await p.locator('#adminDossiers').textContent(),/Autorisation de l’établissement : accordée/);assert.match(await p.locator('#adminDossiers').textContent(),/Catégories manquantes.*marchandises/);await p.evaluate(()=>sessionExpired=true);await revoke.click();
  await p.waitForFunction(()=>document.getElementById('adminNotice').textContent.includes('Session administrateur expirée'));
  assert.equal(await revoke.isEnabled(),true);assert.equal(await p.evaluate(()=>updateCalls.length),0);
  await p.evaluate(()=>{sessionExpired=false;failUpdate=true});await revoke.click();
