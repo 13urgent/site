@@ -3,8 +3,8 @@
  if(window.URGENT_MARKETPLACE_PILOT!==true)return;
  const $=id=>document.getElementById(id);
  const make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
- const state={user:null,profile:null,shipments:[],offers:[],private:[],events:[],incidents:[],generation:0,canPublish:false};
- const labels={published:'Course publiée',offer_submitted:'Offre enregistrée',offer_withdrawn:'Offre retirée',assigned_commercial_manual:'Mise en relation confirmée — frais mensuels CHRONOSS',assigned_pilot_no_charge:'Attribution pilote gratuite',incident_reported:'Incident signalé',incident_resolved:'Signalement clôturé',open:'Ouverte',assigned:'Attribuée',heading_pickup:'En route vers l’enlèvement',at_pickup:'Arrivé au chargement',loaded:'Marchandise chargée',delivery_reported:'Livraison déclarée — confirmation client attendue',completed:'Réalisation confirmée par le client',cancelled:'Annulée'};
+ const state={user:null,profile:null,shipments:[],offers:[],private:[],events:[],incidents:[],generation:0,canPublish:false,canEditShipments:false};
+ const labels={shipment_updated:'Course modifiée — nouvelles informations',published:'Course publiée',offer_submitted:'Offre enregistrée',offer_withdrawn:'Offre retirée',assigned_commercial_manual:'Mise en relation confirmée — frais mensuels CHRONOSS',assigned_pilot_no_charge:'Attribution pilote gratuite',incident_reported:'Incident signalé',incident_resolved:'Signalement clôturé',open:'Ouverte',assigned:'Attribuée',heading_pickup:'En route vers l’enlèvement',at_pickup:'Arrivé au chargement',loaded:'Marchandise chargée',delivery_reported:'Livraison déclarée — confirmation client attendue',completed:'Réalisation confirmée par le client',cancelled:'Annulée'};
  const next={assigned:'heading_pickup',heading_pickup:'at_pickup',at_pickup:'loaded',loaded:'delivery_reported'};
  const notice=(id,text)=>{$(id).hidden=false;$(id).textContent=text;};
  const commercial=s=>window.urgentCommerce?.ready===true&&window.urgentCommerce.enabled===true&&!s?.is_test;
@@ -45,7 +45,7 @@
  };
  if(!adminPage){ownReview.hidden=true;$('shipmentForm').before(ownReview);}
 
- const reset=()=>{ownReview.hidden=!adminPage;publicationStatus('Vérification de votre accès au formulaire…');if($('pilotAdmin'))$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.canPublish=false;state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
+ const reset=()=>{ownReview.hidden=!adminPage;publicationStatus('Vérification de votre accès au formulaire…');if($('pilotAdmin'))$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.canPublish=false;state.canEditShipments=false;state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
  async function rpc(name,args,timeoutMs){if(!sb)throw Error('Service de connexion indisponible.');let request=sb.rpc(name,args);if(timeoutMs&&typeof request.abortSignal==='function')request=request.abortSignal(AbortSignal.timeout(timeoutMs));const result=await request;if(result.error)throw result.error;return result.data;}
  function button(text,action,cls='btn secondary'){
   const b=make('button',text,cls);b.type='button';b.onclick=async()=>{b.disabled=true;try{await action();}catch(e){notice('trackingNotice','Opération non confirmée : '+e.message);}finally{b.disabled=false;}};return b;
@@ -93,10 +93,11 @@
     readRows('urgent_offers',generation),
     readRows('urgent_shipment_private',generation,false),
     readRows('urgent_shipment_events',generation),
-    readRows('urgent_shipment_incidents',generation)
+    readRows('urgent_shipment_incidents',generation),
+    rpc('urgent_shipment_edit_policy',{}).catch(()=>null)
    ]);
    if(generation!==state.generation)return;
-   [state.shipments,state.offers,state.private,state.events,state.incidents]=results;
+   [state.shipments,state.offers,state.private,state.events,state.incidents]=results;state.canEditShipments=results[5]?.enabled===true&&results[5]?.revision===true;
    if($('pilotAdmin'))$('pilotAdmin').hidden=profile.data.role!=='admin';render();
   }catch(e){if(generation===state.generation){if(!state.profile){reset();publicationStatus('Impossible de vérifier votre accès. Reconnectez-vous ou réessayez dans quelques instants.',true);}notice('courseCount','Impossible de charger les courses pour le moment. Actualisez la page ou reconnectez-vous.');}}
  }
@@ -106,6 +107,8 @@
   notice('courseCount',`${visible.length} course(s) ouverte(s) affichée(s). Service professionnel. Toutes les courses accessibles ont été chargées.`);
   for(const s of visible){
    const card=make('article',undefined,'shipment');card.dataset.shipmentId=s.id;const info=make('div');if(s.is_test)info.append(make('strong','EXERCICE FICTIF — AUCUN TRANSPORT RÉEL','test-badge'));info.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${date(s.pickup)} · ${s.vehicle} · ${s.pallets} palette(s) · ${s.weight} kg`));card.append(info);
+   if(s.owner_company_id===state.profile?.company_id)card.append(button('Modifier ma course',()=>openShipmentEditor(card,s,state.private.find(p=>p.shipment_id===s.id))));
+   if(Number(s.revision)>0)info.append(make('p','Course mise à jour : vérifiez les nouvelles informations avant de proposer.'));
    if(state.profile?.role==='carrier'&&s.owner_company_id!==state.profile.company_id){
     const existing=state.offers.find(o=>o.shipment_id===s.id&&o.carrier_company_id===state.profile.company_id);
     if(existing)info.append(make('p',`Votre proposition : ${money(existing.amount_ht)} HT · ${existing.status==='withdrawn'?'retirée':'enregistrée'}`));
@@ -120,7 +123,7 @@
      if(!/^\d+(?:[.,]\d{1,2})?$/.test(value)||!Number.isFinite(amount)||amount<0.01||amount>1000000){feedback('Saisissez un tarif entre 0,01 € et 1 000 000 €, avec deux décimales maximum. Exemple : 450 ou 450,00.',true);input.focus();return;}
      pending=true;const generation=state.generation;submit.disabled=true;input.disabled=true;form.setAttribute('aria-busy','true');submit.textContent='Enregistrement en cours…';feedback('Enregistrement de votre offre en cours…');
      try{
-      await rpc('urgent_submit_offer',{p_shipment:s.id,p_amount:amount},20000);if(generation!==state.generation)return;
+      const args={p_shipment:s.id,p_amount:amount};if(state.canEditShipments)args.p_expected_revision=Number(s.revision||0);await rpc('urgent_submit_offer',args,20000);if(generation!==state.generation)return;
       await refresh();const success='Offre enregistrée. Les autres transporteurs ne peuvent pas consulter votre prix.';notice('trackingNotice',success);
       const updated=[...$('shipments').children].find(el=>el.dataset.shipmentId===s.id)?.querySelector('.offer-feedback');if(updated){updated.hidden=false;updated.textContent=success;updated.scrollIntoView({block:'nearest'});}else $('trackingNotice').scrollIntoView({block:'nearest'});
      }catch(e){if(generation!==state.generation)return;let reason=e.message||'Vérifiez votre connexion et réessayez.';if(/Accès pilote et documents valides requis/.test(reason)){
@@ -140,6 +143,29 @@
   if(!visible.length)list.append(make('p','Aucune course ouverte ne correspond à la recherche.'));
   renderTracking();
  }
+ function openShipmentEditor(card,shipment,contact){
+  const existing=card.querySelector('.shipment-edit-form');if(existing){existing.scrollIntoView({block:'center'});return;}
+  const form=make('form',undefined,'form shipment-edit-form');form.noValidate=true;const message=make('p',undefined,'offer-feedback wide');message.setAttribute('role','status');message.hidden=true;
+  const feedback=(text,error=false)=>{message.hidden=false;message.textContent=text;message.classList.toggle('danger',error);message.scrollIntoView({block:'nearest'});};
+  if(!state.canEditShipments||!contact){card.append(message);feedback(!state.canEditShipments?'La modification des courses doit encore être activée dans Supabase par l’administration.':'Les coordonnées de cette course n’ont pas pu être chargées. Actualisez avant de modifier.',true);return;}
+  const values={company:contact.company_name,email:contact.contact_email,origin:shipment.origin,destination:shipment.destination,pallets:shipment.pallets,weight:shipment.weight,notes:contact.instructions||''};
+  const pad=n=>String(n).padStart(2,'0');const d=new Date(shipment.pickup);const initialPickup=Number.isNaN(d.getTime())?'':d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+  for(const[name,labelText,type,max]of [['company','Raison sociale','text',120],['email','Votre e-mail','email',254],['origin','Ville d’enlèvement','text',100],['destination','Ville de livraison','text',100],['pickup','Date et heure d’enlèvement','datetime-local'],['vehicle','Véhicule souhaité','select'],['pallets','Nombre de palettes','number'],['weight','Poids total (kg)','number'],['notes','Précisions','textarea',2000]]){
+   const label=make('label',labelText,name==='notes'?'wide':undefined);const input=make(type==='select'?'select':type==='textarea'?'textarea':'input');input.name=name;if(type!=='select'&&type!=='textarea')input.type=type;if(max)input.maxLength=max;input.required=name!=='notes';
+   if(type==='select')for(const option of $('shipmentForm').elements.vehicle.options){const o=make('option',option.textContent);o.value=option.value;input.append(o);}
+   if(type==='number'){input.min='0';input.max=name==='pallets'?'99':'40000';input.step=name==='pallets'?'1':'0.01';}if(type==='datetime-local')input.step='1';input.value=name==='pickup'?initialPickup:name==='vehicle'?shipment.vehicle:String(values[name]??'');label.append(input);form.append(label);
+  }
+  const warning=make('p','Une modification retire les offres déjà reçues. Les transporteurs devront proposer à nouveau sur les informations corrigées.','wide');const acknowledge=make('label',undefined,'professional-check wide');const ack=make('input');ack.type='checkbox';ack.name='acknowledgeOffers';acknowledge.append(ack,make('span','J’accepte le retrait des offres reçues pour modifier cette course.'));
+  const save=make('button','Enregistrer les modifications','btn primary');save.type='submit';const cancel=make('button','Fermer sans enregistrer','btn secondary');cancel.type='button';cancel.onclick=()=>form.remove();form.append(warning,acknowledge,save,cancel,message);card.append(form);form.scrollIntoView({block:'center'});let pending=false;
+  form.onsubmit=async event=>{
+   event.preventDefault();if(pending)return;if(!form.reportValidity()){feedback('Complétez les champs obligatoires et vérifiez les valeurs saisies.',true);return;}
+   const generation=state.generation;const data=new FormData(form);pending=true;save.disabled=true;cancel.disabled=true;feedback('Enregistrement des modifications en cours…');
+   try{
+    const result=await rpc('urgent_update_shipment',{p_shipment:shipment.id,p_expected_revision:Number(shipment.revision||0),p_origin:String(data.get('origin')).trim(),p_destination:String(data.get('destination')).trim(),p_pickup:data.get('pickup')===initialPickup?shipment.pickup:new Date(String(data.get('pickup'))).toISOString(),p_vehicle:data.get('vehicle'),p_pallets:Number(data.get('pallets')),p_weight:Number(data.get('weight')),p_company_name:String(data.get('company')).trim(),p_email:String(data.get('email')).trim(),p_instructions:String(data.get('notes')).trim(),p_acknowledge_offers:ack.checked},20000);
+    if(generation!==state.generation)return;if(!Number.isInteger(result?.revision)||typeof result.changed!=='boolean')throw Error('Le résultat ne peut pas être confirmé. Actualisez la course.');await refresh();notice('trackingNotice',result.changed?'Course modifiée. '+result.withdrawn_offers+' offre(s) retirée(s) ; les transporteurs peuvent proposer à nouveau.':'Aucun changement : les informations sont déjà enregistrées.');$('trackingNotice').scrollIntoView({block:'nearest'});
+   }catch(error){if(generation===state.generation)feedback('Modification non confirmée : '+error.message,true);}finally{pending=false;save.disabled=false;cancel.disabled=false;}
+  };
+ }
  function incidentForm(text,action){
   const details=make('details');details.append(make('summary',text));const form=make('form',undefined,'incident-form');const label=make('label','Description (10 à 2000 caractères)');const input=make('textarea');input.minLength=10;input.maxLength=2000;input.required=true;label.append(input);const submit=make('button',text,'btn secondary');submit.type='submit';form.append(label,submit);
   form.onsubmit=async e=>{e.preventDefault();if(!form.reportValidity())return;submit.disabled=true;try{await action(input.value.trim());}catch(error){notice('trackingNotice','Signalement non confirmé : '+error.message);}finally{submit.disabled=false;}};details.append(form);return details;
@@ -151,6 +177,7 @@
    const card=make('article',undefined,'dossier');if(s.is_test)card.append(make('strong','EXERCICE FICTIF — AUCUN TRANSPORT RÉEL','test-badge'));card.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${labels[s.status]} · ${s.id}`));
    const contact=state.private.find(p=>p.shipment_id===s.id);if(contact){card.append(make('p',`Contact donneur d’ordre : ${contact.company_name} · ${contact.contact_email}`));if(contact.instructions)card.append(make('p',contact.instructions));}
    if(s.owner_company_id===company&&s.status==='open'){
+    card.append(button('Modifier ma course',()=>openShipmentEditor(card,s,contact)));
     const offers=state.offers.filter(o=>o.shipment_id===s.id&&o.status==='submitted');
     card.append(make('p',`${offers.length} proposition(s) active(s)`));
     for(const offer of offers){const box=make('div',undefined,'doc-item');const paid=commercial(s);const fee=window.urgentCommerce?.feeCents(offer.amount_ht)/100;

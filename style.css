@@ -44,3 +44,5 @@
 .account-action-group{border-top:1px solid #d7d9de;margin-top:20px;padding-top:14px}.account-action-group p{margin:0 0 12px}.account-action-group[hidden]{display:none}
 
 .offer-feedback{white-space:pre-line;margin:4px 0;padding:12px;border:1px solid #cce6d1;border-radius:7px;background:#f1f8f1;color:#205b29;font-size:13px;line-height:1.5}.offer-feedback.danger{border-color:#efb6be;background:#fff2f4;color:#a41227}.offer-pilot-form{max-width:100%}
+
+.shipment:has(.shipment-edit-form){flex-wrap:wrap}.shipment-edit-form{flex-basis:100%;width:100%;border-top:1px solid #ddd;margin-top:16px;padding-top:20px}.shipment-edit-form textarea{min-height:90px}
