@@ -60,3 +60,7 @@ La version statique du site et la version Supabase sont des déploiements distin
 ## Pièces de contrôle
 
 Rapports JSON locaux : `/workspace/13urgent-tools/audit-general-final-20261027.json`, `/workspace/13urgent-tools/audit-public-live-20261027.json`, `/workspace/13urgent-tools/audit-liens-20261027.json`. La suite générale contient 32 contrôles, tous réussis ; les tests ciblés après modification de la clôture ont également réussi. La nouvelle version construite a réussi `deployment-browser.cjs`.
+
+## Suivi du 28 octobre 2026
+
+Après la modification et le déploiement annoncés par le propriétaire, le point de statut réel de support-assistant répond HTTP 200 avec la version attendue `20261027-audit`, service actif et tickets disponibles. La mise à jour Supabase demandée à la fin de l’audit est donc confirmée déployée. La réception réelle des e-mails et une vraie conversion attribuée dans Google Ads restent non confirmées par ce contrôle de statut. Rapport de vérification : `/workspace/13urgent-tools/verification-assistance-20261028.json`.

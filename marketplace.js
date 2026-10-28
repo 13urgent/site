@@ -44,7 +44,7 @@
  if(!adminPage){ownReview.hidden=true;$('shipmentForm').before(ownReview);}
 
  const reset=()=>{ownReview.hidden=!adminPage;publicationStatus('Vérification de votre accès au formulaire…');if($('pilotAdmin'))$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.canPublish=false;state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
- async function rpc(name,args){if(!sb)throw Error('Service de connexion indisponible.');const result=await sb.rpc(name,args);if(result.error)throw result.error;return result.data;}
+ async function rpc(name,args,timeoutMs){if(!sb)throw Error('Service de connexion indisponible.');let request=sb.rpc(name,args);if(timeoutMs&&typeof request.abortSignal==='function')request=request.abortSignal(AbortSignal.timeout(timeoutMs));const result=await request;if(result.error)throw result.error;return result.data;}
  function button(text,action,cls='btn secondary'){
   const b=make('button',text,cls);b.type='button';b.onclick=async()=>{b.disabled=true;try{await action();}catch(e){notice('trackingNotice','Opération non confirmée : '+e.message);}finally{b.disabled=false;}};return b;
  }
@@ -100,15 +100,37 @@
  }
  function render(){
   const list=$('shipments');list.replaceChildren();const query=$('courseSearch').value.trim().toLocaleLowerCase('fr');const vehicle=$('courseVehicle').value;
-  const visible=state.shipments.filter(s=>s.status==='open'&&(!vehicle||s.vehicle===vehicle)&&(!query||`${s.origin} ${s.destination}`.toLocaleLowerCase('fr').includes(query)));
+  const visible=state.shipments.filter(s=>s.status==='open'&&new Date(s.pickup).getTime()>=Date.now()&&(!vehicle||s.vehicle===vehicle)&&(!query||`${s.origin} ${s.destination}`.toLocaleLowerCase('fr').includes(query)));
   notice('courseCount',`${visible.length} course(s) ouverte(s) affichée(s). Service professionnel. Toutes les courses accessibles ont été chargées.`);
   for(const s of visible){
-   const card=make('article',undefined,'shipment');const info=make('div');if(s.is_test)info.append(make('strong','EXERCICE FICTIF — AUCUN TRANSPORT RÉEL','test-badge'));info.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${date(s.pickup)} · ${s.vehicle} · ${s.pallets} palette(s) · ${s.weight} kg`));card.append(info);
+   const card=make('article',undefined,'shipment');card.dataset.shipmentId=s.id;const info=make('div');if(s.is_test)info.append(make('strong','EXERCICE FICTIF — AUCUN TRANSPORT RÉEL','test-badge'));info.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${date(s.pickup)} · ${s.vehicle} · ${s.pallets} palette(s) · ${s.weight} kg`));card.append(info);
    if(state.profile?.role==='carrier'&&s.owner_company_id!==state.profile.company_id){
     const existing=state.offers.find(o=>o.shipment_id===s.id&&o.carrier_company_id===state.profile.company_id);
     if(existing)info.append(make('p',`Votre proposition : ${money(existing.amount_ht)} HT · ${existing.status==='withdrawn'?'retirée':'enregistrée'}`));
-    const form=make('form',undefined,'offer-pilot-form');const label=make('label',s.is_test?'Tarif fictif de test (€ HT)':'Votre tarif HT à recevoir (€)');const input=make('input');input.type='number';input.min='0.01';input.max='1000000';input.step='0.01';input.required=true;input.value=existing?.amount_ht||'';label.append(input);const submit=make('button','Enregistrer mon offre confidentielle','btn primary');submit.type='submit';form.append(label,submit);
-    form.onsubmit=async event=>{event.preventDefault();if(!form.reportValidity())return;submit.disabled=true;try{await rpc('urgent_submit_offer',{p_shipment:s.id,p_amount:input.value});await refresh();notice('trackingNotice','Offre enregistrée. Les autres transporteurs ne peuvent pas consulter votre prix.');}catch(e){notice('trackingNotice','Offre refusée : '+e.message);}finally{submit.disabled=false;}};
+    const form=make('form',undefined,'offer-pilot-form');form.noValidate=true;
+    const label=make('label',s.is_test?'Tarif fictif de test (€ HT)':'Votre tarif HT à recevoir (€)');const input=make('input');input.type='text';input.inputMode='decimal';input.maxLength=30;input.required=true;input.placeholder='Ex. : 450,00';input.value=existing?.amount_ht||'';label.append(input);
+    const submit=make('button','Enregistrer mon offre confidentielle','btn primary');submit.type='submit';const result=make('p',undefined,'offer-feedback');result.setAttribute('role','status');result.setAttribute('aria-live','polite');result.hidden=true;form.append(label,submit,result);
+    const feedback=(text,error=false)=>{result.textContent=text;result.hidden=false;result.classList.toggle('danger',error);result.scrollIntoView({block:'nearest'});};
+    let pending=false;
+    form.onsubmit=async event=>{
+     event.preventDefault();if(pending)return;
+     const value=input.value.trim().replace(/\s/g,'').replace(/€$/,'');const amount=Number(value.replace(',','.'));
+     if(!/^\d+(?:[.,]\d{1,2})?$/.test(value)||!Number.isFinite(amount)||amount<0.01||amount>1000000){feedback('Saisissez un tarif entre 0,01 € et 1 000 000 €, avec deux décimales maximum. Exemple : 450 ou 450,00.',true);input.focus();return;}
+     pending=true;const generation=state.generation;submit.disabled=true;input.disabled=true;form.setAttribute('aria-busy','true');submit.textContent='Enregistrement en cours…';feedback('Enregistrement de votre offre en cours…');
+     try{
+      await rpc('urgent_submit_offer',{p_shipment:s.id,p_amount:amount},20000);if(generation!==state.generation)return;
+      await refresh();const success='Offre enregistrée. Les autres transporteurs ne peuvent pas consulter votre prix.';notice('trackingNotice',success);
+      const updated=[...$('shipments').children].find(el=>el.dataset.shipmentId===s.id)?.querySelector('.offer-feedback');if(updated){updated.hidden=false;updated.textContent=success;updated.scrollIntoView({block:'nearest'});}else $('trackingNotice').scrollIntoView({block:'nearest'});
+     }catch(e){if(generation!==state.generation)return;let reason=e.message||'Vérifiez votre connexion et réessayez.';if(/Accès pilote et documents valides requis/.test(reason)){
+       reason='Votre compte transporteur n’a pas tous les accès requis.';
+       const checks=await Promise.allSettled([rpc('urgent_document_checklist',{p_company:state.profile.company_id},8000),rpc('urgent_commercial_status',{},8000)]);if(generation!==state.generation)return;
+       const names={registration:'Immatriculation / Kbis',transport_licence:'Licence de transport',insurance_rc:'Assurance RC',insurance_goods:'Assurance marchandises'};const reasons={missing:'absent',not_approved:'en attente ou refusé',expiry_missing:'date d’expiration manquante',expired:'expiré',renewal_due:'à actualiser'};
+       if(checks[0].status==='fulfilled'&&Array.isArray(checks[0].value))for(const doc of checks[0].value)if(doc.reason!=='valid')reason+='\n'+(names[doc.document_type]||'Justificatif')+' : '+(reasons[doc.reason]||'à vérifier')+'.';
+       if(checks[1].status==='fulfilled'&&checks[1].value?.enabled===true&&checks[1].value.terms_accepted===false)reason+='\nConditions professionnelles non acceptées : ouvrez « Espace professionnel — abonnements et frais » pour les consulter et enregistrer votre acceptation.';
+       reason+='\nCompte : '+(state.user?.email||'session courante')+'. Si ces éléments sont valides, faites vérifier l’autorisation de l’établissement et les droits de forfait par l’administration.';
+      }feedback('Offre non enregistrée ou non confirmée : '+reason,true);}
+     finally{pending=false;submit.disabled=false;input.disabled=false;submit.textContent='Enregistrer mon offre confidentielle';form.removeAttribute('aria-busy');}
+    };
     card.append(form);
     if(existing?.status==='submitted')card.append(button('Retirer mon offre',async()=>{if(!confirm('Retirer cette proposition ?'))return;await rpc('urgent_withdraw_offer',{p_offer:existing.id});await refresh();}));
    }list.append(card);
