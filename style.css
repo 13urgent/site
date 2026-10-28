@@ -42,3 +42,5 @@
 #manualCommerce form{margin:24px 0}#manualCommerce h3{margin-top:32px}#manualCommerce .professional-check{display:flex;gap:10px;align-items:flex-start;margin:16px 0}#manualCommerce>p{max-width:850px}#commercialReport{max-height:420px;overflow:auto}#commercialOwn p,#commercialPeriods p,#commercialReport label{overflow-wrap:anywhere}
 
 .account-action-group{border-top:1px solid #d7d9de;margin-top:20px;padding-top:14px}.account-action-group p{margin:0 0 12px}.account-action-group[hidden]{display:none}
+
+.offer-feedback{white-space:pre-line;margin:4px 0;padding:12px;border:1px solid #cce6d1;border-radius:7px;background:#f1f8f1;color:#205b29;font-size:13px;line-height:1.5}.offer-feedback.danger{border-color:#efb6be;background:#fff2f4;color:#a41227}.offer-pilot-form{max-width:100%}
