@@ -3,8 +3,8 @@
  if(window.URGENT_MARKETPLACE_PILOT!==true)return;
  const $=id=>document.getElementById(id);
  const make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
- const state={user:null,profile:null,shipments:[],offers:[],private:[],events:[],incidents:[],generation:0,canPublish:false,canEditShipments:false};
- const labels={shipment_updated:'Course modifiée — nouvelles informations',published:'Course publiée',offer_submitted:'Offre enregistrée',offer_withdrawn:'Offre retirée',assigned_commercial_manual:'Mise en relation confirmée — frais mensuels CHRONOSS',assigned_pilot_no_charge:'Attribution pilote gratuite',incident_reported:'Incident signalé',incident_resolved:'Signalement clôturé',open:'Ouverte',assigned:'Attribuée',heading_pickup:'En route vers l’enlèvement',at_pickup:'Arrivé au chargement',loaded:'Marchandise chargée',delivery_reported:'Livraison déclarée — confirmation client attendue',completed:'Réalisation confirmée par le client',cancelled:'Annulée'};
+ const state={user:null,profile:null,shipments:[],offers:[],private:[],events:[],incidents:[],generation:0,canPublish:false,canEditShipments:false,canArchiveShipments:false};
+ const labels={shipment_archived:'Course retirée des listes courantes',shipment_restored:'Course réaffichée dans l’historique',shipment_updated:'Course modifiée — nouvelles informations',published:'Course publiée',offer_submitted:'Offre enregistrée',offer_withdrawn:'Offre retirée',assigned_commercial_manual:'Mise en relation confirmée — frais mensuels CHRONOSS',assigned_pilot_no_charge:'Attribution pilote gratuite',incident_reported:'Incident signalé',incident_resolved:'Signalement clôturé',open:'Ouverte',assigned:'Attribuée',heading_pickup:'En route vers l’enlèvement',at_pickup:'Arrivé au chargement',loaded:'Marchandise chargée',delivery_reported:'Livraison déclarée — confirmation client attendue',completed:'Réalisation confirmée par le client',cancelled:'Annulée'};
  const next={assigned:'heading_pickup',heading_pickup:'at_pickup',at_pickup:'loaded',loaded:'delivery_reported'};
  const notice=(id,text)=>{$(id).hidden=false;$(id).textContent=text;};
  const commercial=s=>window.urgentCommerce?.ready===true&&window.urgentCommerce.enabled===true&&!s?.is_test;
@@ -45,7 +45,7 @@
  };
  if(!adminPage){ownReview.hidden=true;$('shipmentForm').before(ownReview);}
 
- const reset=()=>{ownReview.hidden=!adminPage;publicationStatus('Vérification de votre accès au formulaire…');if($('pilotAdmin'))$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.canPublish=false;state.canEditShipments=false;state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
+ const reset=()=>{ownReview.hidden=!adminPage;publicationStatus('Vérification de votre accès au formulaire…');if($('pilotAdmin'))$('pilotAdmin').hidden=true;$('testShipmentChoice').hidden=true;if($('pilotDirectory'))$('pilotDirectory').replaceChildren();state.canPublish=false;state.canEditShipments=false;state.canArchiveShipments=false;state.generation++;state.shipments=[];state.offers=[];state.private=[];state.events=[];state.incidents=[];state.user=null;state.profile=null;$('shipmentForm').querySelectorAll('input,select,textarea,button').forEach(e=>e.disabled=true);$('shipments').replaceChildren();$('shipmentTracking').replaceChildren();};
  async function rpc(name,args,timeoutMs){if(!sb)throw Error('Service de connexion indisponible.');let request=sb.rpc(name,args);if(timeoutMs&&typeof request.abortSignal==='function')request=request.abortSignal(AbortSignal.timeout(timeoutMs));const result=await request;if(result.error)throw result.error;return result.data;}
  function button(text,action,cls='btn secondary'){
   const b=make('button',text,cls);b.type='button';b.onclick=async()=>{b.disabled=true;try{await action();}catch(e){notice('trackingNotice','Opération non confirmée : '+e.message);}finally{b.disabled=false;}};return b;
@@ -94,16 +94,17 @@
     readRows('urgent_shipment_private',generation,false),
     readRows('urgent_shipment_events',generation),
     readRows('urgent_shipment_incidents',generation),
-    rpc('urgent_shipment_edit_policy',{}).catch(()=>null)
+    rpc('urgent_shipment_edit_policy',{}).catch(()=>null),
+    rpc('urgent_shipment_archive_policy',{}).catch(()=>null)
    ]);
    if(generation!==state.generation)return;
-   [state.shipments,state.offers,state.private,state.events,state.incidents]=results;state.canEditShipments=results[5]?.enabled===true&&results[5]?.revision===true;
+   [state.shipments,state.offers,state.private,state.events,state.incidents]=results;state.canEditShipments=results[5]?.enabled===true&&results[5]?.revision===true;state.canArchiveShipments=results[6]?.enabled===true&&results[6]?.restore===true;
    if($('pilotAdmin'))$('pilotAdmin').hidden=profile.data.role!=='admin';render();
   }catch(e){if(generation===state.generation){if(!state.profile){reset();publicationStatus('Impossible de vérifier votre accès. Reconnectez-vous ou réessayez dans quelques instants.',true);}notice('courseCount','Impossible de charger les courses pour le moment. Actualisez la page ou reconnectez-vous.');}}
  }
  function render(){
   const list=$('shipments');list.replaceChildren();const query=$('courseSearch').value.trim().toLocaleLowerCase('fr');const vehicle=$('courseVehicle').value;
-  const visible=state.shipments.filter(s=>s.status==='open'&&new Date(s.pickup).getTime()>=Date.now()&&(!vehicle||s.vehicle===vehicle)&&(!query||`${s.origin} ${s.destination}`.toLocaleLowerCase('fr').includes(query)));
+  const visible=state.shipments.filter(s=>!s.archived_at&&s.status==='open'&&new Date(s.pickup).getTime()>=Date.now()&&(!vehicle||s.vehicle===vehicle)&&(!query||`${s.origin} ${s.destination}`.toLocaleLowerCase('fr').includes(query)));
   notice('courseCount',`${visible.length} course(s) ouverte(s) affichée(s). Service professionnel. Toutes les courses accessibles ont été chargées.`);
   for(const s of visible){
    const card=make('article',undefined,'shipment');card.dataset.shipmentId=s.id;const info=make('div');if(s.is_test)info.append(make('strong','EXERCICE FICTIF — AUCUN TRANSPORT RÉEL','test-badge'));info.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${date(s.pickup)} · ${s.vehicle} · ${s.pallets} palette(s) · ${s.weight} kg`));card.append(info);
@@ -173,10 +174,11 @@
  function renderTracking(){
   const host=$('shipmentTracking');host.replaceChildren();const company=state.profile?.company_id;
   const rows=state.shipments.filter(s=>s.owner_company_id===company||s.assigned_company_id===company||state.profile?.role==='admin');
+  const archived=rows.filter(s=>s.archived_at);const archiveBox=make('details');archiveBox.id='shipmentArchives';const archiveTitle=make('summary','Courses retirées / exercices rangés ('+archived.length+')');archiveBox.append(archiveTitle);const archiveList=make('div',undefined,'doc-list');archiveBox.append(archiveList);
   for(const s of rows){
-   const card=make('article',undefined,'dossier');if(s.is_test)card.append(make('strong','EXERCICE FICTIF — AUCUN TRANSPORT RÉEL','test-badge'));card.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${labels[s.status]} · ${s.id}`));
+   const card=make('article',undefined,'dossier');card.dataset.shipmentId=s.id;if(s.is_test)card.append(make('strong','EXERCICE FICTIF — AUCUN TRANSPORT RÉEL','test-badge'));card.append(make('h3',`${s.origin} → ${s.destination}`),make('p',`${labels[s.status]} · ${s.id}`));
    const contact=state.private.find(p=>p.shipment_id===s.id);if(contact){card.append(make('p',`Contact donneur d’ordre : ${contact.company_name} · ${contact.contact_email}`));if(contact.instructions)card.append(make('p',contact.instructions));}
-   if(s.owner_company_id===company&&s.status==='open'){
+   if(!s.archived_at&&s.owner_company_id===company&&s.status==='open'){
     card.append(button('Modifier ma course',()=>openShipmentEditor(card,s,contact)));
     const offers=state.offers.filter(o=>o.shipment_id===s.id&&o.status==='submitted');
     card.append(make('p',`${offers.length} proposition(s) active(s)`));
@@ -191,8 +193,8 @@
     }
     card.append(button('Annuler la course non attribuée',async()=>{if(!confirm('Annuler cette course ?'))return;await rpc('urgent_cancel_shipment',{p_shipment:s.id});await refresh();}));
    }
-   if(s.assigned_company_id===company&&next[s.status])card.append(button(labels[next[s.status]],async()=>{if(!confirm('Confirmer : '+labels[next[s.status]]+' ?'))return;await rpc('urgent_progress_shipment',{p_shipment:s.id,p_next:next[s.status]});await refresh();}));
-   if(s.owner_company_id===company&&s.status==='delivery_reported')card.append(button('Confirmer la réalisation',async()=>{if(!confirm('Confirmez uniquement si vous avez vérifié la réalisation de la prestation.'))return;await rpc('urgent_progress_shipment',{p_shipment:s.id,p_next:'completed'});await refresh();}));
+   if(!s.archived_at&&s.assigned_company_id===company&&next[s.status])card.append(button(labels[next[s.status]],async()=>{if(!confirm('Confirmer : '+labels[next[s.status]]+' ?'))return;await rpc('urgent_progress_shipment',{p_shipment:s.id,p_next:next[s.status]});await refresh();}));
+   if(!s.archived_at&&s.owner_company_id===company&&s.status==='delivery_reported')card.append(button('Confirmer la réalisation',async()=>{if(!confirm('Confirmez uniquement si vous avez vérifié la réalisation de la prestation.'))return;await rpc('urgent_progress_shipment',{p_shipment:s.id,p_next:'completed'});await refresh();}));
    if(s.accepted_offer_id)card.append(button('Voir la fiche d’attribution',async()=>{
     const detail=await rpc('urgent_assignment_details',{p_shipment:s.id});const existing=card.querySelector('.assignment-detail');if(existing)existing.remove();const area=make('div',undefined,'doc-item assignment-detail');area.append(make('p',`Transporteur : ${detail.carrier_company} · ${detail.carrier_email}`),make('p',`Tarif transport convenu : ${money(detail.amount_ht)} HT. Frais plateforme encaissés : 0 €. Attribution le ${date(detail.assigned_at)}.`),make('p',detail.mode==='commercial_manual'?`Frais de mise en relation enregistrés : ${money(detail.fee_due_ht)} HT, à reprendre dans la facture mensuelle CHRONOSS. Cette fiche n’est pas une facture. Les parties confirment directement leur contrat de transport.`:'Fiche pilote, sans facture ni confirmation d’affrètement automatique. Les parties doivent confirmer directement leur contrat de transport.'));card.append(area);
    }));
@@ -207,9 +209,18 @@
     area.append(make('p','Ces signalements restent privés entre les parties et l’administration. Ils ne constituent ni une décision de remboursement ni une preuve de livraison.','muted'));card.append(area);
    }
    const events=state.events.filter(e=>e.shipment_id===s.id).slice().reverse();if(events.length){const details=make('details');details.append(make('summary','Historique horodaté'));for(const e of events)details.append(make('p',`${date(e.created_at)} · ${labels[e.event_type]||e.event_type}`));card.append(details);}
-   host.append(card);
+   if(s.owner_company_id===company&&(s.status==='cancelled'||s.is_test)){
+    const feedback=make('p',undefined,'offer-feedback');feedback.setAttribute('role','status');feedback.hidden=true;
+    const action=button(s.archived_at?'Réafficher dans l’historique':s.is_test?'Ranger cet exercice fictif':'Retirer cette course annulée',async()=>{
+     const generation=state.generation;const show=(text,error=false)=>{feedback.textContent=text;feedback.hidden=false;feedback.classList.toggle('danger',error);feedback.scrollIntoView({block:'nearest'});};
+     if(!state.canArchiveShipments){show('Le rangement doit encore être activé dans Supabase par l’administration.',true);return;}
+     if(!confirm(s.archived_at?'Réafficher cette course dans l’historique ? Une course annulée restera annulée.':s.is_test?'Ranger cet exercice fictif ? S’il est encore ouvert, il sera annulé et ses offres retirées. Son historique sera conservé.':'Retirer cette course annulée de la liste courante ? Elle restera consultable dans les courses retirées.'))return;
+     show('Enregistrement en cours…');try{const result=await rpc('urgent_archive_shipment',{p_shipment:s.id,p_archive:!s.archived_at},20000);if(generation!==state.generation)return;if(typeof result?.archived!=='boolean')throw Error('Le résultat ne peut pas être confirmé. Actualisez.');await refresh();notice('trackingNotice',result.archived?'Course rangée. Vous la retrouverez dans « Courses retirées / exercices rangés ».':'Course réaffichée dans l’historique. Une course annulée reste annulée.');$('trackingNotice').scrollIntoView({block:'nearest'});}catch(error){if(generation===state.generation)show('Rangement non confirmé : '+error.message,true);}
+    });card.append(action,feedback);
+   }
+   (s.archived_at?archiveList:host).append(card);
   }
-  if(!rows.length)host.append(make('p','Aucune course suivie pour ce compte.'));
+  if(!rows.some(s=>!s.archived_at))host.append(make('p','Aucune course dans votre suivi courant.'));if(archived.length)host.append(archiveBox);
  }
  $('shipmentForm').onsubmit=async event=>{
   event.preventDefault();const form=event.currentTarget;if(!form.reportValidity())return;const button=event.submitter;button.disabled=true;
