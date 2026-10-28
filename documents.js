@@ -94,11 +94,21 @@ async function loadAdmin(){
   ]);
   if(generation!==professionalAccessGeneration)return;
   if(companies.error||docs.error){docMsg('adminNotice','Lecture impossible : '+(companies.error?.message||docs.error?.message));host.replaceChildren();return;}
+  let directory=[];try{if(typeof sb.rpc==='function'){const r=await sb.rpc('urgent_pilot_directory',{});if(!r.error&&Array.isArray(r.data))directory=r.data;}}catch{}
+  if(generation!==professionalAccessGeneration)return;
   host.replaceChildren();if(!companies.data?.length){line(host,'p','Aucun transporteur enregistré.');return;}
   const folders=window.urgentDossiers?.folders(host,[['review','Nouveaux documents à examiner'],['renew','Dossiers à compléter ou à actualiser'],['validated','Dossiers documentaires validés']]);
   for(const c of companies.data){
     const companyDocs=(docs.data||[]).filter(d=>d.company_id===c.id);const folder=window.urgentDossiers?.classify(companyDocs)||'review';
-    const card=line(folders?.containers[folder]||host,'article','', 'dossier');line(card,'h3',c.name);line(card,'p',`Entreprise : ${c.verification_status} · ${c.id}`);
+    const card=line(folders?.containers[folder]||host,'article','', 'dossier');line(card,'h3',c.name);line(card,'p',`Référence entreprise : ${c.id}`);
+    const access=directory.find(row=>row.company_id===c.id);line(card,'p',access?`Autorisation de l’établissement : ${access.pilot_enabled?'accordée':'à valider ou suspendue'} · Dossier et droits transporteur : ${access.carrier_ready?'valides':'à compléter / vérifier'}`:'Autorisation de l’établissement : état non confirmé, consultez la validation des établissements.');
+    const kinds=['registration','transport_licence','insurance_rc','insurance_goods'];const missing=kinds.filter(kind=>!companyDocs.some(d=>d.document_type===kind));if(missing.length)line(card,'p','Catégories manquantes : '+missing.map(documentLabel).join(', ')+'.','danger');
+    const prepare=line(card,'button','Préparer la validation de cet établissement','btn secondary');prepare.type='button';prepare.onclick=async()=>{prepare.disabled=true;try{if(window.urgentPrepareBusinessReview)await window.urgentPrepareBusinessReview(c.id);else docMsg('adminNotice','Ouvrez la validation des établissements dans l’administration.');}catch(e){docMsg('adminNotice','Préparation impossible : '+e.message);doc$('adminNotice').scrollIntoView({block:'nearest'});}finally{prepare.disabled=false;}};
+    if(access?.pilot_plan){const plans={basics:'Start gratuit',bronze:'Drive',silver:'Boost',gold:'Premium'};line(card,'p','Forfait retenu par l’administration : '+(plans[access.pilot_plan]||access.pilot_plan)+'. Les périodes payantes restent contrôlées séparément.');}
+    if(access?.pilot_enabled&&window.urgentSupport?.notifyBusinessValidation){
+      const notify=line(card,'button','Notifier la décision au transporteur','btn secondary');notify.type='button';const delivery=line(card,'p','');delivery.setAttribute('role','status');
+      notify.onclick=async()=>{notify.disabled=true;delivery.textContent='Envoi de la notification en cours…';try{const mail=await window.urgentSupport.notifyBusinessValidation(c.id,true);if(generation!==professionalAccessGeneration)return;delivery.textContent=mail.notified?'Le service e-mail a accepté la notification'+(mail.recipient_emails?.length?' à '+mail.recipient_emails.join(', '):'')+'. '+(mail.eligible?'Dossier et droits transporteur valides.':'L’e-mail indique les éléments encore nécessaires avant les propositions.'):mail.notification_status==='service_update_required'?'La fonction support-assistant doit être mise à jour dans Supabase pour activer cet envoi.':'Notification non confirmée. La décision enregistrée reste inchangée.';}catch{delivery.textContent='Notification non confirmée. La décision enregistrée reste inchangée.';}finally{notify.disabled=false;delivery.scrollIntoView({block:'nearest'});}};
+    }
     const items=(docs.data||[]).filter(d=>d.company_id===c.id);
     if(!items.length)line(card,'p','Aucun document déposé.');
     const latestIds=new Set((window.urgentDossiers?.latestDocuments(items)||items).map(d=>d.id));
@@ -150,6 +160,7 @@ async function loadAdmin(){
               await loadAdmin();
               if(actionGeneration!==professionalAccessGeneration)return;
               docMsg('adminNotice',d.review_status==='approved'?'Approbation retirée. Le dossier sera de nouveau contrôlé lors des prochaines propositions et attributions.':`Document ${status==='approved'?'accepté':'refusé'}. L’entreprise n’est pas automatiquement validée.`);
+              if(status==='approved'&&window.urgentSupport?.notifyBusinessValidation){const mail=await window.urgentSupport.notifyBusinessValidation(c.id);if(actionGeneration!==professionalAccessGeneration)return;const detail=mail.notified?' Le service e-mail a accepté la notification de validation.':mail.notification_status==='not_ready'||mail.notification_status==='establishment_not_approved'?' Les accès ne sont pas encore tous validés ; aucun e-mail d’activation envoyé.':mail.notification_status==='service_update_required'?' La fonction d’envoi doit être mise à jour dans Supabase.':' L’envoi de l’e-mail n’est pas confirmé.';docMsg('adminNotice',doc$('adminNotice').textContent+detail);doc$('adminNotice').scrollIntoView({block:'nearest'});}
             }catch(e){if(actionGeneration===professionalAccessGeneration)docMsg('adminNotice','Validation impossible : '+e.message);}
             finally{b.disabled=false;}
           };
@@ -159,6 +170,7 @@ async function loadAdmin(){
   }
   folders?.update();
 }
+window.refreshAdminDossiers=loadAdmin;
 doc$('openDocuments').addEventListener('click',()=>showMyDocuments().catch(()=>docMsg('documentNotice','Service momentanément inaccessible.')));
 if(adminPage)doc$('openAdmin').addEventListener('click',event=>{event.preventDefault();showAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.'));});
 doc$('refreshAdmin')?.addEventListener('click',()=>loadAdmin().catch(()=>docMsg('adminNotice','Service momentanément inaccessible.')));

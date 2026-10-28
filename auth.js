@@ -118,7 +118,7 @@ for(const plan of subscriptionPlans){
  label.append(radio,description);subscriptionRequest.append(label);
 }
 const subscriptionInfo=document.createElement('p');subscriptionInfo.className='muted';subscriptionInfo.textContent='Demande de forfait à examiner par CHRONOSS. Pour le service commercial, CHRONOSS confirme le prix et transmet son RIB ; la période est activée après vérification du crédit bancaire effectif et du dossier. Aucun prélèvement automatique. Le pilote gratuit ne demande aucun paiement. Tout abonnement, même payé, ne dispense pas de fournir des documents professionnels valides et à jour. L’accès aux offres reste soumis à la validation du dossier par 13 URGENT et pourra être suspendu si les justificatifs expirent ou deviennent non conformes. Les conditions de suspension, de résiliation, de remboursement et de décompte des transports seront communiquées avant toute souscription.';subscriptionRequest.append(subscriptionInfo);
-const saveSubscription=document.createElement('button');saveSubscription.id='saveSubscription';saveSubscription.type='button';saveSubscription.className='btn primary';saveSubscription.textContent='Enregistrer ma demande de forfait';saveSubscription.hidden=true;subscriptionRequest.append(saveSubscription);
+const saveSubscription=document.createElement('button');saveSubscription.id='saveSubscription';saveSubscription.type='button';saveSubscription.className='btn primary';saveSubscription.textContent='Soumettre ma demande de forfait à l’administration';saveSubscription.hidden=true;subscriptionRequest.append(saveSubscription);
 passwordSettings.before(subscriptionRequest);
 function selectedPlan(){const value=subscriptionRequest.querySelector('input:checked')?.value;return subscriptionPlans.some(p=>p.id===value)?value:null;}
 let subscriptionView=0;
@@ -141,7 +141,7 @@ saveSubscription.addEventListener('click',()=>runAuthOperation(async()=>{
   if(profile.error||profile.data?.role!=='carrier')throw Error('Compte transporteur requis.');
   const result=await sb.auth.updateUser({data:{subscription_plan_request:plan,subscription_catalog_version:'2026-10-17',subscription_requested_at:new Date().toISOString()}});
   if(result.error)throw result.error;
-  notify('Choix enregistré dans votre compte. Aucun paiement effectué ; votre abonnement et votre dossier ne sont pas activés.');
+  notify('Demande de forfait enregistrée, en attente de confirmation par l’administration. Vos droits et votre forfait actifs restent inchangés. Aucun paiement effectué.');
  }catch{notify('Demande non confirmée. Vérifiez votre connexion et réessayez.');}
 },'Demande non confirmée. Vérifiez votre connexion et réessayez.'));
 if(sb)sb.auth.onAuthStateChange((event,session)=>{
