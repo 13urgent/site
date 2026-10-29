@@ -2,7 +2,7 @@
 (()=>{
  const knowledge=window.urgentSupportKnowledge;if(!knowledge)return;
  const isAdmin=document.body.dataset.adminPage==='true';
- if(!isAdmin&&!['/','/index.html'].includes(location.pathname))return;
+ if(!isAdmin&&!document.body.dataset.sitePage&&!['/','/index.html'].includes(location.pathname))return;
  const make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
  let generation=0,busy=false,capabilities=null;
  const client=()=>typeof sb!=='undefined'?sb:null;
@@ -43,7 +43,7 @@
   if(action==='account')document.getElementById('openAccount')?.click();
   else if(action==='documents'){const b=document.getElementById('openDocuments');if(b&&!b.hidden)b.click();else document.getElementById('openAccount')?.click();}
   else if(action==='diagnostic')openDiagnostic();
-  else location.hash=action;
+  else if(!window.urgentNavigateSection?.(action))location.hash=action;
  }
  function answerTopic(key){const topic=knowledge.topics[key];if(!topic)return;const node=message(topic.answer);if(topic.action){const action=make('button',topic.action==='diagnostic'?'Vérifier mon dossier':'Ouvrir cette rubrique','btn secondary');action.type='button';action.onclick=()=>navigate(topic.action);node.append(make('br'),action);}}
  for(const[key,topic]of Object.entries(knowledge.topics)){const b=make('button',topic.label,'btn secondary');b.type='button';b.onclick=()=>answerTopic(key);topics.append(b);}

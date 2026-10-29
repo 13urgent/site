@@ -5,6 +5,7 @@ import re
 import shutil
 from build_admin import build_admin
 from build_mobile import build_mobile
+from build_site_pages import build_pages
 
 root = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
@@ -19,6 +20,10 @@ if any(output.iterdir()):
     raise SystemExit('Le dossier de sortie doit être vide pour préserver les fichiers existants.')
 files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js','manual-commerce.js','conditions-professionnelles.html','conditions-professionnelles-v3.html','conditions-professionnelles-v4.html','mentions-legales.html','confidentialite.html','billing.js','documents.js','imports.js','terms-links.js','audience.js','audience.css','google-ads.js','support.js','support-knowledge.js','support.css','document-assistant.js','dossier-organisation.js','robots.txt','sitemap.xml']
 for name in files:
+    shutil.copy2(root / name, output / name)
+for name, page in build_pages().items():
+    (output / name).write_text(page)
+for name in ['site-pages.css','site-navigation.js']:
     shutil.copy2(root / name, output / name)
 (output / 'admin.html').write_text(build_admin())
 (output / 'mobile.html').write_text(build_mobile())
