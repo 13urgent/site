@@ -10,7 +10,7 @@ const fs=require('fs');const assert=require('assert/strict');
  async function run({provider=200,ack=true,missing=false,network=false,invalid=false}={}){
   const calls=[];const fetcher=async(url,options)=>{
    const body=JSON.parse(options.body);calls.push({url,options,body});
-   if(url.endsWith('urgent_claim_registration_alerts'))return Response.json([]);
+   if(url.endsWith('urgent_claim_registration_alerts')||url.endsWith('urgent_claim_mission_notifications'))return Response.json([]);
    if(url.endsWith('urgent_claim_document_alerts'))return missing?Response.json({code:'PGRST202'},{status:404}):Response.json([{...row,...(invalid?{company_id:'invalid'}:{})}]);
    if(url.endsWith('urgent_finish_document_alert'))return Response.json(ack);
    assert.equal(url,'https://api.resend.com/emails');if(network)throw Error('Timeout');return Response.json(provider===200?{id:'provider-document'}:{message:'private error'},{status:provider});
@@ -20,7 +20,7 @@ const fs=require('fs');const assert=require('assert/strict');
  const sent=r.calls.find(c=>c.url==='https://api.resend.com/emails');assert.deepEqual(sent.body.to,['saschronoss@outlook.com']);assert.equal(sent.options.headers['Idempotency-Key'],'document-alert/'+row.alert_id);assert(!sent.body.attachments);
  let finish=r.calls.find(c=>c.url.endsWith('urgent_finish_document_alert'));assert.equal(finish.body.p_lease_token,row.lease_token);assert.equal(finish.body.p_success,true);
  r=await run({provider:429});finish=r.calls.find(c=>c.url.endsWith('urgent_finish_document_alert'));assert.equal(finish.body.p_success,false);assert.equal(finish.body.p_error_code,'provider_http_429');assert.equal((await r.response.json()).documents.retry,1);
- r=await run({network:true});assert.equal(r.calls.at(-1).body.p_error_code,'provider_network_error');
+ r=await run({network:true});assert.equal(r.calls.find(c=>c.url.endsWith('urgent_finish_document_alert')).body.p_error_code,'provider_network_error');
  r=await run({ack:false});assert.equal(r.response.status,502);assert.equal((await r.response.json()).documents.sent,0);
  r=await run({missing:true});assert.equal(r.response.status,200);assert.equal((await r.response.json()).documents.enabled,false);assert(!r.calls.some(c=>c.url==='https://api.resend.com/emails'));
  r=await run({invalid:true});assert.equal(r.response.status,502);assert(!r.calls.some(c=>c.url==='https://api.resend.com/emails'));

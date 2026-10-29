@@ -4,6 +4,7 @@ import argparse
 import re
 import shutil
 from build_admin import build_admin
+from build_mobile import build_mobile
 
 root = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
@@ -20,8 +21,13 @@ files = ['index.html','style.css','config.js','auth.js','app.js','marketplace.js
 for name in files:
     shutil.copy2(root / name, output / name)
 (output / 'admin.html').write_text(build_admin())
+(output / 'mobile.html').write_text(build_mobile())
+for name in ['mobile.css','mobile.js','mobile-sw.js','mobile.webmanifest','mission-files.js']:
+    shutil.copy2(root / name, output / name)
 (output / 'assets').mkdir()
 shutil.copy2(root / 'assets/logo-13urgent-web.png', output / 'assets/logo-13urgent-web.png')
+for name in ['mobile-icon.svg','mobile-icon-192.png','mobile-icon-512.png']:
+    shutil.copy2(root / 'assets' / name, output / 'assets' / name)
 config = (output / 'config.js').read_text()
 config, count = re.subn(r'window\.URGENT_MARKETPLACE_PILOT\s*=\s*false\s*;', 'window.URGENT_MARKETPLACE_PILOT = true;', config)
 if count != 1:

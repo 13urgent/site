@@ -4,7 +4,7 @@
  const $=id=>document.getElementById(id);
  const make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
  const state={user:null,profile:null,shipments:[],offers:[],private:[],events:[],incidents:[],generation:0,canPublish:false,canEditShipments:false,canArchiveShipments:false};
- const labels={shipment_archived:'Course retirée des listes courantes',shipment_restored:'Course réaffichée dans l’historique',shipment_updated:'Course modifiée — nouvelles informations',published:'Course publiée',offer_submitted:'Offre enregistrée',offer_withdrawn:'Offre retirée',assigned_commercial_manual:'Mise en relation confirmée — frais mensuels CHRONOSS',assigned_pilot_no_charge:'Attribution pilote gratuite',incident_reported:'Incident signalé',incident_resolved:'Signalement clôturé',open:'Ouverte',assigned:'Attribuée',heading_pickup:'En route vers l’enlèvement',at_pickup:'Arrivé au chargement',loaded:'Marchandise chargée',delivery_reported:'Livraison déclarée — confirmation client attendue',completed:'Réalisation confirmée par le client',cancelled:'Annulée'};
+ const labels={mission_file_added:'Pièce de course partagée',mission_addresses_updated:'Adresses de navigation renseignées',shipment_archived:'Course retirée des listes courantes',shipment_restored:'Course réaffichée dans l’historique',shipment_updated:'Course modifiée — nouvelles informations',published:'Course publiée',offer_submitted:'Offre enregistrée',offer_withdrawn:'Offre retirée',assigned_commercial_manual:'Mise en relation confirmée — frais mensuels CHRONOSS',assigned_pilot_no_charge:'Attribution pilote gratuite',incident_reported:'Incident signalé',incident_resolved:'Signalement clôturé',open:'Ouverte',assigned:'Attribuée',heading_pickup:'En route vers l’enlèvement',at_pickup:'Arrivé au chargement',loaded:'Marchandise chargée',delivery_reported:'Livraison déclarée — confirmation client attendue',completed:'Réalisation confirmée par le client',cancelled:'Annulée'};
  const next={assigned:'heading_pickup',heading_pickup:'at_pickup',at_pickup:'loaded',loaded:'delivery_reported'};
  const notice=(id,text)=>{$(id).hidden=false;$(id).textContent=text;};
  const commercial=s=>window.urgentCommerce?.ready===true&&window.urgentCommerce.enabled===true&&!s?.is_test;
@@ -219,6 +219,7 @@
     });card.append(action,feedback);
    }
    (s.archived_at?archiveList:host).append(card);
+   window.urgentMissionFiles?.attach(card,s,state.profile,contact);
   }
   if(!rows.some(s=>!s.archived_at))host.append(make('p','Aucune course dans votre suivi courant.'));if(archived.length)host.append(archiveBox);
  }
@@ -288,6 +289,7 @@
   document.querySelector('#suivi .eyebrow').textContent=active?'ESPACE PROFESSIONNEL':'ESPACE PROFESSIONNEL';
   if(state.profile)render();
  }
+ window.urgentMarketplaceRefresh=refresh;
  window.addEventListener('urgent-commerce-updated',updateCommercialPresentation);
  sb?.auth.onAuthStateChange(()=>{reset();if($('pilotAdmin'))$('pilotAdmin').hidden=true;setTimeout(refresh,0);});refresh();
 })();

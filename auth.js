@@ -73,7 +73,7 @@ document.getElementById('signOut').addEventListener('click',()=>runAuthOperation
 
 
 // Conserve le sous-dossier d’hébergement, sans recopier les jetons de l’URL.
-function authReturnUrl(){const target=new URL('.',location.href);return target.pathname==='/'?target.origin:target.href;}
+function authReturnUrl(){const target=new URL(document.body.dataset.mobileApp==='true'?'mobile.html':'.',location.href);return target.pathname==='/'?target.origin:target.href;}
 // Réinitialisation par e-mail ; aucun compte n’est créé par cette action.
 document.getElementById('magicLink').addEventListener('click',()=>runAuthOperation(async()=>{
  const input=document.getElementById('authEmail');if(!input.reportValidity())return;

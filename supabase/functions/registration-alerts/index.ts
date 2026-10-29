@@ -36,9 +36,11 @@ export async function registrationAlertsHandler(request, env, fetcher=fetch) {
   const response=await fetcher(`${base.origin}/rest/v1/rpc/${name}`,{method:'POST',headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,'content-type':'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(10000)});
   // Compatibilité avec l'ancienne base : les alertes d'inscription continuent
   // tant que la nouvelle migration documentaire n'a pas encore été appliquée.
-  if(response.status===404&&name==='urgent_claim_document_alerts')return null;
+  if(response.status===404&&['urgent_claim_document_alerts','urgent_claim_mission_notifications'].includes(name))return null;
   if(!response.ok)throw Error('database_error');return response.json();
  };
+ // Le suivi des missions passe avant les récapitulatifs et les inscriptions.
+ const missions=alertsEnabled?await sendMissionNotifications(env,fetcher,rpc):null;
  const monthly=monthlyEnabled?await sendMonthlyReport(env,fetcher,rpc):null;
  const stats=statsEnabled?await sendSiteReport(env,fetcher,rpc):null;
  let rows;
@@ -57,7 +59,34 @@ export async function registrationAlertsHandler(request, env, fetcher=fetch) {
   if(success)sent++;else retry++;
  }
  const documents=alertsEnabled?await sendDocumentAlerts(env,fetcher,rpc):null;
- return json(monthly?.error||stats?.error||documents?.error?502:200,{enabled:true,sent,retry,...(monthly?{monthly}:{}),...(stats?{stats}:{}),...(documents?{documents}:{})});
+ return json(monthly?.error||stats?.error||documents?.error||missions?.error?502:200,{enabled:true,sent,retry,...(monthly?{monthly}:{}),...(stats?{stats}:{}),...(documents?{documents}:{}),...(missions?{missions}:{})});
+}
+
+export function missionNotificationEmail(row){
+ const labels={loaded:'Chargement déclaré effectué',delivery_reported:'Livraison déclarée — confirmation attendue',goods:'Photo de marchandise disponible',reservation:'Réserves et photo ajoutées',waybill:'Lettre de voiture disponible'};
+ const title=labels[row.event_type];if(!title)throw Error('invalid_mission_notice');
+ const route=clean(row.origin,100)+' → '+clean(row.destination,100);
+ const note=row.event_type==='delivery_reported'?'Le transporteur a déclaré la livraison. Consultez le dossier puis confirmez la réalisation seulement après vos vérifications.':row.event_type==='reservation'?'Des réserves ont été enregistrées. Consultez les photos et le signalement dans le dossier privé ; leur traitement reste à examiner avec le transporteur et l’administration.':'Consultez la course et ses pièces dans votre espace professionnel.';
+ const fields=[['Course',route],['Référence',clean(row.shipment_id)],['Événement',title],['Enregistré le',clean(row.recorded_at)],...(row.filename?[['Fichier',clean(row.filename,250)]]:[])];
+ return{subject:`[13 URGENT] ${title} — ${route}`,text:`${fields.map(([k,v])=>k+' : '+v).join('\n')}\n\n${note}\n\nAucune pièce privée n’est jointe. Connectez-vous avec le compte ayant créé la course pour consulter les documents.\n${SITE}mobile.html#missions`,html:`<!doctype html><html lang="fr"><meta charset="utf-8"><body style="font:16px Arial,sans-serif;color:#172333;max-width:640px;margin:auto;padding:24px"><h1 style="font-size:24px">${escape(title)}</h1><table cellpadding="8">${fields.map(([k,v])=>'<tr><th align="left">'+escape(k)+'</th><td>'+escape(v)+'</td></tr>').join('')}</table><p>${escape(note)}</p><p>Aucune pièce privée n’est jointe. Les documents sont accessibles après connexion.</p><a href="${SITE}mobile.html#missions" style="display:inline-block;padding:14px;background:#cd1830;color:white;text-decoration:none">Consulter ma course</a></body></html>`};
+}
+async function sendMissionNotifications(env,fetcher,rpc){
+ let jobs;try{jobs=await rpc('urgent_claim_mission_notifications',{});}catch{return{error:'mission_database_error'};}
+ if(jobs===null)return{enabled:false,reason:'migration_required'};
+ if(!Array.isArray(jobs)||jobs.length>3||jobs.some(j=>!uuid.test(j.alert_id)||!uuid.test(j.lease_token)||!uuid.test(j.shipment_id)||!['loaded','delivery_reported','goods','reservation','waybill'].includes(j.event_type)))return{error:'invalid_mission_jobs'};
+ const results=await Promise.all(jobs.map(async row=>{
+  let success=false,provider=null,code='send_error';
+  if(row.recipient_allowed!==true)code='recipient_access_changed';
+  else if(row.recipient_confirmed!==true)code='recipient_unconfirmed';
+  else if(typeof row.recipient_email!=='string'||!/^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(row.recipient_email))code='recipient_invalid';
+  else try{
+   const response=await fetcher('https://api.resend.com/emails',{method:'POST',headers:{authorization:`Bearer ${env.RESEND_API_KEY}`,'content-type':'application/json','Idempotency-Key':`mission-notice/${row.alert_id}`},body:JSON.stringify({from:env.REGISTRATION_ALERTS_FROM,to:[row.recipient_email],...missionNotificationEmail(row)}),signal:AbortSignal.timeout(10000)});
+   if(response.ok){const data=await response.json();if(typeof data.id==='string'&&data.id){success=true;provider=data.id;}else code='provider_invalid_response';}else code=`provider_http_${response.status}`;
+  }catch{code='provider_network_error';}
+  try{if(await rpc('urgent_finish_mission_notification',{p_alert_id:row.alert_id,p_lease_token:row.lease_token,p_success:success,p_provider_id:provider,p_error_code:success?null:code})!==true)throw Error();}catch{return{error:'mission_acknowledgement_failed'};}
+  return{success};
+ }));
+ return{enabled:true,sent:results.filter(r=>r.success===true).length,retry:results.filter(r=>r.success===false).length,...(results.some(r=>r.error)?{error:'mission_acknowledgement_failed'}:{})};
 }
 
 async function sendDocumentAlerts(env,fetcher,rpc){
