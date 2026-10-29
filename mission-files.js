@@ -38,10 +38,12 @@
     }
    }
    drawNavigation();host.append(navigation);
-   if(shipment.owner_company_id===profile.company_id&&!shipment.archived_at&&['open','assigned'].includes(shipment.status)){
+   const lateAddresses=!['open','assigned'].includes(shipment.status);
+   if(shipment.owner_company_id===profile.company_id&&!shipment.archived_at&&(['open','assigned'].includes(shipment.status)||['heading_pickup','at_pickup','loaded'].includes(shipment.status)&&(!pickup||!delivery))){
     const details=el('details');details.append(el('summary','Renseigner les adresses exactes du GPS'));
     const form=el('form',undefined,'mission-address-form');
-    for(const[name,label,value]of[['pickup','Adresse complète d’enlèvement',pickup],['delivery','Adresse complète de livraison',delivery]]){const l=el('label',label);const i=el('textarea');i.name=name;i.required=true;i.minLength=5;i.maxLength=500;i.value=value;l.append(i);form.append(l);}
+    for(const[name,label,value]of[['pickup','Adresse complète d’enlèvement',pickup],['delivery','Adresse complète de livraison',delivery]]){const l=el('label',label);const i=el('textarea');i.name=name;i.required=true;i.minLength=5;i.maxLength=500;i.value=value;i.disabled=lateAddresses&&Boolean(value);l.append(i);form.append(l);}
+    if(lateAddresses)form.append(el('p','Complétez les adresses manquantes. Les adresses déjà renseignées restent figées après le départ.','muted'));
     const save=el('button','Enregistrer les adresses','btn primary');save.type='submit';form.append(save);details.append(form);host.append(details);
     form.onsubmit=async e=>{e.preventDefault();if(save.disabled||!form.reportValidity())return;save.disabled=true;busy++;try{await sameUser(userId);await rpc('urgent_save_mission_addresses',{p_shipment:shipment.id,p_pickup:form.elements.pickup.value.trim(),p_delivery:form.elements.delivery.value.trim()});if(!valid())return;pickup=form.elements.pickup.value.trim();delivery=form.elements.delivery.value.trim();drawNavigation();show('Adresses enregistrées et accessibles au transporteur attribué.');}catch(e){show('Adresses non confirmées : '+e.message,true);}finally{save.disabled=false;busy--;}};
    }

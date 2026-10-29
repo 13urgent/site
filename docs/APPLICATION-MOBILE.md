@@ -9,7 +9,7 @@ Navigation fixe : Mes courses, Disponibles, Déposer, Forfaits. Les boutons Mon 
 ## Parcours du transporteur
 
 1. La course doit être attribuée à son entreprise. Les règles de contrôle des documents et des forfaits restent celles du site.
-2. Les adresses exactes d'enlèvement et de livraison sont saisies par l'entreprise propriétaire dans le suivi, avant le départ. Elles restent privées. Sans adresse exacte, l'application demande de la faire préciser et ne présente pas un guidage vers une ville comme une destination précise.
+2. Les adresses exactes d'enlèvement et de livraison sont saisies par l'entreprise propriétaire dans le suivi, avant le départ. Pour une ancienne course déjà commencée, les adresses encore manquantes peuvent être complétées ; les adresses existantes ne peuvent pas être changées après le départ. Elles restent privées. Sans adresse exacte, l'application demande de la faire préciser et ne présente pas un guidage vers une ville comme une destination précise.
 3. Les boutons Google Maps et Waze ouvrent l'application ou le service correspondant avec l'adresse encodée. Ils ne constituent pas un calcul d'itinéraire poids lourds. Le conducteur doit vérifier les contraintes de gabarit et de poids dans son outil de navigation. Aucun suivi GPS en direct ni collecte de positions en arrière-plan n'est ajouté à 13 URGENT.
 4. Le conducteur conserve les étapes du site : départ vers l'enlèvement, arrivée au chargement, marchandise chargée, livraison déclarée. La confirmation finale reste au donneur d'ordre.
 5. Il peut prendre une photo ou sélectionner une photo / un PDF, choisir Photo de marchandise, Photo et réserves, ou Lettre de voiture, puis partager dans le dossier privé de la course.

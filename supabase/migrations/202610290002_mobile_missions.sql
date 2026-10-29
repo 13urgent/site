@@ -6,12 +6,14 @@ alter table public.urgent_shipment_private add column delivery_address text not 
 
 create function public.urgent_save_mission_addresses(p_shipment uuid,p_pickup text,p_delivery text)returns void
 language plpgsql security definer set search_path='' as $$
-declare s public.urgent_shipments;
+declare s public.urgent_shipments;contact public.urgent_shipment_private;
 begin
  select * into s from public.urgent_shipments where id=p_shipment for update;
  if auth.uid()is null or not found or s.owner_company_id is distinct from public.urgent_actor_company()then raise exception 'Entreprise propriétaire requise';end if;
- if s.archived_at is not null or s.status not in('open','assigned')then raise exception 'Les adresses sont figées après le départ vers l’enlèvement';end if;
+ if s.archived_at is not null or s.status not in('open','assigned','heading_pickup','at_pickup','loaded')then raise exception 'Les adresses ne peuvent plus être renseignées à cette étape';end if;
  if p_pickup is null or p_delivery is null or length(trim(p_pickup))not between 5 and 500 or length(trim(p_delivery))not between 5 and 500 then raise exception 'Renseignez les deux adresses complètes (5 à 500 caractères)';end if;
+ select * into contact from public.urgent_shipment_private where shipment_id=s.id;
+ if s.status not in('open','assigned')and((contact.pickup_address<>''and contact.pickup_address<>trim(p_pickup))or(contact.delivery_address<>''and contact.delivery_address<>trim(p_delivery)))then raise exception 'Les adresses existantes sont figées après le départ vers l’enlèvement';end if;
  update public.urgent_shipment_private set pickup_address=trim(p_pickup),delivery_address=trim(p_delivery)
  where shipment_id=s.id and(pickup_address is distinct from trim(p_pickup)or delivery_address is distinct from trim(p_delivery));
  if found then insert into public.urgent_shipment_events(shipment_id,actor_id,event_type)values(s.id,auth.uid(),'mission_addresses_updated');end if;
