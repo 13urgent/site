@@ -35,6 +35,8 @@ async function updateAuth(){
  for(const id of ['registrationAction','loginActions']){const group=document.getElementById(id);if(group)group.hidden=Boolean(user)||(id==='registrationAction'&&window.URGENT_ALLOW_REGISTRATION===false);}
  if(window.URGENT_ALLOW_REGISTRATION===false){document.getElementById('signUp').hidden=true;document.getElementById('accountType').closest('label').hidden=true;}
  document.getElementById('passwordSettings').hidden=!user||passwordRecoveryUser!==user.id;
+ const resetLink=document.getElementById('magicLink');
+ if(user)accountIdentity.after(resetLink);else document.querySelector('#loginActions .actions').append(resetLink);
  document.getElementById('magicLink').hidden=Boolean(user&&passwordRecoveryUser===user.id);
  if(user?.email)document.getElementById('authEmail').value=user.email;
  document.getElementById('businessRegistration').hidden=Boolean(user)||window.URGENT_ALLOW_REGISTRATION===false;

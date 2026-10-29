@@ -13,6 +13,14 @@ export function registrationEmail(row) {
  const action='Connectez-vous avec votre compte administrateur, cliquez sur Administration et recherchez cette entreprise. Aucune pièce justificative n’est jointe à cet e-mail.';
  return {subject:`[13 URGENT] Nouvelle inscription ${type.toLowerCase()} — ${company}`,text:`${note}\n\n${fields.map(([k,v])=>`${k} : ${v}`).join('\n')}\n\n${action}\n${SITE}`,html:`<!doctype html><html lang="fr"><meta charset="utf-8"><body style="font:16px Arial,sans-serif;color:#171923;max-width:640px;margin:auto;padding:24px"><h1 style="font-size:24px">13 URGENT · Nouvelle inscription</h1><p>${escape(note)}</p><table cellpadding="8" style="border-collapse:collapse">${fields.map(([k,v])=>`<tr><th align="left" valign="top">${escape(k)}</th><td>${escape(v)}</td></tr>`).join('')}</table><p>${escape(action)}</p><p><a href="${SITE}" style="background:#e91d32;color:white;display:inline-block;padding:14px;text-decoration:none">Ouvrir 13 URGENT</a></p></body></html>`};
 }
+export function documentUploadEmail(row) {
+ const company=clean(row.company_name)||'Entreprise à compléter';
+ const kind={registration:'Immatriculation / Kbis',transport_licence:'Licence de transport',insurance_rc:'Assurance responsabilité civile',insurance_goods:'Assurance marchandises',other:'Autre document'}[row.document_type]||'Justificatif';
+ const type=row.account_type==='carrier'?'Transporteur':'Donneur d’ordre';
+ const fields=[['Entreprise',company],['Type de compte',type],['Compte déposant',clean(row.email)],['Catégorie',kind],['Nom du fichier',clean(row.original_filename,250)],['Dépôt enregistré',clean(row.uploaded_at)],['Référence entreprise',clean(row.company_id)],['Référence document',clean(row.document_id)]];
+ const note='Un nouveau document a été déposé sur 13 URGENT. Connectez-vous à l’administration pour examiner le dossier. Le dépôt ne vaut pas validation du document ni autorisation de l’entreprise.';
+ return {subject:`[13 URGENT] Nouveau document ${type.toLowerCase()} — ${company}`,text:`${note}\n\n${fields.map(([k,v])=>`${k} : ${v}`).join('\n')}\n\nAucune pièce ni lien de téléchargement privé n’est joint.\n${SITE}admin.html`,html:`<!doctype html><html lang="fr"><meta charset="utf-8"><body style="font:16px Arial,sans-serif;color:#171923;max-width:640px;margin:auto;padding:24px"><h1 style="font-size:24px">13 URGENT · Nouveau document à examiner</h1><p>${escape(note)}</p><table cellpadding="8" style="border-collapse:collapse">${fields.map(([k,v])=>`<tr><th align="left" valign="top">${escape(k)}</th><td>${escape(v)}</td></tr>`).join('')}</table><p>Aucune pièce ni lien de téléchargement privé n’est joint.</p><p><a href="${SITE}admin.html" style="background:#cd1830;color:#fff;padding:14px;display:inline-block;text-decoration:none">Examiner les documents</a></p></body></html>`};
+}
 function json(status,body){return new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json','cache-control':'no-store'}});}
 export async function registrationAlertsHandler(request, env, fetcher=fetch) {
  if(request.method!=='POST')return json(405,{error:'method_not_allowed'});
@@ -26,6 +34,9 @@ export async function registrationAlertsHandler(request, env, fetcher=fetch) {
  if(!env.SUPABASE_SERVICE_ROLE_KEY||!env.RESEND_API_KEY||!/^.+<[^<>\s@]+@[^<>\s@]+>$/.test(env.REGISTRATION_ALERTS_FROM||'')||/[\r\n]/.test(env.REGISTRATION_ALERTS_FROM))return json(503,{error:'not_configured'});
  const rpc=async(name,data)=>{
   const response=await fetcher(`${base.origin}/rest/v1/rpc/${name}`,{method:'POST',headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,'content-type':'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(10000)});
+  // Compatibilité avec l'ancienne base : les alertes d'inscription continuent
+  // tant que la nouvelle migration documentaire n'a pas encore été appliquée.
+  if(response.status===404&&name==='urgent_claim_document_alerts')return null;
   if(!response.ok)throw Error('database_error');return response.json();
  };
  const monthly=monthlyEnabled?await sendMonthlyReport(env,fetcher,rpc):null;
@@ -45,7 +56,27 @@ export async function registrationAlertsHandler(request, env, fetcher=fetch) {
   try{const done=await rpc('urgent_finish_registration_alert',{p_alert_id:row.alert_id,p_lease_token:row.lease_token,p_success:success,p_provider_id:providerId,p_error_code:success?null:errorCode});if(done!==true)throw Error();}catch{return json(502,{error:'acknowledgement_failed'});}
   if(success)sent++;else retry++;
  }
- return json(monthly?.error||stats?.error?502:200,{enabled:true,sent,retry,...(monthly?{monthly}:{}),...(stats?{stats}:{})});
+ const documents=alertsEnabled?await sendDocumentAlerts(env,fetcher,rpc):null;
+ return json(monthly?.error||stats?.error||documents?.error?502:200,{enabled:true,sent,retry,...(monthly?{monthly}:{}),...(stats?{stats}:{}),...(documents?{documents}:{})});
+}
+
+async function sendDocumentAlerts(env,fetcher,rpc){
+ let jobs;try{jobs=await rpc('urgent_claim_document_alerts',{});}catch{return{error:'document_database_error'};}
+ if(jobs===null)return{enabled:false,reason:'migration_required'};
+ if(!Array.isArray(jobs)||jobs.length>3)return{error:'invalid_document_jobs'};
+ if(jobs.some(row=>!uuid.test(row.alert_id)||!uuid.test(row.lease_token)||!uuid.test(row.document_id)||!uuid.test(row.user_id)||!uuid.test(row.company_id)||!['client','carrier'].includes(row.account_type)))return{error:'invalid_document_job'};
+ // Trois envois au maximum en parallèle ; un échec ne bloque pas les autres pièces.
+ const results=await Promise.all(jobs.map(async row=>{
+  let success=false,provider=null,code='send_error';
+  try{
+   const mail=documentUploadEmail(row);
+   const response=await fetcher('https://api.resend.com/emails',{method:'POST',headers:{authorization:`Bearer ${env.RESEND_API_KEY}`,'content-type':'application/json','Idempotency-Key':`document-alert/${row.alert_id}`},body:JSON.stringify({from:env.REGISTRATION_ALERTS_FROM,to:[RECIPIENT],...mail}),signal:AbortSignal.timeout(10000)});
+   if(response.ok){const data=await response.json();if(typeof data.id==='string'&&data.id){success=true;provider=data.id;}else code='provider_invalid_response';}else code=`provider_http_${response.status}`;
+  }catch{code='provider_network_error';}
+  try{if(await rpc('urgent_finish_document_alert',{p_alert_id:row.alert_id,p_lease_token:row.lease_token,p_success:success,p_provider_id:provider,p_error_code:success?null:code})!==true)throw Error();}catch{return{error:'document_acknowledgement_failed'};}
+  return{success};
+ }));
+ return{enabled:true,sent:results.filter(r=>r.success===true).length,retry:results.filter(r=>r.success===false).length,...(results.some(r=>r.error)?{error:'document_acknowledgement_failed'}:{})};
 }
 
 // Récapitulatif mensuel interne : aucune émission de facture ou modification de frais.
