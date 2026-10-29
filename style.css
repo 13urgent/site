@@ -46,3 +46,40 @@
 .offer-feedback{white-space:pre-line;margin:4px 0;padding:12px;border:1px solid #cce6d1;border-radius:7px;background:#f1f8f1;color:#205b29;font-size:13px;line-height:1.5}.offer-feedback.danger{border-color:#efb6be;background:#fff2f4;color:#a41227}.offer-pilot-form{max-width:100%}
 
 .shipment:has(.shipment-edit-form){flex-wrap:wrap}.shipment-edit-form{flex-basis:100%;width:100%;border-top:1px solid #ddd;margin-top:16px;padding-top:20px}.shipment-edit-form textarea{min-height:90px}
+
+/* Présentation professionnelle : fond discret et actions faciles à repérer. */
+:root{color:#172333;background:#eaf0f5}
+body{background:radial-gradient(ellipse at 100% 12%,#dce6f2 0,transparent 48%),radial-gradient(ellipse at 0 55%,#f4e2e6 0,transparent 35%),linear-gradient(135deg,#f1f5f9,#e7edf4);background-repeat:no-repeat;min-height:100vh}
+.top{background:#111b2a;border-bottom:3px solid #df2034;box-shadow:0 4px 20px #101b3020}
+.top nav a{padding:12px 2px;color:#e2e8f0;font-weight:650;text-underline-offset:5px}
+.top nav a:hover,.top nav a:focus-visible{text-decoration:underline;color:#fff}
+.hero{background:#101b2a}.hero-art{background:radial-gradient(ellipse at 65% 45%,#7b1b304d,transparent 65%),linear-gradient(140deg,#17283b,#101b2a)}
+.section:not(.panel)>.section-head{color:#172333}.section-head p,.pricing p{color:#4e5d70}
+.panel,.feature,.shipment,.dossier,.pilot-admin,.external-import{box-shadow:0 8px 28px #172d4610;border-color:#ccd6e1}
+.panel,.feature,.shipment,.dossier,.pilot-admin{background:#fff}
+.feature{border-top:3px solid #d92337}.feature p{color:#4e5d70}
+.btn,.support-topics button,.support-controls button,.audience-actions button,.ads-choice button{min-height:46px;border:2px solid #7b8a9e;border-radius:9px;font-weight:800;line-height:1.35;transition:background-color .15s,border-color .15s,box-shadow .15s;box-shadow:0 3px 0 #14243816}
+.btn{padding:13px 20px;font-size:14px;text-align:center;white-space:normal;max-width:100%;overflow-wrap:anywhere}
+.btn.primary{background:#cd1830;color:#fff;border-color:#b71229;box-shadow:0 4px 0 #861124}
+.btn.primary:hover:not(:disabled){background:#ad1026;border-color:#940e20;box-shadow:0 4px 12px #a31a3430}
+.btn.secondary,.support-topics button,.support-controls button,.audience-actions button,.ads-choice button{background:#f3f6fa;color:#172b43;border-color:#8b9bb0}
+.btn.secondary:hover:not(:disabled),.support-topics button:hover:not(:disabled),.support-controls button:hover:not(:disabled),.audience-actions button:hover:not(:disabled),.ads-choice button:hover:not(:disabled){background:#e2eaf4;border-color:#243e60;box-shadow:0 4px 12px #243e6020}
+.btn.ghost{background:#22344e;border-color:#9cabbe;color:#fff}
+.modal .btn.ghost{background:#eef2f7;color:#172b43;border-color:#8b9bb0}
+#openAccount{background:#cd1830;color:#fff;border-color:#ff7182;box-shadow:0 3px 0 #8c0c21}
+#openAccount:hover{background:#ad1026}
+.modal select{min-height:44px;padding:12px;border:1px solid #8b9bb0;border-radius:7px;background:#fff;color:#172333;max-width:100%}
+#loginActions{margin-top:0;padding-top:0;border-top:0}#loginActions>p{margin:0 0 12px}#loginActions .actions{margin-top:0;gap:10px}#loginActions .btn{flex:1 1 140px}
+button:disabled,.btn:disabled{cursor:not-allowed;opacity:.6;box-shadow:none}
+:where(a,button,input,textarea,select,summary):focus-visible{outline:3px solid #1766ba;outline-offset:4px}
+.top :where(a,button):focus-visible,.hero :where(a,button):focus-visible{outline-color:#ffd176}
+.feature>a{display:inline-flex;align-items:center;min-height:44px;border:1px solid #d5a0a8;border-radius:7px;padding:9px 12px;background:#fff1f3;color:#a41027}
+.dossier summary,.dossier-folder>summary,#shipmentArchives>summary{cursor:pointer;min-height:44px;padding:12px;border:1px solid #abb9cb;border-radius:8px;background:#f0f4f9;color:#172b43}
+#shipmentArchives{padding:12px;border:1px solid #c3cfdd;border-radius:12px;background:#f8fafc}
+#shipmentArchives>.doc-list{margin-top:14px}
+.doc-actions .btn{min-height:44px}.shipment>.btn{flex-shrink:0}
+.support-header .btn,.support-controls .btn,.support-topics .btn{box-shadow:0 2px 0 #14243816}
+.modal .close{min-width:44px;min-height:44px;background:#eef2f7;border:1px solid #aab7c7;border-radius:8px;color:#172b43}
+.form input:focus,.form select:focus,.form textarea:focus,.modal input:focus{border-color:#1766ba;box-shadow:0 0 0 3px #1766ba18}
+@media(max-width:800px){.panel{margin:18px 12px;border-radius:16px;padding:30px 18px}.top .btn{min-height:44px}.hero-inner{padding-top:48px}.btn{gap:10px}.doc-actions .btn{flex:1 1 145px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn,.support-topics button,.support-controls button,.audience-actions button,.ads-choice button{transition:none}}
