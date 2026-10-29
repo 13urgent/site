@@ -96,29 +96,52 @@ async function loadAdmin(){
   if(!adminPage||professionalProfile?.role!=='admin')return;
   const generation=professionalAccessGeneration;
   doc$('adminNotice').hidden=true;const host=doc$('adminDossiers');host.replaceChildren();line(host,'p','Chargement des dossiers…');
-  async function readAll(table,columns,filter){
-    const query=()=>{let q=sb.from(table).select(columns);if(filter)q=q.in('company_type',filter);return q.order('created_at',{ascending:false});};
+  async function readAll(table,columns,filter,sort='created_at',tie='id'){
+    const query=()=>{let q=sb.from(table).select(columns);if(filter)q=q.in('company_type',filter);return q.order(sort,{ascending:false});};
     const first=query();if(typeof first.range!=='function')return await first;
-    const rows=[];for(let offset=0;;offset+=200){const result=await query().order('id').range(offset,offset+199);if(generation!==professionalAccessGeneration)return{data:[]};if(result.error)return result;rows.push(...result.data||[]);if((result.data||[]).length<200)return{data:rows};}
+    const rows=[];for(let offset=0;;offset+=200){const result=await query().order(tie).range(offset,offset+199);if(generation!==professionalAccessGeneration)return{data:[]};if(result.error)return result;rows.push(...result.data||[]);if((result.data||[]).length<200)return{data:rows};}
   }
-  const [companies,docs]=await Promise.all([
+  const [companies,docs,decisions]=await Promise.all([
     readAll('companies','id,name,company_type,verification_status',['carrier','both','client']),
-    readAll('carrier_documents','id,company_id,document_type,storage_path,original_filename,review_status,expires_on,created_at')
+    readAll('carrier_documents','id,company_id,document_type,storage_path,original_filename,review_status,expires_on,created_at'),
+    readAll('urgent_business_access','company_id,pilot_enabled,reviewed_at',null,'company_id','company_id')
   ]);
   if(generation!==professionalAccessGeneration)return;
   if(companies.error||docs.error){docMsg('adminNotice','Lecture impossible : '+(companies.error?.message||docs.error?.message));host.replaceChildren();return;}
   let directory=[];try{if(typeof sb.rpc==='function'){const r=await sb.rpc('urgent_pilot_directory',{});if(!r.error&&Array.isArray(r.data))directory=r.data;}}catch{}
   if(generation!==professionalAccessGeneration)return;
   host.replaceChildren();if(!companies.data?.length){line(host,'p','Aucun établissement enregistré.');return;}
-  const folders=window.urgentDossiers?.folders(host,[['review','Nouveaux documents à examiner'],['renew','Dossiers à compléter ou à actualiser'],['validated','Dossiers documentaires validés']]);
+  const folders=window.urgentDossiers?.folders(host,[['review','Nouveaux documents à examiner'],['renew','Dossiers à compléter ou à actualiser'],['validated','Dossiers documentaires validés'],['refused','Inscriptions refusées / accès suspendus']]);
   for(const c of companies.data){
     const companyDocs=(docs.data||[]).filter(d=>d.company_id===c.id);const access=directory.find(row=>row.company_id===c.id);const clientOnly=c.company_type==='client'&&access?.account_role!=='carrier';
     const clientLatest=window.urgentDossiers?.latestDocuments(companyDocs).find(d=>d.document_type==='registration')||companyDocs.find(d=>d.document_type==='registration');
-    const folder=clientOnly?(!clientLatest||clientLatest.review_status!=='approved'?'review':clientLatest.expires_on&&clientLatest.expires_on<new Date().toISOString().slice(0,10)?'renew':'validated'):window.urgentDossiers?.classify(companyDocs)||'review';
+    const refused=!decisions.error&&(decisions.data||[]).some(d=>d.company_id===c.id&&d.pilot_enabled===false&&d.reviewed_at);
+    const folder=refused?'refused':clientOnly?(!clientLatest||clientLatest.review_status!=='approved'?'review':clientLatest.expires_on&&clientLatest.expires_on<new Date().toISOString().slice(0,10)?'renew':'validated'):window.urgentDossiers?.classify(companyDocs)||'review';
     const card=line(folders?.containers[folder]||host,'article','', 'dossier');line(card,'h3',c.name);line(card,'p',`Référence entreprise : ${c.id}`);
-    line(card,'p',access?`Autorisation de l’établissement : ${access.pilot_enabled?'accordée':'à valider ou suspendue'}`+(clientOnly?' · Donneur d’ordre':` · Dossier et droits transporteur : ${access.carrier_ready?'valides':'à compléter / vérifier'}`):'Autorisation de l’établissement : état non confirmé, consultez la validation des établissements.');
+    line(card,'p',refused?'Inscription refusée / accès de l’établissement suspendu.':access?`Autorisation de l’établissement : ${access.pilot_enabled?'accordée':'à valider ou suspendue'}`+(clientOnly?' · Donneur d’ordre':` · Dossier et droits transporteur : ${access.carrier_ready?'valides':'à compléter / vérifier'}`):'Autorisation de l’établissement : état non confirmé, consultez la validation des établissements.');
     const kinds=clientOnly?['registration']:['registration','transport_licence','insurance_rc','insurance_goods'];const missing=kinds.filter(kind=>!companyDocs.some(d=>d.document_type===kind));if(missing.length)line(card,'p',clientOnly?'Justificatif d’immatriculation non déposé.':'Catégories manquantes : '+missing.map(documentLabel).join(', ')+'.',clientOnly?'muted':'danger');
     const prepare=line(card,'button','Préparer la validation de cet établissement','btn secondary');prepare.type='button';prepare.onclick=async()=>{prepare.disabled=true;try{if(window.urgentPrepareBusinessReview)await window.urgentPrepareBusinessReview(c.id);else docMsg('adminNotice','Ouvrez la validation des établissements dans l’administration.');}catch(e){docMsg('adminNotice','Préparation impossible : '+e.message);doc$('adminNotice').scrollIntoView({block:'nearest'});}finally{prepare.disabled=false;}};
+    const refuse=line(card,'button',refused?'Maintenir le refus / la suspension':'Refuser l’inscription / suspendre l’accès','btn primary');refuse.type='button';
+    const refusalNotice=line(card,'p','');refusalNotice.setAttribute('role','status');
+    refuse.onclick=async()=>{
+      if(!confirm('Refuser l’inscription de « '+c.name+' » et bloquer la publication ainsi que les nouvelles offres ? Le dossier et son historique seront conservés.'))return;
+      const actorId=professionalProfile?.id;refuse.disabled=true;refusalNotice.textContent='Enregistrement du refus…';
+      try{
+        const {data:auth,error:authError}=await sb.auth.getUser();
+        if(generation!==professionalAccessGeneration)return;
+        if(authError||!auth?.user||professionalProfile?.role!=='admin'||actorId!==auth.user.id)throw Error('Session administrateur expirée. Reconnectez-vous.');
+        const current=await sb.from('urgent_business_access').select('siret,plan').eq('company_id',c.id).maybeSingle();if(current.error)throw current.error;
+        if(generation!==professionalAccessGeneration)return;
+        const siret=current.data?.siret||access?.declared_siret||'';
+        if(!/^[0-9]{14}$/.test(siret))throw Error('SIRET absent ou incorrect. Renseignez-le dans la validation des établissements pour enregistrer la suspension.');
+        const {error}=await sb.rpc('urgent_review_pilot',{p_company:c.id,p_siret:siret,p_plan:current.data?.plan||'basics',p_enabled:false,p_registry_checked:false});if(error)throw error;
+        if(generation!==professionalAccessGeneration)return;
+        refusalNotice.textContent='Refus enregistré. Actualisation du dossier…';
+        await loadAdmin();if(generation!==professionalAccessGeneration)return;
+        docMsg('adminNotice','Inscription de '+c.name+' refusée : publication et nouvelles offres bloquées. Dossier conservé dans « Inscriptions refusées / accès suspendus ». Aucun e-mail de refus n’a été envoyé.');doc$('adminNotice').scrollIntoView({block:'nearest'});
+      }catch(e){if(generation===professionalAccessGeneration)refusalNotice.textContent='Refus non confirmé : '+e.message;}
+      finally{refuse.disabled=false;}
+    };
     if(!clientOnly&&access?.pilot_plan){const plans={basics:'Start gratuit',bronze:'Drive',silver:'Boost',gold:'Premium'};line(card,'p','Forfait retenu par l’administration : '+(plans[access.pilot_plan]||access.pilot_plan)+'. Les périodes payantes restent contrôlées séparément.');}
     if(!clientOnly&&access?.pilot_enabled&&window.urgentSupport?.notifyBusinessValidation){
       const notify=line(card,'button','Notifier la décision au transporteur','btn secondary');notify.type='button';const delivery=line(card,'p','');delivery.setAttribute('role','status');
