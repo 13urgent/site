@@ -1,0 +1,21 @@
+const{chromium}=require('playwright');const fs=require('fs');const assert=require('assert/strict');
+(async()=>{const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});try{
+const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));let accept=true;page.on('dialog',d=>accept?d.accept():d.dismiss());
+await page.route('http://127.0.0.1:8010/**',r=>{const file=__dirname+'/../'+(new URL(r.request().url()).pathname.slice(1)||'index.html');return fs.existsSync(file)?r.fulfill({path:file}):r.abort();});
+await page.route('https://cdn.jsdelivr.net/**',r=>r.fulfill({contentType:'application/javascript',body:`
+window.calls=[];window.access=null;window.expired=false;window.fail=false;
+window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:expired?null:{id:'admin-test',email:'admin@example.com',user_metadata:{}}}}),onAuthStateChange:()=>{}},rpc:async(name,args)=>{
+if(name==='urgent_pilot_directory')return{data:[{company_id:'company-test',declared_siret:'91871039300052',pilot_plan:'gold',pilot_enabled:access?.pilot_enabled===true}]};
+if(name==='urgent_review_pilot'){calls.push(args);if(fail)return{error:{message:'Connexion interrompue'}};access={company_id:args.p_company,siret:args.p_siret,plan:args.p_plan,pilot_enabled:args.p_enabled,reviewed_at:new Date().toISOString()};return{};}return{data:null};},from:table=>{
+const rows=()=>table==='companies'?[{id:'company-test',name:'Transporteur de démonstration',company_type:'carrier'}]:table==='urgent_business_access'?(access?[access]:[]):[];
+const q={select(){return q},eq(){return q},in(){return q},order(){return q},range:async()=>({data:rows()}),then(resolve){return Promise.resolve({data:rows()}).then(resolve)},maybeSingle:async()=>({data:table==='profiles'?{id:'admin-test',company_id:'admin-company',role:'admin'}:access})};return q;}})};`}));
+await page.goto('http://127.0.0.1:8010/admin.html');await page.locator('#openAdmin').click();
+let button=page.getByRole('button',{name:'Refuser l’inscription / suspendre l’accès',exact:true});await button.waitFor();assert.match(await page.locator('#adminDossiers').textContent(),/Aucun document déposé/);
+accept=false;await button.click();assert.equal(await page.evaluate(()=>calls.length),0);accept=true;
+await page.evaluate(()=>expired=true);await button.click();await page.getByText(/Refus non confirmé : Session administrateur expirée/).waitFor();assert.equal(await page.evaluate(()=>calls.length),0);
+await page.evaluate(()=>{expired=false;fail=true});await button.click();await page.getByText(/Refus non confirmé : Connexion interrompue/).waitFor();assert.equal(await button.isEnabled(),true);assert.equal(await page.locator('#adminDossiers [data-folder=refused] article').count(),0);
+await page.evaluate(()=>fail=false);await button.click();await page.locator('#adminNotice').getByText(/Inscription de Transporteur de démonstration refusée/).waitFor();assert.deepEqual(await page.evaluate(()=>calls.at(-1)),{p_company:'company-test',p_siret:'91871039300052',p_plan:'basics',p_enabled:false,p_registry_checked:false});assert.equal(await page.locator('#adminDossiers [data-folder=refused] article').count(),1);
+await page.locator('#refreshAdmin').click();await page.locator('#adminDossiers [data-folder=refused] article').waitFor();assert.match(await page.locator('#adminDossiers [data-folder=refused]').textContent(),/Inscription refusée/);
+await page.evaluate(()=>access={company_id:'company-test',siret:'91871039300052',plan:'gold',pilot_enabled:true,reviewed_at:new Date().toISOString()});await page.locator('#refreshAdmin').click();await button.click();await page.locator('#adminNotice').getByText(/Inscription de/).waitFor();assert.equal(await page.evaluate(()=>calls.at(-1).p_plan),'gold');assert.equal(await page.evaluate(()=>access.pilot_enabled),false);assert.deepEqual(errors,[]);
+console.log('PASS refus navigateur : dossier sans document, confirmation annulée, session expirée, erreur serveur sans faux succès, suspension persistante et classée après actualisation, forfait conservé ; aucune écriture réelle.');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exit(1)});
