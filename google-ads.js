@@ -1,7 +1,7 @@
 'use strict';
 // Mesure Google Ads facultative ; aucun appel à Google avant un accord distinct.
 (()=>{
- if(document.body.dataset.adminPage==='true'||!['/','/index.html'].includes(location.pathname))return;
+ if(document.body.dataset.adminPage==='true'||(!document.body.dataset.sitePage&&!['/','/index.html'].includes(location.pathname)))return;
  const tag='AW-18537989618',target=tag+'/iTMnCKiasaodEPKLzYdF';
  const key='13urgent_ads_consent_v1',dedupKey='13urgent_ads_sent_v1',maxAge=180*86400000;
  const blocked=navigator.globalPrivacyControl===true||navigator.doNotTrack==='1';

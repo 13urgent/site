@@ -1,0 +1,31 @@
+/* Une rubrique par URL ; les points de montage métier hors rubrique sont masqués. */
+body[data-site-page] main>section,body[data-site-page] main>.pilot-banner{display:none!important}
+body[data-site-page=accueil] main>.hero{display:grid!important}
+body[data-site-page=fonctionnement] main>#fonctionnement,body[data-site-page=courses] main>#courses,body[data-site-page=suivi] main>#suivi,body[data-site-page=deposer] main>#deposer,body[data-site-page=tarifs] main>#tarifs,body[data-site-page=abonnement-transporteur] main>#abonnement-transporteur,body[data-site-page=espace] main>#espace-professionnel,body[data-site-page=espace] main>#manualCommerce:not([hidden]){display:block!important}
+body[data-site-page=tarifs] main>#tarifs{display:grid!important}
+body[data-site-page] main{min-height:52vh}
+body[data-site-page] .section-head h1{font-size:clamp(29px,4vw,44px);letter-spacing:-1.2px;line-height:1.15;margin:16px 0}
+body[data-site-page] .section-head{margin-bottom:28px}
+.top:has(#siteNavigation){height:auto;min-height:88px;padding:16px max(3%,calc((100% - 1360px)/2));flex-wrap:wrap;gap:12px 18px}
+.top:has(#siteNavigation) .brand{margin-right:auto}
+.top #siteNavigation{order:10;flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid #ffffff26;padding-top:12px}
+.top #siteNavigation a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:10px 14px;border:1px solid transparent;border-radius:8px;color:#e2e8f0;text-decoration:none;font-size:14px;font-weight:700}
+.top #siteNavigation a:hover,.top #siteNavigation a:focus-visible{background:#263c58;color:#fff;border-color:#8b9bb0}
+.top #siteNavigation a[aria-current=page]{background:#fff;color:#172b43;border-color:#fff;box-shadow:inset 0 -3px #cd1830}
+.site-menu-toggle{display:none}
+@media(max-width:800px){
+ .top:has(#siteNavigation){padding:12px 16px;gap:10px}
+ .top:has(#siteNavigation) .brand{width:110px;flex-shrink:0}
+ .top:has(#siteNavigation) .brand img{width:110px;height:auto}
+ .top:has(#siteNavigation)>.btn{font-size:12px;padding:10px 12px;min-height:44px}
+ .top .site-menu-toggle{display:inline-flex}
+ .top #siteNavigation{display:none}
+ .top #siteNavigation.is-open{display:grid;grid-template-columns:1fr 1fr}
+ .top #siteNavigation a{justify-content:flex-start;padding:10px}
+ body[data-site-page] .section{padding:32px 20px}
+ body[data-site-page] .panel{margin:18px 12px;padding:28px 18px}
+ body[data-site-page=accueil] main>.hero{display:block!important}
+ body[data-site-page=accueil] .hero-art{min-height:230px}
+ body[data-site-page=accueil] .hero-inner{padding:38px 24px}
+}
+.page-help{margin:0 0 24px}.page-help a{display:inline-flex;align-items:center;min-height:44px;padding:8px 12px;border:1px solid #aab8ca;border-radius:8px;background:#fff;color:#243e60;text-decoration:underline;text-underline-offset:3px;font-size:14px}

@@ -279,8 +279,8 @@
  document.querySelector('.hero-inner>p').textContent='Publiez votre besoin de transport express, comparez les propositions confidentielles et suivez votre course. Service réservé aux professionnels vérifiés.';
  document.querySelector('#courses .section-head p').textContent='Demandes de transport entre professionnels. Les prix proposés sont confidentiels entre chaque transporteur, le donneur d’ordre et l’administration.';
  document.querySelector('#deposer .section-head p').textContent='Connexion et établissement préalablement vérifié par 13 URGENT requis. Les offres sont réservées aux transporteurs autorisés et aux documents valides.';
- document.querySelector('#suivi h2').textContent='Mes courses et leur suivi';document.querySelector('#suivi .section-head p').textContent='Suivi partagé entre les parties. La livraison déclarée par le transporteur doit être confirmée par le donneur d’ordre ; aucune preuve de livraison signée n’est encore collectée ici.';
- document.querySelector('#suivi .eyebrow').textContent='ESPACE PROFESSIONNEL';document.querySelector('nav a[href="#suivi"]').textContent='Mes courses';
+ document.querySelector('#suivi .section-head :is(h1,h2)').textContent='Mes courses et leur suivi';document.querySelector('#suivi .section-head p').textContent='Suivi partagé entre les parties. Le transporteur déclare la livraison ; le donneur d’ordre en confirme la réalisation.';
+ document.querySelector('#suivi .eyebrow').textContent='ESPACE PROFESSIONNEL';document.querySelector('nav a[data-section-link="suivi"],nav a[href="#suivi"]').textContent='Mes courses';
  const presentationSelectors=['.hero-inner>p','#courses .section-head p','#deposer .section-head p','#tarifs .pricebox small'];const pilotPresentation=presentationSelectors.map(selector=>document.querySelector(selector).textContent);
  function updateCommercialPresentation(){
   const active=commercial();banner.textContent=active?'Service professionnel — facturation mensuelle CHRONOSS. Abonnements transporteurs par virement après vérification du dossier.':'13 URGENT — Transport express et mise en relation entre professionnels.';
