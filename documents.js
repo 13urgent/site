@@ -8,6 +8,10 @@ const doc$=id=>document.getElementById(id);
 function docMsg(id,message){const e=doc$(id)||doc$('authNotice');if(e){e.hidden=false;e.textContent=message;}}
 function safeText(v){return String(v??'');}
 function line(parent,tag,txt,cls){const e=document.createElement(tag);if(cls)e.className=cls;e.textContent=safeText(txt);parent.append(e);return e;}
+const documentCameraLabel=document.createElement('label');documentCameraLabel.className='wide';documentCameraLabel.textContent='Ou prendre le justificatif en photo avec le téléphone';
+const documentCamera=document.createElement('input');documentCamera.id='documentCamera';documentCamera.type='file';documentCamera.accept='image/jpeg,image/png';documentCamera.setAttribute('capture','environment');documentCameraLabel.append(documentCamera);doc$('documentFile').closest('label').after(documentCameraLabel);
+documentCamera.onchange=()=>{doc$('documentFile').value='';doc$('documentFile').required=!documentCamera.files.length;};
+doc$('documentFile').addEventListener('change',()=>{documentCamera.value='';doc$('documentFile').required=true;});
 let professionalProfile=null;
 let professionalAccessGeneration=0;
 let professionalSessionId=null;
@@ -41,6 +45,7 @@ async function showMyDocuments(){
   doc$('documentNotice').hidden=true;
   if(!professionalProfile||!(professionalProfile.role==='carrier'||professionalProfile.role==='client'&&clientDocumentUploadAvailable))return;
   const clientOnly=professionalProfile.role==='client';const dialog=doc$('documentsDialog');
+  renewalWarning.hidden=clientOnly;
   dialog.querySelector('.eyebrow').textContent=clientOnly?'ESPACE DONNEUR D’ORDRE':'ESPACE TRANSPORTEUR';
   dialog.querySelector('h2+p').textContent=clientOnly?'Vous pouvez transmettre votre extrait Kbis ou justificatif d’immatriculation à l’administration. Ce dépôt ne valide pas automatiquement votre établissement.':'Les missions restent visibles. Aucune proposition ne sera autorisée avant la validation de votre dossier par 13 URGENT.';
   for(const option of doc$('documentType').options){option.hidden=clientOnly&&option.value!=='registration';option.disabled=option.hidden;}
@@ -61,7 +66,7 @@ async function uploadDocument(e){
   e.preventDefault();const btn=e.submitter;const generation=professionalAccessGeneration;btn.disabled=true;doc$('documentNotice').hidden=true;
   try{
     if(!(professionalProfile?.role==='carrier'||professionalProfile?.role==='client'&&clientDocumentUploadAvailable))throw Error('Connectez-vous avec un compte professionnel autorisé.');
-    const company=await getOwnCompany();if(generation!==professionalAccessGeneration)return;const file=doc$('documentFile').files[0];
+    const company=await getOwnCompany();if(generation!==professionalAccessGeneration)return;const file=documentCamera.files[0]||doc$('documentFile').files[0];
     if(!file)throw Error('Choisissez un fichier.');
     if(file.size>10*1024*1024)throw Error('Le fichier dépasse 10 Mo.');
     const allowed={'application/pdf':'pdf','image/jpeg':'jpg','image/png':'png'};
@@ -80,7 +85,7 @@ async function uploadDocument(e){
     const {error}=await sb.from('carrier_documents').insert(row);
     if(generation!==professionalAccessGeneration)return;
     if(error)throw Error('Fichier envoyé mais fiche non enregistrée : '+error.message+' (contactez 13 URGENT).');
-    doc$('documentFile').value='';await showMyDocuments();if(generation!==professionalAccessGeneration)return;docMsg('documentNotice',`Document envoyé dans la catégorie « ${documentLabel(kind)} ». Il reste en attente de vérification par 13 URGENT.`);
+    doc$('documentFile').value='';documentCamera.value='';doc$('documentFile').required=true;await showMyDocuments();if(generation!==professionalAccessGeneration)return;docMsg('documentNotice',`Document envoyé dans la catégorie « ${documentLabel(kind)} ». Il reste en attente de vérification par 13 URGENT.`);
   }catch(err){if(generation===professionalAccessGeneration)docMsg('documentNotice','Envoi impossible : '+err.message);}finally{btn.disabled=false;}
 }
 async function showAdmin(){
@@ -193,7 +198,7 @@ function clearProfessionalViews(){
  if(doc$('adminPageNotice'))doc$('adminPageNotice').textContent='Connectez-vous avec votre compte administrateur pour accéder à la gestion.';
  for(const name of ['documentsDialog','adminDialog'])if(doc$(name)?.open)doc$(name).close();
  for(const name of ['myDocuments','adminDossiers'])doc$(name)?.replaceChildren();
- doc$('companyStatus').textContent='';doc$('documentForm').reset();
+ doc$('companyStatus').textContent='';doc$('documentForm').reset();doc$('documentFile').required=true;
  for(const name of ['documentNotice','adminNotice']){if(doc$(name)){doc$(name).textContent='';doc$(name).hidden=true;}}
 }
 sb?.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>{
