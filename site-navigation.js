@@ -1,6 +1,6 @@
 'use strict';
 (()=>{
- const pages={accueil:'index.html',fonctionnement:'fonctionnement.html',courses:'courses.html',suivi:'mes-courses.html',deposer:'deposer.html',tarifs:'donneurs-ordre.html','abonnement-transporteur':'transporteurs.html',espace:'mon-espace.html'};
+ const pages={accueil:'index.html',fonctionnement:'fonctionnement.html',courses:'courses.html',suivi:'mes-courses.html',deposer:'deposer.html',tarifs:'donneurs-ordre.html','abonnement-transporteur':'transporteurs.html',espace:'mon-espace.html',chronoss:'services-chronoss.html',moving:'demenagement.html',quote:'demander-un-devis.html',capacity:'retours-a-vide.html'};
  const sitePage=document.body.dataset.sitePage;
  window.urgentNavigateSection=section=>{
   const key=String(section).replace(/^#/,'');
