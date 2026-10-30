@@ -1,6 +1,6 @@
 'use strict';
-const VERSION='13urgent-mobile-20261029-v1';
-const FILES=['mobile.html','mobile.css','mobile.js','mobile.webmanifest','assets/mobile-icon.svg','assets/mobile-icon-192.png','assets/mobile-icon-512.png','assets/logo-13urgent-web.png','style.css','config.js','auth.js','app.js','marketplace.js','mission-files.js','documents.js','manual-commerce.js','billing.js','dossier-organisation.js','document-assistant.js','audience.js','audience.css','google-ads.js','support.js','support.css','support-knowledge.js','terms-links.js'];
+const VERSION='13urgent-mobile-20261030-v2';
+const FILES=['mobile.html','mobile.css','mobile.js','mobile.webmanifest','assets/mobile-icon.svg','assets/mobile-icon-192.png','assets/mobile-icon-512.png','assets/logo-13urgent-web.png','style.css','config.js','auth.js','app.js','marketplace.js','shipment-schedule.js','mission-files.js','documents.js','manual-commerce.js','billing.js','dossier-organisation.js','document-assistant.js','audience.js','audience.css','google-ads.js','support.js','support.css','support-knowledge.js','terms-links.js'];
 const ALLOWED=new Set(FILES.map(p=>new URL(p,self.registration.scope).pathname));
 self.addEventListener('install',event=>event.waitUntil(caches.open(VERSION).then(cache=>cache.addAll(FILES))));
 self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const name of await caches.keys())if(name.startsWith('13urgent-mobile-')&&name!==VERSION)await caches.delete(name);await self.clients.claim();})()));
