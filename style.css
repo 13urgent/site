@@ -83,3 +83,5 @@ button:disabled,.btn:disabled{cursor:not-allowed;opacity:.6;box-shadow:none}
 .form input:focus,.form select:focus,.form textarea:focus,.modal input:focus{border-color:#1766ba;box-shadow:0 0 0 3px #1766ba18}
 @media(max-width:800px){.panel{margin:18px 12px;border-radius:16px;padding:30px 18px}.top .btn{min-height:44px}.hero-inner{padding-top:48px}.btn{gap:10px}.doc-actions .btn{flex:1 1 145px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn,.support-topics button,.support-controls button,.audience-actions button,.ads-choice button{transition:none}}
+
+.shipment-schedule{display:flex;flex-wrap:wrap;gap:8px 24px;margin:12px 0;color:#172b43}.shipment-schedule p{margin:0;font-size:15px;line-height:1.6;color:#172b43}.shipment-schedule small{flex-basis:100%;color:#526174;font-size:12px}
