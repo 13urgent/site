@@ -71,3 +71,14 @@ Les contrôles utilisent PostgreSQL embarqué PGlite et Chromium ; les dépendan
 - [Paiements Stripe de test, désactivés](docs/PAIEMENTS-TEST.md)
 
 Les documents datés décrivent parfois un état antérieur à l'ouverture commerciale. Utiliser l'état confirmé ci-dessus et les résultats de recette récents pour préparer une mise à jour ; conserver les réserves qui n'ont pas été effectivement levées.
+
+### Services CHRONOSS, devis et capacités nationales
+
+Le gabarit partagé est `tools/site-template.html` ; les contenus des nouvelles pages
+sont dans `tools/service_pages.py`. Générer les pages avec `tools/build_site_pages.py`,
+`tools/build_admin.py` et `tools/build_mobile.py`, puis construire le site avec
+`tools/build_pilot.py --output CHEMIN_EXTERIEUR --open-registration`.
+Les fichiers HTML publics sont générés. Voir `docs/SERVICES-FRANCE.md` pour les
+frontières d'accès, l'activation SQL/Edge et les tests. L'ouverture aux particuliers
+porte sur les demandes de devis CHRONOSS sans SIRET ; elle ne modifie pas les droits
+des comptes professionnels et n'effectue aucune réservation ou facturation automatique.

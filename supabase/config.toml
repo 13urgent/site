@@ -17,3 +17,7 @@ verify_jwt = false
 # Le handler valide chaque JWT via /auth/v1/user ; statut public sans données privées.
 [functions.support-assistant]
 verify_jwt = false
+
+# Demandes de devis publiques : validation, limites et droits service_role dans le handler.
+[functions.service-requests]
+verify_jwt = false

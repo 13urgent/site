@@ -6,6 +6,7 @@ de cette présentation : les règles Supabase restent inchangées.
 """
 from pathlib import Path
 import re
+from service_pages import EXTRA
 ROOT = Path(__file__).resolve().parents[1]
 PAGES = {
     'accueil': ('index.html', '13 URGENT — Transport express entre professionnels', None),
@@ -17,7 +18,12 @@ PAGES = {
     'abonnement-transporteur': ('transporteurs.html', 'Transporteurs et abonnements — 13 URGENT', 'abonnement-transporteur'),
     'espace': ('mon-espace.html', 'Mon espace professionnel — 13 URGENT', 'espace-professionnel'),
 }
+PAGES.update({key:(v[0],v[1],v[2])for key,v in EXTRA.items()})
 DESCRIPTIONS = {
+    'chronoss':'Découvrez les services CHRONOSS : transport routier et express, trajets réguliers, déménagement et demandes de devis en France.',
+    'moving':'Demandez un devis de déménagement ou de transport de meubles et objets volumineux en France auprès de CHRONOSS.',
+    'quote':'Présentez votre besoin de transport à CHRONOSS : demande de devis gratuite pour particuliers et professionnels, sans paiement en ligne.',
+    'capacity':'Transporteurs, signalez votre retour à vide ou votre capacité disponible aux professionnels inscrits sur 13 URGENT.',
     'fonctionnement': 'Découvrez comment déposer une demande de transport et consulter les propositions sur 13 URGENT.',
     'courses': 'Consultez les courses disponibles et envoyez vos propositions confidentielles depuis votre compte transporteur professionnel.',
     'suivi': 'Retrouvez vos courses, leurs propositions et les étapes de chargement et de livraison dans votre espace privé 13 URGENT.',
@@ -31,13 +37,13 @@ def navigation(page, current=None):
     for section, (name, _, _) in PAGES.items():
         page = page.replace('href="#'+section+'"', 'href="'+name+'" data-section-link="'+section+'"')
     # Le menu est commun, avec de vrais liens utilisables sans JavaScript.
-    items = [('accueil','Accueil'),('fonctionnement','Fonctionnement'),('courses','Courses'),('suivi','Mes courses'),('deposer','Déposer une course'),('tarifs','Donneurs d’ordre'),('abonnement-transporteur','Transporteurs'),('espace','Mon espace')]
+    items = [('accueil','Accueil'),('fonctionnement','Fonctionnement'),('courses','Courses'),('suivi','Mes courses'),('deposer','Déposer une course'),('tarifs','Donneurs d’ordre'),('abonnement-transporteur','Transporteurs'),('espace','Mon espace'),('chronoss','Services CHRONOSS'),('moving','Déménagement'),('capacity','Retours à vide'),('quote','Devis CHRONOSS')]
     links = ''.join('<a href="'+PAGES[key][0]+'" data-section-link="'+key+'"'+(' aria-current="page"' if current==key else '')+'>'+label+'</a>' for key,label in items)
     menu = '<button type="button" class="site-menu-toggle btn secondary" aria-expanded="false" aria-controls="siteNavigation">Menu</button><nav id="siteNavigation" aria-label="Navigation principale">'+links+'</nav>'
     page, count = re.subn(r'<nav>.*?</nav>', lambda _:menu, page, count=1)
     if count != 1:
         raise ValueError('Menu principal introuvable')
-    page = page.replace('</head>','<link rel="stylesheet" href="site-pages.css?v=20261029-pages"><script src="site-navigation.js?v=20261029-pages" defer></script></head>',1)
+    page = page.replace('</head>','<link rel="stylesheet" href="site-pages.css?v=20261030-services"><script src="site-navigation.js?v=20261029-pages" defer></script></head>',1)
     page = page.replace('</body>', '<noscript><style>@media(max-width:800px){.top #siteNavigation{display:grid;grid-template-columns:1fr 1fr}.top .site-menu-toggle{display:none}}</style></noscript></body>',1)
     return page
 
@@ -59,7 +65,7 @@ def build_pages():
                 page=re.sub('<meta '+prefix+' content="[^"]*">',lambda _,prefix=prefix:'<meta '+prefix+' content="'+DESCRIPTIONS[key]+'">',page,count=1)
         if key in ('suivi','espace'):
             page=page.replace('name="robots" content="index,follow"','name="robots" content="noindex,follow"')
-        if section and key!='espace':
+        if section and key!='espace'and key not in EXTRA:
             start=page.index('id="'+section+'"')
             a=page.index('<h2>',start);b=page.index('</h2>',a)
             page=page[:a]+page[a:b+5].replace('<h2>','<h1>',1).replace('</h2>','</h1>',1)+page[b+5:]
@@ -67,6 +73,8 @@ def build_pages():
             start=page.index('id="'+section+'"')
             end=page.index('</div>',start)+6
             page=page[:end]+'<p class="page-help"><a href="mon-espace.html">Mon compte, mes justificatifs et mes conditions d’accès →</a></p>'+page[end:]
+        if key in EXTRA:
+            page=page.replace('</main>',EXTRA[key][3]+'</main>',1)
         if key=='espace':
             page=page.replace('</main>',SPACE+'</main>',1)
         pages[filename]=page

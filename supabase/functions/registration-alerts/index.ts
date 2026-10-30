@@ -36,11 +36,12 @@ export async function registrationAlertsHandler(request, env, fetcher=fetch) {
   const response=await fetcher(`${base.origin}/rest/v1/rpc/${name}`,{method:'POST',headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,'content-type':'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(10000)});
   // Compatibilité avec l'ancienne base : les alertes d'inscription continuent
   // tant que la nouvelle migration documentaire n'a pas encore été appliquée.
-  if(response.status===404&&['urgent_claim_document_alerts','urgent_claim_mission_notifications'].includes(name))return null;
+  if(response.status===404&&['urgent_claim_document_alerts','urgent_claim_mission_notifications','urgent_claim_platform_notifications'].includes(name))return null;
   if(!response.ok)throw Error('database_error');return response.json();
  };
  // Le suivi des missions passe avant les récapitulatifs et les inscriptions.
  const missions=alertsEnabled?await sendMissionNotifications(env,fetcher,rpc):null;
+ const platform=alertsEnabled&&env.PLATFORM_ALERTS_ENABLED==='true'?await sendPlatformNotifications(env,fetcher,rpc):null;
  const monthly=monthlyEnabled?await sendMonthlyReport(env,fetcher,rpc):null;
  const stats=statsEnabled?await sendSiteReport(env,fetcher,rpc):null;
  let rows;
@@ -59,7 +60,7 @@ export async function registrationAlertsHandler(request, env, fetcher=fetch) {
   if(success)sent++;else retry++;
  }
  const documents=alertsEnabled?await sendDocumentAlerts(env,fetcher,rpc):null;
- return json(monthly?.error||stats?.error||documents?.error||missions?.error?502:200,{enabled:true,sent,retry,...(monthly?{monthly}:{}),...(stats?{stats}:{}),...(documents?{documents}:{}),...(missions?{missions}:{})});
+ return json(monthly?.error||stats?.error||documents?.error||missions?.error||platform?.error?502:200,{enabled:true,sent,retry,...(monthly?{monthly}:{}),...(stats?{stats}:{}),...(documents?{documents}:{}),...(missions?{missions}:{}),...(platform?{platform}:{})});
 }
 
 export function missionNotificationEmail(row){
@@ -178,6 +179,26 @@ async function sendSiteReport(env,fetcher,rpc){
  }catch(error){if(error.message==='invalid_site_report'){permanent=true;code=error.message;}else code='provider_network_error';}
  try{if(await rpc('urgent_finish_site_report',{p_report_id:job.report_id,p_lease_token:job.lease_token,p_success:success,p_provider_id:provider,p_error_code:success?null:code,p_permanent:permanent})!==true)throw Error();}catch{return{error:'site_acknowledgement_failed'};}
  return{sent:success?1:0,retry:success||permanent?0:1,...(permanent?{error:code}:{})};
+}
+
+
+export function platformNotificationEmail(row){
+ const route=clean(row.origin,100)+' → '+clean(row.destination,100);
+ const title=row.kind==='quote'?'Nouvelle demande de devis CHRONOSS':row.kind==='message'?'Nouveau message dans une course':'Course correspondant à vos alertes';
+ const url=row.kind==='quote'?SITE+'admin.html#devis':row.kind==='message'?SITE+'mes-courses.html':SITE+'courses.html';
+ const details=row.kind==='quote'?'Une demande de devis a été enregistrée. Consultez les informations et coordonnées dans votre administration. Référence : '+clean(row.quote_id):row.kind==='message'?'Un message vous attend dans le dossier privé de la course '+route+'. Le contenu du message reste accessible après connexion.':route+' · '+clean(row.vehicle)+' · Départ prévu : '+new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',dateStyle:'short',timeStyle:'short'}).format(new Date(row.pickup))+'. Consultez la disponibilité et les horaires avant de proposer. Vous pouvez désactiver vos alertes dans Mon espace.';
+ return{subject:'[13 URGENT] '+title,text:details+'\n\n'+url,html:'<!doctype html><html lang="fr"><body><h1>'+escape(title)+'</h1><p>'+escape(details)+'</p><p><a href="'+url+'">Ouvrir mon espace</a></p></body></html>'};
+}
+async function sendPlatformNotifications(env,fetcher,rpc){
+ let rows;try{rows=await rpc('urgent_claim_platform_notifications',{});}catch{return{error:'platform_database_error'};}
+ if(rows===null)return{enabled:false,reason:'migration_required'};
+ if(!Array.isArray(rows)||rows.length>3||rows.some(r=>!uuid.test(r.alert_id)||!uuid.test(r.lease_token)||!['course','message','quote'].includes(r.kind)))return{error:'invalid_platform_jobs'};
+ const results=await Promise.all(rows.map(async row=>{
+  let success=false,provider=null,code='send_error';const recipient=row.kind==='quote'?RECIPIENT:row.recipient_email;
+  if(row.recipient_allowed!==true)code='recipient_access_changed';else if(row.recipient_confirmed!==true)code='recipient_unconfirmed';else if(typeof recipient!=='string'||!/^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(recipient))code='recipient_invalid';
+  else try{const response=await fetcher('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+env.RESEND_API_KEY,'content-type':'application/json','Idempotency-Key':'platform-notice/'+row.alert_id},body:JSON.stringify({from:env.REGISTRATION_ALERTS_FROM,to:[recipient],...platformNotificationEmail(row)}),signal:AbortSignal.timeout(10000)});if(response.ok){const value=await response.json();if(typeof value.id==='string'&&value.id){success=true;provider=value.id;}else code='provider_invalid_response';}else code='provider_http_'+response.status;}catch{code='provider_network_error';}
+  try{if(await rpc('urgent_finish_platform_notification',{p_id:row.alert_id,p_lease:row.lease_token,p_success:success,p_provider:provider,p_error:success?null:code})!==true)throw Error();}catch{return{error:'platform_acknowledgement_failed'};}return{success};
+ }));return{enabled:true,sent:results.filter(r=>r.success===true).length,retry:results.filter(r=>r.success===false).length,...(results.some(r=>r.error)?{error:'platform_acknowledgement_failed'}:{})};
 }
 
 if(typeof Deno!=='undefined')Deno.serve(request=>registrationAlertsHandler(request,Deno.env.toObject()));
