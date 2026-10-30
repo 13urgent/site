@@ -165,7 +165,7 @@ create function public.urgent_queue_platform_notification()returns trigger langu
  and(cardinality(p.vehicles)=0 or s.vehicle=any(p.vehicles))
  and(cardinality(p.origin_departments)=0 or public.urgent_department(t.origin_postcode)=any(p.origin_departments))
  and(cardinality(p.destination_departments)=0 or public.urgent_department(t.destination_postcode)=any(p.destination_departments))
- and(select count(*)from public.urgent_platform_notifications n where n.recipient_id=p.user_id and n.kind='course'and n.created_at>=date_trunc('day',now())and n.status in('sent','pending'))<10
+ and(select count(*)from public.urgent_platform_notifications n where n.recipient_id=p.user_id and n.kind='course'and n.created_at>=(date_trunc('day',now()at time zone'Europe/Paris')at time zone'Europe/Paris')and n.status in('sent','pending'))<10
  on conflict(dedupe)do nothing;return new;
 end;$$;
 create constraint trigger urgent_queue_course_alert after insert or update on public.urgent_shipments deferrable initially deferred for each row execute function public.urgent_queue_platform_notification();
