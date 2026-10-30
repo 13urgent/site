@@ -65,7 +65,9 @@ l'administration selon la notice de confidentialité, sans purge automatique ann
 Appliquer supabase/migrations/202610300002_platform_services.sql après la migration
 d'horaires. Déployer le worker complet registration-alerts/index.ts sous son nom
 existant bright-service. Déployer service-requests/index.ts sous service-requests,
-avec verify_jwt=false. Ajouter PLATFORM_ALERTS_ENABLED=true sans retirer les secrets
+avec verify_jwt=false. Mettre aussi à jour support-assistant avec son propre fichier
+complet pour les explications des nouveaux services, sans remplacer sa revue de
+documents ou ses contrôles privés. Ajouter PLATFORM_ALERTS_ENABLED=true sans retirer les secrets
 existants ni le cron. Le fichier LIRE-EN-PREMIER.txt du pack précise l'ordre et les contrôles.
 Le site garde un contact par e-mail/téléphone si le formulaire de devis n'est pas encore
 activé. Les panneaux professionnels sont conditionnés par la politique serveur.
