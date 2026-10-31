@@ -3,7 +3,7 @@
 (()=>{
  const client=()=>typeof sb!=='undefined'?sb:null;
  const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;};
- let epoch=0,run=0,dialog=null,policyPromise=null,refreshTimer;
+ let epoch=0,run=0,dialog=null,policyPromise=null,refreshTimer,sessionUserId=null;
  const policy=()=>policyPromise||(policyPromise=rpc('urgent_internal_premium_policy').catch(()=>null));
  async function rpc(name,args={}){let q=client().rpc(name,args);if(q.abortSignal)q=q.abortSignal(AbortSignal.timeout(20000));const r=await q;if(r.error)throw Error(r.error.message||'Service indisponible');return r.data;}
  const today=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Paris'}).format(new Date());
@@ -11,7 +11,7 @@
  const date=d=>new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',dateStyle:'short',timeStyle:'short'}).format(new Date(d));
  const button=(text,fn,primary=false)=>{const b=el('button',text,'btn '+(primary?'primary':'secondary'));b.type='button';b.onclick=fn;return b;};
  function notice(n,text,error=false){n.textContent=text;n.classList.toggle('danger',error);}
- async function identity(){const u=await client()?.auth.getUser();if(u?.error||!u?.data?.user)throw Error('Connexion requise.');const p=await client().from('profiles').select('id,company_id,role').eq('id',u.data.user.id).single();if(p.error||!p.data)throw Error('Profil professionnel inaccessible.');return p.data;}
+ async function identity(){const current=epoch;const u=await client()?.auth.getUser();if(u?.error||!u?.data?.user)throw Error('Connexion requise.');const p=await client().from('profiles').select('id,company_id,role').eq('id',u.data.user.id).single();if(p.error||!p.data)throw Error('Profil professionnel inaccessible.');if(current===epoch)sessionUserId=u.data.user.id;return p.data;}
  async function sameUser(id){const r=await client().auth.getUser();if(r.error||r.data?.user?.id!==id)throw Error('La session a changé. Reconnectez-vous.');}
  function field(f,name,title,type='text',value='',max=120){const l=el('label',title),i=el(type==='textarea'?'textarea':'input');i.name=name;if(type!=='textarea')i.type=type;else i.rows=3;i.value=value;i.required=true;i.maxLength=max;l.append(i);f.append(l);return i;}
  function periodState(p){return p.revoked_at?'Retiré':new Date(p.starts_at)>new Date()?'À venir':new Date(p.ends_at)<=new Date()?'Terminé':'En cours';}
@@ -29,6 +29,6 @@
  async function refresh(){const attempt=++run,current=epoch;try{const p=await policy();if(!p?.enabled)return;const actor=await identity();if(attempt!==run||current!==epoch)return;if(actor.role==='admin'&&document.body.dataset.adminPage==='true'){const host=document.getElementById('commercialAdmin');if(host&&!document.getElementById('manageInternalPremium')){const b=button('Gérer les accès Premium internes offerts',manage,true);b.id='manageInternalPremium';host.prepend(b);}}if(actor.role!=='carrier')return;const state=await rpc('urgent_internal_premium_status',{});if(attempt!==run||current!==epoch)return;const host=document.getElementById('commercialOwn');if(!host)return;document.getElementById('internalPremiumOwn')?.remove();host.querySelectorAll('.commercial-no-paid-period').forEach(n=>n.hidden=state.active===true);if(!state.periods.length)return;const box=el('section',undefined,'services-panel');box.id='internalPremiumOwn';box.append(el('h3',state.active?'Mon accès Premium interne offert':'Historique des accès Premium internes'));for(const row of state.periods)box.append(el('p','Premium offert · '+periodState(row)+' · '+date(row.starts_at)+' → '+date(row.ends_at)+' (fin exclue)'));if(state.active)box.append(el('p',state.carrier_ready?'Vos droits transporteur sont valides. Aucun abonnement payant n’a été enregistré pour cet accès interne.':'Une période interne est accordée. Les documents, les conditions ou l’autorisation de l’établissement restent à vérifier.'));host.prepend(box);}catch{/* Le module facultatif ne bloque pas les abonnements existants. */}}
  function schedule(){clearTimeout(refreshTimer);refreshTimer=setTimeout(refresh,30);}
  window.addEventListener('urgent-commerce-updated',schedule);
- client()?.auth.onAuthStateChange(event=>{if(event==='TOKEN_REFRESHED'||event==='INITIAL_SESSION')return;epoch++;run++;dialog?.close();dialog?.remove();dialog=null;document.getElementById('manageInternalPremium')?.remove();document.getElementById('internalPremiumOwn')?.remove();schedule();});
+ client()?.auth.onAuthStateChange((event,session)=>{if(event==='TOKEN_REFRESHED'||event==='INITIAL_SESSION'||event==='SIGNED_IN'&&session?.user?.id===sessionUserId)return;sessionUserId=session?.user?.id||null;epoch++;run++;dialog?.close();dialog?.remove();dialog=null;document.getElementById('manageInternalPremium')?.remove();document.getElementById('internalPremiumOwn')?.remove();schedule();});
  refresh();
 })();

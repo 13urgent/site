@@ -18,7 +18,8 @@ const assert=require('assert/strict');
   rpc:async(name,args)=>{
    if(name==='urgent_pilot_directory')return{data:[{company_id:'company-test',pilot_enabled:true,carrier_ready:false}]};
    if(name==='urgent_commercial_status')return{data:{enabled:false,terms_version:'PRO-B2B-2026-10-20-v3',terms_accepted:false}};
-   reviewCalls.push({name,args});Object.assign(testDoc,{document_type:args.p_kind,expires_on:args.p_expiry,review_status:'pending'});return{};
+   if(name==='urgent_correct_document'){reviewCalls.push({name,args});Object.assign(testDoc,{document_type:args.p_kind,expires_on:args.p_expiry,review_status:'pending'});return{};}
+   return{data:null};
   },
   from:table=>{const q={select(){return q},eq(){return q},in(){return q},
    update(values){return{eq:(key,id)=>({select:()=>({single:async()=>{updateCalls.push({values,key,id});if(failUpdate)throw Error('Connexion interrompue');Object.assign(testDoc,values);return{data:{id}};}})})}},

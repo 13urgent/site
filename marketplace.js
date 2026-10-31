@@ -330,5 +330,5 @@
  }
  window.urgentMarketplaceRefresh=refresh;
  window.addEventListener('urgent-commerce-updated',updateCommercialPresentation);
- sb?.auth.onAuthStateChange(()=>{reset();if($('pilotAdmin'))$('pilotAdmin').hidden=true;setTimeout(refresh,0);});refresh();
+ sb?.auth.onAuthStateChange((event,session)=>{if(event==='TOKEN_REFRESHED'||event==='SIGNED_IN'&&session?.user?.id===state.user?.id)return;reset();if($('pilotAdmin'))$('pilotAdmin').hidden=true;setTimeout(refresh,0);});refresh();
 })();

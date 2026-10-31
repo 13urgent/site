@@ -2,12 +2,19 @@
 from pathlib import Path
 import subprocess,os,json,concurrent.futures,sys,time
 root=Path(__file__).resolve().parents[1]
-checks=['admin-lockdown-sql.cjs','document-file-boundary-sql.cjs','registration-alerts-sql.cjs','registration-alerts-http.cjs','document-upload-alerts-sql.cjs','document-upload-alerts-http.cjs','monthly-reports-sql.cjs','monthly-reports-http.cjs','business-registration.cjs','signup-compatibility.cjs','carrier-shipper-sql.cjs','shipment-edit-sql.cjs','shipment-archive-sql.cjs','shipment-visibility-sql.cjs','mobile-missions-sql.cjs','mobile-notifications-http.cjs','mobile-app-browser.cjs','mobile-cache.cjs','mobile-install-browser.cjs','manual-commerce-sql.cjs','invoice-reference-boundary-sql.cjs','marketplace-pilot-browser.cjs','manual-commerce-browser.cjs','document-review-browser.cjs','document-session-browser.cjs','client-documents-browser.cjs','external-drafts-browser.cjs','subscription-choice-browser.cjs','production-no-local-fallback.cjs','public-admin-boundary.cjs','admin-validation-browser.cjs','terms-v4-sql.cjs','site-statistics-sql.cjs','site-statistics-http.cjs','site-statistics-browser.cjs','google-ads-browser.cjs','otp-registration-browser.cjs','password-recovery-browser.cjs','document-assistant-browser.cjs','support-assistant-http.cjs','business-validation-mail-http.cjs','support-browser.cjs','support-submit-feedback-browser.cjs','dossier-renewal.cjs']
+# L'export exact des politiques de production nécessite un fichier fourni à part.
+build=Path(sys.argv[2]).resolve() if len(sys.argv)>2 else None
+excluded={'exported-production-guards.cjs'}
+if build is None:excluded.update({'deployment-browser.cjs','site-pages-browser.cjs'})
+checks=sorted(p.name for p in (root/'tests').glob('*.cjs') if p.name not in excluded)
 env=dict(os.environ);env['NODE_PATH']='/workspace/13urgent-tools/node_modules:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules'+(':'+env['NODE_PATH'] if env.get('NODE_PATH') else '')
 def run(name):
  started=time.monotonic()
  try:
-  result=subprocess.run(['node',str(root/'tests'/name)],cwd=root,env=env,capture_output=True,text=True,timeout=120)
+  args=['node',str(root/'tests'/name)]
+  if name=='deployment-browser.cjs':args.extend([str(build),'open'])
+  if name=='site-pages-browser.cjs':args.extend([str(build),'--opening'])
+  result=subprocess.run(args,cwd=root,env=env,capture_output=True,text=True,timeout=120)
   return {'test':name,'ok':result.returncode==0,'seconds':round(time.monotonic()-started,1),'output':(result.stdout+result.stderr).strip()}
  except subprocess.TimeoutExpired:return {'test':name,'ok':False,'output':'Délai de 120 secondes dépassé'}
 results=[]
