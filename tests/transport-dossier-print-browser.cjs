@@ -50,6 +50,7 @@ const sample=kind=>({id:'document-synthetique',kind,state:kind==='confirmation'?
    assert.equal(result.count,1,kind+' short document must fit one A4 page');
    assert.equal(await result.frame.getByText('Référence e-CMR externe',{exact:true}).count(),0);
   }
+  const brandedShipper=sample('waybill');brandedShipper.snapshot.owner.logo=png;brandedShipper.snapshot.owner.address='Adresse fictive du donneur d’ordre';const branded=await render(brandedShipper);assert.equal(await branded.frame.locator('.lv-customer img.shipper-logo').count(),1);assert.equal(await branded.frame.locator('header .logo').count(),1);assert.equal(await branded.frame.locator('img.platform-logo').count(),1);assert(branded.text.includes('Adresse fictive du donneur'));assert.equal(branded.count,1);
   const noBrand=sample('waybill');noBrand.snapshot.issuer={name:'Entreprise fictive émettrice'};
   const missing=await render(noBrand);
   assert.equal(missing.count,1);

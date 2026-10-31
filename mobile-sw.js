@@ -1,5 +1,5 @@
 'use strict';
-const VERSION='13urgent-mobile-20261031-v5';
+const VERSION='13urgent-mobile-20261031-v6';
 const FILES=['mobile.html','mobile.css','mobile.js','mobile.webmanifest','assets/mobile-icon.svg','assets/mobile-icon-192.png','assets/mobile-icon-512.png','assets/logo-13urgent-web.png','style.css','config.js','auth.js','app.js','marketplace.js','shipment-schedule.js','platform-services.js','transport-dossier.js','transport-dossier.css','mission-files.js','documents.js','manual-commerce.js','internal-premium.js','billing.js','dossier-organisation.js','document-assistant.js','audience.js','audience.css','google-ads.js','support.js','support.css','support-knowledge.js','terms-links.js'];
 const ALLOWED=new Set(FILES.map(p=>new URL(p,self.registration.scope).pathname));
 self.addEventListener('install',event=>event.waitUntil(caches.open(VERSION).then(cache=>cache.addAll(FILES))));
