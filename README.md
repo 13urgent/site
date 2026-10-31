@@ -82,3 +82,7 @@ Les fichiers HTML publics sont générés. Voir `docs/SERVICES-FRANCE.md` pour l
 frontières d'accès, l'activation SQL/Edge et les tests. L'ouverture aux particuliers
 porte sur les demandes de devis CHRONOSS sans SIRET ; elle ne modifie pas les droits
 des comptes professionnels et n'effectue aucune réservation ou facturation automatique.
+
+### Dossier transport (première étape)
+
+Identité/logo, confirmations versionnées et préparations de lettres de voiture : [livraison et limites](docs/produit/DOSSIER-TRANSPORT-LIVRAISON.md). [Feuille de route](docs/produit/ROADMAP-TRANSPORT.md) et [circuit iRoad / X Mobile / TransFollow](docs/produit/CONNECTEUR-IROAD-XMOBILE-TRANSFOLLOW.md). Activation séparée par la migration `202610310001_transport_dossier.sql` ; aucune e-CMR signée ou synchronisation fournisseur n’est activée par ce code.
