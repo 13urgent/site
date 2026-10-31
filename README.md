@@ -86,3 +86,7 @@ des comptes professionnels et n'effectue aucune réservation ou facturation auto
 ### Dossier transport (première étape)
 
 Identité/logo, confirmations versionnées et préparations de lettres de voiture : [livraison et limites](docs/produit/DOSSIER-TRANSPORT-LIVRAISON.md). [Feuille de route](docs/produit/ROADMAP-TRANSPORT.md) et [circuit iRoad / X Mobile / TransFollow](docs/produit/CONNECTEUR-IROAD-XMOBILE-TRANSFOLLOW.md). Activation séparée par la migration `202610310001_transport_dossier.sql` ; aucune e-CMR signée ou synchronisation fournisseur n’est activée par ce code.
+
+### Accès Premium interne offert
+
+[Droits et activation](docs/produit/PREMIUM-INTERNE.md), migration `202610310002_internal_premium.sql`. Les périodes offertes sont accordées par l’administration, séparées des règlements bancaires et soumises aux documents/conditions. Aucun compte n’est activé automatiquement par l’installation.
