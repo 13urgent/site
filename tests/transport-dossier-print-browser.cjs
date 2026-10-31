@@ -52,9 +52,13 @@ const sample=kind=>({id:'document-synthetique',kind,state:kind==='confirmation'?
   }
   const brandedShipper=sample('waybill');brandedShipper.snapshot.owner.logo=png;brandedShipper.snapshot.owner.address='Adresse fictive du donneur d’ordre';const branded=await render(brandedShipper);assert.equal(await branded.frame.locator('.lv-customer img.shipper-logo').count(),1);assert.equal(await branded.frame.locator('header .logo').count(),1);assert.equal(await branded.frame.locator('img.platform-logo').count(),1);assert(branded.text.includes('Adresse fictive du donneur'));assert.equal(branded.count,1);
   const noBrand=sample('waybill');noBrand.snapshot.issuer={name:'Entreprise fictive émettrice'};
+  noBrand.snapshot.pickup=null;noBrand.snapshot.delivery_at=null;
+  noBrand.snapshot.data.instructions='';noBrand.snapshot.data.driver_name=null;
+  delete noBrand.snapshot.data.trailer_plate;
   const missing=await render(noBrand);
   assert.equal(missing.count,1);
-  assert((await missing.frame.locator('header').innerText()).includes('À préciser'));
+  assert(!missing.text.includes('À préciser'),'Blank waybill fields and schedules must print without placeholder text');
+  assert.equal(await missing.frame.locator('.lv-order>section').last().locator('p').textContent(),'');
   const withReference=sample('confirmation');withReference.snapshot.data.external_ecmr_reference='REFERENCE-EXTERNE-FICTIVE';
   assert((await render(withReference)).text.includes('REFERENCE-EXTERNE-FICTIVE'));
   const unbroken=sample('waybill');unbroken.snapshot.data.instructions='Z'.repeat(1800)+' FIN_MOT_LONG';
