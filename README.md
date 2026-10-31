@@ -98,3 +98,7 @@ Identité/logo, confirmations versionnées et préparations de lettres de voitur
 ### Reclassement des exercices
 
 [Action administrative et protections](docs/produit/RECLASSER-EXERCICES.md), migration `202610310004_reclassify_exercise.sql`. Classement explicitement confirmé avant chargement, crédits traçables des seuls frais non facturés, documents historiques conservés.
+
+### Transmission confirmation et lettre de voiture
+
+[Partage documentaire entre les parties](docs/produit/PARTAGE-DOCUMENTS.md), migration `202610310005_document_delivery.sql`. Le donneur d’ordre peut préparer et transmettre le lot au transporteur attribué. Documents privés, message et notification existants, versions conservées ; aucune signature générée.
