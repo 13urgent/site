@@ -138,7 +138,7 @@
        if(checks[0].status==='fulfilled'&&Array.isArray(checks[0].value))for(const doc of checks[0].value)if(doc.reason!=='valid')reason+='\n'+(names[doc.document_type]||'Justificatif')+' : '+(reasons[doc.reason]||'à vérifier')+'.';
        if(checks[1].status==='fulfilled'&&checks[1].value?.enabled===true&&checks[1].value.terms_accepted===false)reason+='\nConditions professionnelles non acceptées : ouvrez « Espace professionnel — abonnements et frais » pour les consulter et enregistrer votre acceptation.';
        reason+='\nCompte : '+(state.user?.email||'session courante')+'. Si ces éléments sont valides, faites vérifier l’autorisation de l’établissement et les droits de forfait par l’administration.';
-      }feedback('Offre non enregistrée ou non confirmée : '+reason,true);}
+      }feedback('Offre non enregistrée ou non confirmée : '+reason,true);if(/accès requis|Conditions professionnelles|Accès pilote et documents/.test(reason)){const link=make('a','Ouvrir mon espace : justificatifs, conditions et forfait','btn secondary');link.href='mon-espace.html#conditions-professionnelles';result.append(document.createTextNode(' '),link);}}
      finally{pending=false;submit.disabled=false;input.disabled=false;submit.textContent='Enregistrer mon offre confidentielle';form.removeAttribute('aria-busy');}
     };
     card.append(form);
