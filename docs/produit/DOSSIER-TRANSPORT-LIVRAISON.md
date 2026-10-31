@@ -35,3 +35,7 @@ Le circuit CHRONOSS déclaré est iRoad → X Mobile / TransFollow. Aucun connec
 - `tests/mobile-cache.cjs` et `tests/mobile-install-browser.cjs BUILD` : cache statique, exclusion des contenus privés, installation locale et affichage.
 
 Ces tests ne prouvent pas l'activation de la migration en production ni une signature électronique, une connexion EDI ou une impression sur téléphone physique.
+
+## Lettre de voiture papier
+
+Le modèle imprimable reprend des blocs donneur d'ordre/conducteur, marchandises, deux colonnes chargement/livraison, horaires réels à renseigner, réserves et quatre zones de signature (conducteur à chaque étape, expéditeur, destinataire). Le logo du transporteur vient du snapshot ; le logo 13 URGENT et son attribution sont intégrés au modèle, sans téléchargement externe à l'impression. National/international reste à cocher lors de la préparation papier. Les signatures manuscrites ne sont pas créées par le logiciel. La copie signée peut être déposée dans les pièces privées de la mission par le transporteur attribué. Aucune nouvelle migration ni connexion TransFollow n'est nécessaire pour ce modèle.

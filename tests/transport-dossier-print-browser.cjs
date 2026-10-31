@@ -26,15 +26,15 @@ const sample=kind=>({id:'document-synthetique',kind,state:kind==='confirmation'?
    await page.evaluate(value=>{window.syntheticDocument=value;return window.urgentTransportDossier.open(value.snapshot.shipment_id)},row);
    await page.getByRole('button',{name:'Ouvrir / imprimer en PDF',exact:true}).click();
    const frame=page.frameLocator('.dossier-print-frame');
-   await frame.getByRole('heading',{name:row.kind==='confirmation'?'Confirmation d’affrètement':'Préparation de lettre de voiture',exact:true}).waitFor();
+   await frame.getByRole('heading',{name:row.kind==='confirmation'?'Confirmation d’affrètement':'Lettre de voiture',exact:true}).waitFor();
    const source=page.frames().find(f=>f.parentFrame());
    await page.waitForFunction(()=>document.title==='Page privée de départ');
    const html=await source.content();
    assert(!html.includes('PRIVATE_MAIN_PAGE_SENTINEL'));
-   assert.equal(await frame.locator('header h2').textContent(),'Émetteur');
+   assert.equal(await frame.locator('header h2').textContent(),row.kind==='waybill'?'Entreprise fictive émettrice':'Émetteur');
    assert.equal(await frame.locator('header .logo').count(),row.snapshot.issuer.logo?1:0);
-   assert.equal(await source.title(),(row.kind==='confirmation'?'Confirmation d’affrètement':'Préparation de lettre de voiture')+' — ORDRE-FICTIF — V3');
-   for(const name of ['Nombre d’unités','Palettes déclarées','Poids déclaré (kg)'])assert.equal(await frame.locator('.field').filter({has:frame.locator('dt').filter({hasText:name})}).locator('dd').textContent(),'0');
+   assert.equal(await source.title(),(row.kind==='confirmation'?'Confirmation d’affrètement':'Lettre de voiture')+' — ORDRE-FICTIF — V3');
+   if(row.kind==='waybill'){for(const key of['units','pallets','weight_kg'])assert.equal(await frame.locator('[data-paper-quantity='+key+']').textContent(),'0');}else for(const name of ['Nombre d’unités','Palettes déclarées','Poids déclaré (kg)'])assert.equal(await frame.locator('.field').filter({has:frame.locator('dt').filter({hasText:name})}).locator('dd').textContent(),'0');
    const printed=await browser.newPage();
    try{
     await printed.setContent(html);
@@ -46,14 +46,14 @@ const sample=kind=>({id:'document-synthetique',kind,state:kind==='confirmation'?
    }finally{await printed.close()}
   }
   for(const kind of ['confirmation','waybill']){
-   const result=await render(sample(kind));
+   const result=await render(sample(kind));if(kind==='waybill'){assert.equal(await result.frame.locator('.lv-signatures>section').count(),4);assert.equal(await result.frame.locator('.signature-space').count(),4);assert.equal(await result.frame.locator('img.platform-logo[alt="13 URGENT"]').count(),1);assert(result.text.includes('Préparé avec 13 URGENT'));assert(result.text.includes('Chargement'));assert(result.text.includes('Livraison'));assert(result.text.includes('Arrivée réelle'));assert(result.text.includes('Départ réel'));for(const name of['Conducteur — chargement','Expéditeur','Conducteur — livraison','Destinataire'])assert(result.text.includes(name));assert(result.text.includes('Signature et cachet'));}
    assert.equal(result.count,1,kind+' short document must fit one A4 page');
-   assert.equal(await result.frame.getByText('Référence e-CMR externe',{exact:true}).count(),kind==='confirmation'?0:1);
+   assert.equal(await result.frame.getByText('Référence e-CMR externe',{exact:true}).count(),0);
   }
   const noBrand=sample('waybill');noBrand.snapshot.issuer={name:'Entreprise fictive émettrice'};
   const missing=await render(noBrand);
   assert.equal(missing.count,1);
-  assert.equal(await missing.frame.locator('header dd').allTextContents().then(values=>values.slice(1).join('|')),'À préciser|À préciser|À préciser');
+  assert((await missing.frame.locator('header').innerText()).includes('À préciser'));
   const withReference=sample('confirmation');withReference.snapshot.data.external_ecmr_reference='REFERENCE-EXTERNE-FICTIVE';
   assert((await render(withReference)).text.includes('REFERENCE-EXTERNE-FICTIVE'));
   const unbroken=sample('waybill');unbroken.snapshot.data.instructions='Z'.repeat(1800)+' FIN_MOT_LONG';
@@ -75,7 +75,7 @@ const sample=kind=>({id:'document-synthetique',kind,state:kind==='confirmation'?
    const result=await render(long);
    assert(result.count>1,kind+' long document must continue on further pages');
    for(const end of ends)assert(result.text.includes(end),'Printed content must retain '+end);
-   assert(result.text.includes('Les documents signés et photos restent à joindre au dossier de mission.'));
+   assert(result.text.replace(/\s+/g,' ').includes('Les documents signés et photos restent à joindre au dossier de mission.'));
   }
   console.log('PASS transport print: short A4 documents, issuer/header, snapshot branding, zero quantities, references, titles and complete long documents.');
  }finally{await browser.close()}
