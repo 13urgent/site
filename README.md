@@ -90,3 +90,11 @@ Identité/logo, confirmations versionnées et préparations de lettres de voitur
 ### Accès Premium interne offert
 
 [Droits et activation](docs/produit/PREMIUM-INTERNE.md), migration `202610310002_internal_premium.sql`. Les périodes offertes sont accordées par l’administration, séparées des règlements bancaires et soumises aux documents/conditions. Aucun compte n’est activé automatiquement par l’installation.
+
+### Réautorisation Start après une période payée
+
+[Correctif et limites](docs/produit/START-REVALIDATION.md), migration `202610310003_start_reauthorization.sql`. Le quota reste inchangé ; une décision administrative récente est requise après le cycle d’un ancien abonnement.
+
+### Reclassement des exercices
+
+[Action administrative et protections](docs/produit/RECLASSER-EXERCICES.md), migration `202610310004_reclassify_exercise.sql`. Classement explicitement confirmé avant chargement, crédits traçables des seuls frais non facturés, documents historiques conservés.

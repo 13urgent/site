@@ -4,7 +4,7 @@
  const $=id=>document.getElementById(id);
  const make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
  const state={user:null,profile:null,shipments:[],offers:[],private:[],events:[],incidents:[],generation:0,canPublish:false,canEditShipments:false,canArchiveShipments:false,canScheduleShipments:false,canTransportDetails:false,transportDetails:[]};
- const labels={affreightment_issued:'Confirmation d’affrètement émise',affreightment_draft_saved:'Brouillon d’affrètement enregistré',waybill_prepared:'Lettre de voiture préparée — non signée',mission_file_added:'Pièce de course partagée',mission_addresses_updated:'Adresses de navigation renseignées',shipment_archived:'Course retirée des listes courantes',shipment_restored:'Course réaffichée dans l’historique',shipment_updated:'Course modifiée — nouvelles informations',published:'Course publiée',offer_submitted:'Offre enregistrée',offer_withdrawn:'Offre retirée',assigned_commercial_manual:'Mise en relation confirmée — frais mensuels CHRONOSS',assigned_pilot_no_charge:'Attribution pilote gratuite',incident_reported:'Incident signalé',incident_resolved:'Signalement clôturé',open:'Ouverte',assigned:'Attribuée',heading_pickup:'En route vers l’enlèvement',at_pickup:'Arrivé au chargement',loaded:'Marchandise chargée',delivery_reported:'Livraison déclarée — confirmation client attendue',completed:'Réalisation confirmée par le client',cancelled:'Annulée'};
+ const labels={reclassified_as_exercise:'Course classée comme exercice fictif',affreightment_issued:'Confirmation d’affrètement émise',affreightment_draft_saved:'Brouillon d’affrètement enregistré',waybill_prepared:'Lettre de voiture préparée — non signée',mission_file_added:'Pièce de course partagée',mission_addresses_updated:'Adresses de navigation renseignées',shipment_archived:'Course retirée des listes courantes',shipment_restored:'Course réaffichée dans l’historique',shipment_updated:'Course modifiée — nouvelles informations',published:'Course publiée',offer_submitted:'Offre enregistrée',offer_withdrawn:'Offre retirée',assigned_commercial_manual:'Mise en relation confirmée — frais mensuels CHRONOSS',assigned_pilot_no_charge:'Attribution pilote gratuite',incident_reported:'Incident signalé',incident_resolved:'Signalement clôturé',open:'Ouverte',assigned:'Attribuée',heading_pickup:'En route vers l’enlèvement',at_pickup:'Arrivé au chargement',loaded:'Marchandise chargée',delivery_reported:'Livraison déclarée — confirmation client attendue',completed:'Réalisation confirmée par le client',cancelled:'Annulée'};
  const schedule=window.urgentShipmentSchedule;
  function scheduleAccess(){const field=$('shipmentForm').elements.arrival;if(!field)return;field.closest('label').hidden=false;field.required=state.canScheduleShipments;field.disabled=!state.canScheduleShipments||!(state.canPublish||(state.profile?.role==='admin'&&$('testShipmentInput')?.checked));$('shipmentScheduleNotice').textContent=state.canScheduleShipments?'Horaire prévu, exprimé en heure de Paris.':'L’heure d’arrivée n’est pas encore disponible. L’horaire de départ reste enregistré.';}
  const next={assigned:'heading_pickup',heading_pickup:'at_pickup',at_pickup:'loaded',loaded:'delivery_reported'};
@@ -179,6 +179,35 @@
   const details=make('details');details.append(make('summary',text));const form=make('form',undefined,'incident-form');const label=make('label','Description (10 à 2000 caractères)');const input=make('textarea');input.minLength=10;input.maxLength=2000;input.required=true;label.append(input);const submit=make('button',text,'btn secondary');submit.type='submit';form.append(label,submit);
   form.onsubmit=async e=>{e.preventDefault();if(!form.reportValidity())return;submit.disabled=true;try{await action(input.value.trim());}catch(error){notice('trackingNotice','Signalement non confirmé : '+error.message);}finally{submit.disabled=false;}};details.append(form);return details;
  }
+ async function openExerciseReclassification(card,shipment){
+  if(state.profile?.role!=='admin')return;
+  const existing=card.querySelector('.exercise-reclassification-form');if(existing){existing.scrollIntoView({block:'nearest'});return;}
+  const generation=state.generation,actor=state.user?.id;
+  const active=()=>generation===state.generation&&card.isConnected&&state.profile?.role==='admin'&&state.user?.id===actor;
+  let feedback=card.querySelector('.exercise-reclassification-feedback');if(!feedback){feedback=make('p',undefined,'offer-feedback exercise-reclassification-feedback');feedback.setAttribute('role','status');card.append(feedback);}
+  const show=(text,error=false)=>{if(!active())return;feedback.hidden=false;feedback.textContent=text;feedback.classList.toggle('danger',error);feedback.scrollIntoView({block:'nearest'});};
+  show('Vérification du classement en exercice fictif…');
+  const policy=await rpc('urgent_exercise_reclassification_policy',{},8000).catch(()=>null);if(!active())return;
+  if(policy?.enabled!==true){show('Le classement en exercice fictif doit encore être activé dans Supabase par l’administration.',true);return;}
+  const form=make('form',undefined,'form exercise-reclassification-form');form.noValidate=true;
+  form.append(make('h4','Classer comme exercice fictif','wide'),make('p','Les frais éventuels de mise en relation encore non facturés seront régularisés par un crédit. L’historique de la course restera conservé.','wide'));
+  const reasonLabel=make('label','Motif du classement (10 à 1000 caractères)','wide'),reason=make('textarea');reason.name='exerciseReason';reason.required=true;reason.minLength=10;reason.maxLength=1000;reasonLabel.append(reason);
+  const confirmLabel=make('label',undefined,'professional-check wide'),confirmExercise=make('input');confirmExercise.type='checkbox';confirmExercise.name='confirmExercise';confirmExercise.required=true;confirmLabel.append(confirmExercise,make('span','Je confirme qu’aucun transport réel n’a eu lieu et qu’il s’agit uniquement d’un exercice fictif.'));
+  const submit=make('button','Confirmer le classement en exercice fictif','btn primary');submit.type='submit';const cancel=make('button','Fermer sans classer','btn secondary');cancel.type='button';cancel.onclick=()=>{form.remove();feedback.remove();};
+  form.append(reasonLabel,confirmLabel,submit,cancel,feedback);card.append(form);feedback.hidden=true;form.scrollIntoView({block:'nearest'});reason.focus();let pending=false;
+  form.onsubmit=async event=>{
+   event.preventDefault();if(pending||!active())return;const value=reason.value.trim();
+   if(value.length<10||!confirmExercise.checked||!form.reportValidity()){show('Précisez un motif d’au moins 10 caractères et confirmez l’absence de transport réel.',true);return;}
+   pending=true;const controls=[...form.querySelectorAll('input,textarea,button')];controls.forEach(control=>control.disabled=true);form.setAttribute('aria-busy','true');show('Classement en exercice fictif en cours…');
+   try{
+    const current=await sb.auth.getUser();if(current.error||current.data?.user?.id!==actor)throw Error('La session a changé. Reconnectez-vous.');if(!active())return;
+    const result=await rpc('urgent_reclassify_exercise',{p_shipment:shipment.id,p_reason:value,p_confirm:confirmExercise.checked},20000);if(!active())return;
+    if(result?.reclassified!==true||!Number.isInteger(result.credited_cents)||result.credited_cents<0)throw Error('Le résultat ne peut pas être confirmé. Actualisez le suivi.');
+    await refresh();if(state.user?.id!==actor||state.profile?.role!=='admin')return;
+    notice('trackingNotice','Course classée comme exercice fictif. '+(result.credited_cents>0?'Crédit de frais de mise en relation enregistré : '+money(result.credited_cents/100)+' HT.':'Aucun crédit de frais supplémentaire.')+' L’historique est conservé. Les documents déjà enregistrés restent inchangés : préparez une nouvelle version pour afficher « EXERCICE FICTIF » sur le PDF.');$('trackingNotice').scrollIntoView({block:'nearest'});
+   }catch(error){show('Classement non confirmé : '+error.message,true);}finally{pending=false;controls.forEach(control=>control.disabled=false);form.removeAttribute('aria-busy');}
+  };
+ }
  function renderTracking(){
   const host=$('shipmentTracking');host.replaceChildren();const company=state.profile?.company_id;
   const rows=state.shipments.filter(s=>s.owner_company_id===company||s.assigned_company_id===company||state.profile?.role==='admin');
@@ -217,6 +246,7 @@
     area.append(make('p','Ces signalements restent privés entre les parties et l’administration. Ils ne constituent ni une décision de remboursement ni une preuve de livraison.','muted'));card.append(area);
    }
    const events=state.events.filter(e=>e.shipment_id===s.id).slice().reverse();if(events.length){const details=make('details');details.append(make('summary','Historique horodaté'));for(const e of events)details.append(make('p',`${date(e.created_at)} · ${labels[e.event_type]||e.event_type}`));card.append(details);}
+   if(state.profile?.role==='admin'&&!s.is_test&&!s.archived_at&&['open','assigned','heading_pickup','at_pickup'].includes(s.status))card.append(button('Classer comme exercice fictif',()=>openExerciseReclassification(card,s)));
    if(s.owner_company_id===company&&(s.status==='cancelled'||s.is_test)){
     const feedback=make('p',undefined,'offer-feedback');feedback.setAttribute('role','status');feedback.hidden=true;
     const action=button(s.archived_at?'Réafficher dans l’historique':s.is_test?'Ranger cet exercice fictif':'Retirer cette course annulée',async()=>{

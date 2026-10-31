@@ -1,6 +1,6 @@
 const{createDatabase}=require('./helpers/pilot-database.cjs'),fs=require('fs'),assert=require('assert/strict');
 (async()=>{const{db,actor,uid}=await createDatabase({includeBilling:false});try{
-for(const n of['202610200001_manual_commerce.sql','202610220001_carrier_shipper.sql','202610270002_document_renewal.sql','202610310002_internal_premium.sql'])await db.exec(fs.readFileSync(__dirname+'/../supabase/migrations/'+n,'utf8'));
+for(const n of['202610200001_manual_commerce.sql','202610220001_carrier_shipper.sql','202610270002_document_renewal.sql','202610310002_internal_premium.sql','202610310003_start_reauthorization.sql'])await db.exec(fs.readFileSync(__dirname+'/../supabase/migrations/'+n,'utf8'));
 const terms='PRO-B2B-2026-10-20-v3',today=(await db.query("select (now()at time zone'Europe/Paris')::date::text d")).rows[0].d,last=(await db.query("select ((now()at time zone'Europe/Paris')::date+29)::text d")).rows[0].d;
 await actor(1);await db.query("select public.urgent_set_commercial_mode(true,'CHRONOSS - VIREMENTS ET FACTURATION MANUELLE')");
 const grant=(id=80,company=3,confirm=true)=>db.query('select public.urgent_grant_internal_premium($1,$2,$3,$4,$5,$6)id',[uid(id),uid(company),today,last,'Compte interne CHRONOSS pour exploitation',confirm]);
