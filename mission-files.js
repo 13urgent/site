@@ -2,7 +2,7 @@
 (()=>{
  const bucket='urgent-mission-files';
  const names={goods:'Photo de marchandise',reservation:'Photo et réserves',waybill:'Lettre de voiture'};
- let generation=0,policyPromise=null,busy=0;
+ let generation=0,policyPromise=null,busy=0,sessionUserId=null;
  const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
  const rpc=async(name,args)=>{let q=sb.rpc(name,args);if(typeof q.abortSignal==='function')q=q.abortSignal(AbortSignal.timeout(20000));const r=await q;if(r.error)throw r.error;return r.data;};
  async function timed(request){let timer;try{return await Promise.race([request,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Délai réseau dépassé ; l’envoi doit être vérifié.')),45000);})]);}finally{clearTimeout(timer);}}
@@ -13,7 +13,7 @@
  }
  function button(text,action){const b=el('button',text,'btn secondary');b.type='button';b.onclick=async()=>{b.disabled=true;try{await action();}finally{b.disabled=false;}};return b;}
  function attach(card,shipment,profile,contact){
-  if(!sb||card.querySelector('.mission-tools'))return;
+  if(!sb||card.querySelector('.mission-tools'))return;sessionUserId=profile.id;
   const current=generation;
   const host=el('section',undefined,'mission-tools');host.append(el('h4','Navigation et documents de la course'));
   const notice=el('p',undefined,'offer-feedback');notice.hidden=true;notice.setAttribute('role','status');
@@ -92,6 +92,6 @@
    };
   })().catch(e=>show('Les documents de la course ne peuvent pas être chargés : '+e.message,true));
  }
- sb?.auth.onAuthStateChange(()=>{generation++;policyPromise=null;document.querySelectorAll('.mission-tools').forEach(e=>e.remove());});
+ sb?.auth.onAuthStateChange((event,session)=>{if(event==='TOKEN_REFRESHED'||event==='SIGNED_IN'&&session?.user?.id===sessionUserId)return;sessionUserId=session?.user?.id||null;generation++;policyPromise=null;document.querySelectorAll('.mission-tools').forEach(e=>e.remove());});
  window.urgentMissionFiles={attach,get busy(){return busy>0;}};
 })();

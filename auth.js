@@ -8,6 +8,7 @@ const sb=configured?window.supabase.createClient(window.URGENT_SUPABASE_URL,wind
 function notify(msg){authNotice.hidden=false;authNotice.textContent=msg;}
 let authOperationPending=false;
 let authView=0;
+let authSessionUserId=null;
 let passwordRecoveryUser=null;
 async function runAuthOperation(operation,errorMessage){
  if(authOperationPending)return;
@@ -27,6 +28,7 @@ async function updateAuth(){
  const result=sb?await sb.auth.getUser():{data:{user:null}};
  if(view!==authView)return;
  const user=result.data?.user||null;
+ authSessionUserId=user?.id||null;
  document.getElementById('signOut').hidden=!user;
  document.getElementById('openAccount').textContent=user?'Mon compte':'Connexion / Inscription';
  accountDialog.querySelector('h2').textContent=user?'Mon compte':'Connexion / inscription';
@@ -147,6 +149,9 @@ saveSubscription.addEventListener('click',()=>runAuthOperation(async()=>{
  }catch{notify('Demande non confirmée. Vérifiez votre connexion et réessayez.');}
 },'Demande non confirmée. Vérifiez votre connexion et réessayez.'));
 if(sb)sb.auth.onAuthStateChange((event,session)=>{
+ const nextId=session?.user?.id||null;
+ if(event==='TOKEN_REFRESHED'||event==='SIGNED_IN'&&nextId&&nextId===authSessionUserId)return;
+ authSessionUserId=nextId;
  if(event==='PASSWORD_RECOVERY'){passwordRecoveryUser=session?.user?.id||null;accountDialog.showModal();}
  else if(event==='SIGNED_OUT'||event==='SIGNED_IN'){passwordRecoveryUser=null;}
  authView++;setTimeout(()=>{document.getElementById('newPassword').value='';document.getElementById('confirmPassword').value='';updateAuth().catch(()=>notify('Impossible de vérifier la session.'));},0);});

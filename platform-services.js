@@ -49,5 +49,5 @@
  window.urgentServices=Object.freeze({policy,setTransportAvailable,editTransport,details,describe,attachConversation,refresh:refreshUI});
  document.getElementById('refreshAdminQuotes')?.addEventListener('click',refreshUI);document.getElementById('loginAdminQuotes')?.addEventListener('click',()=>document.getElementById('openAccount')?.click());
  const mainForm=document.getElementById('shipmentForm');mountTransport(mainForm);if(document.body.dataset.sitePage==='deposer'){const query=new URLSearchParams(location.search);for(const name of['origin','destination'])if(query.get(name))mainForm.elements[name].value=query.get(name).slice(0,100);for(const[n,q]of[['originPostcode','origin_postcode'],['destinationPostcode','destination_postcode']])if(/^\d{5}$/.test(query.get(q)||''))mainForm.elements[n].value=query.get(q);}
- client()?.auth.onAuthStateChange(event=>{if(event!=='TOKEN_REFRESHED')setTimeout(refreshUI,0);});refreshUI();initQuote();
+ client()?.auth.onAuthStateChange((event,session)=>{if(event==='TOKEN_REFRESHED'||event==='SIGNED_IN'&&session?.user?.id===profile?.id)return;setTimeout(refreshUI,0);});refreshUI();initQuote();
 })();

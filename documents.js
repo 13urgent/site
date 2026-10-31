@@ -224,7 +224,7 @@ function clearProfessionalViews(){
  doc$('companyStatus').textContent='';doc$('documentForm').reset();doc$('documentFile').required=true;
  for(const name of ['documentNotice','adminNotice']){if(doc$(name)){doc$(name).textContent='';doc$(name).hidden=true;}}
 }
-sb?.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>{
+sb?.auth.onAuthStateChange((event,session)=>{if(event==='TOKEN_REFRESHED'||event==='SIGNED_IN'&&session?.user?.id===professionalSessionId)return;setTimeout(()=>{
  const id=session?.user?.id||null;
  if(id!==professionalSessionId){
   professionalSessionId=id;professionalAccessGeneration++;professionalProfile=null;clearProfessionalViews();
