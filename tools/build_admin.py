@@ -8,7 +8,9 @@ def build_admin():
     page=page.replace('<meta name="robots" content="index,follow">','<meta name="robots" content="noindex,nofollow">')
     page=page.replace('<title>13 URGENT — Transport express entre professionnels</title>','<title>Administration — 13 URGENT</title>')
     page=page.replace('<main id="accueil">','<section class="section panel" aria-label="Validation administrative"><h1>Administration</h1><p id="adminPageNotice" class="notice" role="status">Connectez-vous avec votre compte administrateur pour accéder à la gestion.</p><button id="openBusinessValidation" type="button" class="btn primary">Vérifier / valider mon établissement</button><p>La décision de validation appartient à l’administration. L’analyse automatique des documents reste un avis.</p></section><main id="accueil">')
+    page=page.replace('<main id="accueil">','<section class="section panel" id="devis"><h2>Demandes de devis CHRONOSS</h2><p>Retrouvez ici les demandes envoyées par les professionnels et les particuliers.</p><button type="button" class="btn primary" id="refreshAdminQuotes">Actualiser les demandes de devis</button><button type="button" class="btn secondary" id="loginAdminQuotes">Se connecter / vérifier mon compte</button><div id="adminQuotes" role="region" aria-label="Demandes de devis"><p>Connectez-vous avec votre compte administrateur pour consulter les demandes.</p></div></section><main id="accueil">')
     page=page.replace('<script src="https://cdn.jsdelivr.net', (root/'tools/admin-dialog.html').read_text()+'<script src="https://cdn.jsdelivr.net',1)
+    page=page.replace('platform-services.js?v=20261030-services','platform-services.js?v=20261031-devis')
     return navigation(page)
 if __name__=='__main__':
     (root/'admin.html').write_text(build_admin())
