@@ -17,6 +17,7 @@ with comptes as (
  left join public.companies c on c.id=p.company_id
  left join public.urgent_business_access a on a.company_id=p.company_id
  left join public.urgent_transport_document_access d on d.company_id=p.company_id
+ where coalesce(to_jsonb(u)->>'deleted_at','')=''
 )
 select email,entreprise,role,company_id,email_confirme,etablissement_autorise,
  case forfait_id when 'basics'then 'Start'when 'bronze'then 'Drive'when 'silver'then 'Boost'when 'gold'then 'Premium'else forfait_id end as forfait_retenu,
