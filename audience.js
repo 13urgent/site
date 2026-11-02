@@ -2,10 +2,11 @@
 (async()=>{
  if(document.body.dataset.adminPage==='true')return;
  const leaf=location.pathname.split('/').pop()||'index.html';
- const pages=['index.html','mentions-legales.html','confidentialite.html','conditions-professionnelles.html','conditions-professionnelles-v3.html','conditions-professionnelles-v4.html'];
+ const legacyPages=['index.html','mentions-legales.html','confidentialite.html','conditions-professionnelles.html','conditions-professionnelles-v3.html','conditions-professionnelles-v4.html'];
+ const pages=[...legacyPages,'fonctionnement.html','courses.html','mes-courses.html','deposer.html','donneurs-ordre.html','transporteurs.html','mon-espace.html','services-chronoss.html','demenagement.html','demander-un-devis.html','retours-a-vide.html','mobile.html'];
  if(!pages.includes(leaf))return;
  if(!window.URGENT_SUPABASE_URL||!window.URGENT_SUPABASE_PUBLISHABLE_KEY)return;
- try{const ready=await fetch(window.URGENT_SUPABASE_URL+'/rest/v1/rpc/urgent_site_stats_public_status',{method:'POST',headers:{apikey:window.URGENT_SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},body:'{}',credentials:'omit'});if(!ready.ok||(await ready.json()).enabled!==true)return;}catch{return;}
+ try{const ready=await fetch(window.URGENT_SUPABASE_URL+'/rest/v1/rpc/urgent_site_stats_public_status',{method:'POST',headers:{apikey:window.URGENT_SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'},body:'{}',credentials:'omit'});if(!ready.ok)return;const status=await ready.json();if(status.enabled!==true||(!legacyPages.includes(leaf)&&status.pages_version!=='20261102-main-pages'))return;}catch{return;}
  const key='13urgent_audience_consent_v1',maxAge=180*86400000;
  let choice=null,sent=false;const seen=new Set();
  try{const old=JSON.parse(localStorage.getItem(key)||'null');if(old&&['accepted','refused'].includes(old.value)&&Number.isFinite(old.at)&&Date.now()-old.at>=0&&Date.now()-old.at<maxAge)choice=old.value;}catch{}
