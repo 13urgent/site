@@ -52,3 +52,12 @@ Pause des envois : `SITE_STATS_REPORTS_ENABLED=false`. Pause de la collecte et d
 `tests/site-statistics-browser.cjs` : absence de collecte avant accord et après refus, retrait et expiration, catégories, GPC, administration exclue et fonctionnement du service.
 
 Ces tests sont locaux ; l’installation distante et la réception réelle doivent être vérifiées après les trois opérations ci-dessus.
+
+
+Contrôle du 2 novembre 2026 : couverture des pages métier
+-------------------------------------------------------
+La mesure initiale ne couvrait que l’accueil et les pages légales. Le correctif `supabase/migrations/202611020001_site_statistics_pages.sql` étend la liste aux courses, au dépôt, au suivi, à l’espace professionnel, aux services CHRONOSS, aux demandes de devis, au déménagement, aux retours à vide et à l’interface mobile. L’administration reste exclue. Le consentement, les signaux GPC/DNT, le plafond journalier et la rétention restent applicables. Les URL et leurs paramètres privés ne sont jamais enregistrés.
+
+Le navigateur attend `pages_version=20261102-main-pages` pour mesurer ces nouvelles pages : on peut publier le JavaScript avant d’installer le correctif SQL sans produire de requêtes de mesure refusées par une ancienne base. L’accueil et les pages légales continuent de fonctionner pendant cette transition. Les visites manquées dans le passé ne sont pas reconstituées.
+
+La disponibilité de `urgent_site_stats_public_status` ne prouve pas que l’Edge Function est configurée pour envoyer les rapports. Vérifier séparément le flag `SITE_STATS_REPORTS_ENABLED`, le cron `urgent-registration-alerts`, les files de traitement et la réception dans la boîte destinataire. Les tests locaux emploient des données fictives et un fournisseur simulé ; ils ne prouvent pas la livraison d’un e-mail réel.
