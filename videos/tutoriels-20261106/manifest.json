@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-06",
+  "videos": [
+    {
+      "id": "creer-compte",
+      "video": "creer-compte.mp4",
+      "cover": "creer-compte.jpg",
+      "path": "/videos/tutoriels-20261106/creer-compte.mp4",
+      "duration_seconds": 30,
+      "width": 1280,
+      "height": 720,
+      "fps": 24,
+      "codec": "H264/AAC",
+      "bytes": 731391,
+      "sha256": "3fbc69681808c7c650c9d2c34feb3e4ef5da6a475db0eb6128db5165175bce1d",
+      "source_page": "https://13urgent.fr/mon-espace.html",
+      "captures": "Real public forms, anonymous session, no data entered",
+      "submitted_forms": 0,
+      "created_accounts": 0,
+      "voiceover": false,
+      "music": "Original generated instrumental, no external samples",
+      "steps": [
+        "1. Ouvrez « Connexion / Inscription » — Saisissez votre adresse e-mail et un mot de passe d’au moins 8 caractères.",
+        "2. Choisissez votre type de compte — Donneur d’ordre professionnel ou transporteur : sélectionnez votre activité.",
+        "3. Renseignez votre établissement — Raison sociale, SIRET de 14 chiffres et confirmation de l’usage professionnel.",
+        "4. Transporteur : choisissez un forfait — Le choix est une demande de forfait. Il ne valide pas automatiquement votre dossier.",
+        "5. Cliquez sur « Créer mon compte » — Confirmez votre e-mail si demandé, puis complétez votre espace et les éléments requis.",
+        "6. Attendez la validation de votre accès — SIRET, justificatifs, conditions et droits sont contrôlés selon votre rôle."
+      ],
+      "ffprobe_verified": true
+    },
+    {
+      "id": "deposer-course",
+      "video": "deposer-course.mp4",
+      "cover": "deposer-course.jpg",
+      "path": "/videos/tutoriels-20261106/deposer-course.mp4",
+      "duration_seconds": 30,
+      "width": 1280,
+      "height": 720,
+      "fps": 24,
+      "codec": "H264/AAC",
+      "bytes": 722077,
+      "sha256": "40fde28128b34af9a29f97e2a24e3b1cf41982c2d26500d58f52a5427e97cbf9",
+      "source_page": "https://13urgent.fr/deposer.html",
+      "captures": "Real public forms, anonymous session, no data entered",
+      "submitted_forms": 0,
+      "created_accounts": 0,
+      "voiceover": false,
+      "music": "Original generated instrumental, no external samples",
+      "steps": [
+        "1. Connectez-vous à votre compte — La publication est réservée aux professionnels dont l’accès a été validé.",
+        "2. Ouvrez « Déposer une course » — Vérifiez les informations de votre entreprise et votre adresse e-mail.",
+        "3. Précisez le trajet et les horaires — Renseignez l’enlèvement, la livraison et les horaires demandés, en heure de Paris.",
+        "4. Décrivez la marchandise — Choisissez le véhicule, puis indiquez le nombre de palettes et le poids total.",
+        "5. Ajoutez les contraintes utiles — Marchandise, accès, hayon, manutention et horaires : donnez les précisions nécessaires.",
+        "6. Vérifiez, puis créez la demande — Après publication, retrouvez la course dans « Mes courses » et étudiez les offres reçues."
+      ],
+      "ffprobe_verified": true
+    },
+    {
+      "id": "demander-transport",
+      "video": "demander-transport.mp4",
+      "cover": "demander-transport.jpg",
+      "path": "/videos/tutoriels-20261106/demander-transport.mp4",
+      "duration_seconds": 30,
+      "width": 1280,
+      "height": 720,
+      "fps": 24,
+      "codec": "H264/AAC",
+      "bytes": 715931,
+      "sha256": "ee9a429e606ccf08268551082374a74eed285e598b1575e5a42fc9e999eefa18",
+      "source_page": "https://13urgent.fr/demander-un-devis.html",
+      "captures": "Real public forms, anonymous session, no data entered",
+      "submitted_forms": 0,
+      "created_accounts": 0,
+      "voiceover": false,
+      "music": "Original generated instrumental, no external samples",
+      "steps": [
+        "1. Ouvrez « Devis CHRONOSS » — Particulier ou professionnel : choisissez votre profil et le service recherché.",
+        "2. Indiquez comment vous contacter — Renseignez votre nom et votre e-mail. Le téléphone est facultatif.",
+        "3. Renseignez le trajet et la date — Villes, codes postaux de départ et d’arrivée, date souhaitée et volume estimé.",
+        "4. Précisez les accès et le chargement — Pour un déménagement : étages, ascenseurs, emballage et montage, si nécessaire.",
+        "5. Décrivez votre demande et envoyez-la — Décrivez les objets, dimensions et contraintes, puis cochez la demande de rappel.",
+        "6. CHRONOSS étudie votre besoin — Pas de compte professionnel ni de SIRET pour un particulier. Devis avant engagement."
+      ],
+      "ffprobe_verified": true
+    }
+  ],
+  "total_video_bytes": 2169399,
+  "notes": "Captures reelles de formulaires publics. Aucun compte cree ni formulaire envoye. Aucun renseignement client. Les champs de course apparaissent desactives dans la session anonyme ; un acces professionnel valide est requis."
+}
