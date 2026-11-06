@@ -1,0 +1,24 @@
+name: Publier la video LinkedIn demandee
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: marketing-13urgent
+  cancel-in-progress: false
+jobs:
+  publish:
+    name: Publier une video sur le profil LinkedIn
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verifier la publication immediate et les doublons
+        run: python -m unittest discover -s marketing -p test_linkedin_now.py
+      - name: Publier et verifier le statut LinkedIn
+        env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+        run: python marketing/send_linkedin_now.py
