@@ -3,9 +3,13 @@
   "posts": {
     "20261107-deposer-transport-tiktok-v1": {
       "fingerprint": "33752785980c726af12930c8b8cc6760da15dc675600e88a8d6059eb6f18fd64",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-06T11:44:18.316157+00:00",
-      "due_at": "2026-11-07T17:00:00Z"
+      "due_at": "2026-11-07T17:00:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "e8e3cde499a7367bbc5664cb58b4693f7850cd555738a62efeaa40bd83820ac7",
+      "updated_at": "2026-11-06T11:44:20.195374+00:00"
     }
   }
 }
