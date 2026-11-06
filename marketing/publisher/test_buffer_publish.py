@@ -54,6 +54,23 @@ class Tests(unittest.TestCase):
     def call(self, client, **kwargs):
         return run(client, 'publish', self.plan, self.state, self.report, now=NOW, **kwargs)
 
+    def test_display_name_resolves_linkedin_handle_and_company_brand(self):
+        replies=[{'data':{'account':{'organizations':[{'id':'org-test'}]}}},
+          {'data':{'channels':[
+            {'id':'profile-test','name':'haeckel-pro-slug','displayName':'Haeckel Hamri','service':'linkedin'},
+            {'id':'page-test','name':'chronoss-company','displayName':'CHRONOSS','service':'linkedin'},
+            {'id':'other-test','name':'outsider','displayName':'Other Company','service':'linkedin'}]}}]
+        client=BufferClient('fake-key',opener=lambda *a,**k:Response(replies.pop(0)))
+        rows=client.channels()
+        self.assertEqual({c['name'] for c in rows},{'haeckel hamri','chronos'})
+        self.assertNotIn('other-test',{c['id'] for c in rows})
+
+    def test_paused_authorized_channel_is_not_used(self):
+        replies=[{'data':{'account':{'organizations':[{'id':'org-test'}]}}},
+          {'data':{'channels':[{'id':'profile-test','name':'haeckel-pro-slug','displayName':'Haeckel Hamri','service':'linkedin','isQueuePaused':True}]}}]
+        client=BufferClient('fake-key',opener=lambda *a,**k:Response(replies.pop(0)))
+        with self.assertRaisesRegex(SafeFailure,'authorized_channel_not_ready'):client.channels()
+
     def test_intent_before_mutation_and_rerun_no_duplicate(self):
         client = FakeClient(self.state)
         checkpoints = []

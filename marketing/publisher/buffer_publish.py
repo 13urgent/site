@@ -100,15 +100,25 @@ class BufferClient:
             oid = organization.get('id') if isinstance(organization, dict) else None
             if not isinstance(oid, str) or not oid:
                 raise SafeFailure('buffer_organization_schema')
-            data = self.query('query { channels(input: { organizationId: ' + json.dumps(oid) + ' }) { id name service } }')
+            data = self.query('query { channels(input: { organizationId: ' + json.dumps(oid) + ' }) { id name displayName service isDisconnected isLocked isQueuePaused } }')
             rows = data.get('channels')
             if not isinstance(rows, list):
                 raise SafeFailure('buffer_channels_schema')
             for row in rows:
                 if not isinstance(row, dict) or any(not isinstance(row.get(k), str) or not row[k] for k in ('id', 'name', 'service')):
                     raise SafeFailure('buffer_channels_schema')
-                if (normal(row['service']), normal(row['name'])) in ALLOWED:
-                    channels.append({k: row[k] for k in ('id', 'name', 'service')})
+                candidates=[row['name']]
+                if isinstance(row.get('displayName'),str):candidates.append(row['displayName'])
+                approved=set()
+                for candidate in candidates:
+                    label=normal(candidate)
+                    if label=='chronoss':label='chronos'
+                    if (normal(row['service']),label) in ALLOWED:approved.add(label)
+                if len(approved)>1:raise SafeFailure('channel_identity_ambiguous')
+                if approved:
+                    if any(row.get(flag,False) for flag in ('isDisconnected','isLocked','isQueuePaused')):
+                        raise SafeFailure('authorized_channel_not_ready')
+                    channels.append({'id':row['id'],'name':next(iter(approved)),'service':row['service']})
                     self._organization_by_channel[row['id']] = oid
         return channels
 
