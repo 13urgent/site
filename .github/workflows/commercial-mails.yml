@@ -1,0 +1,40 @@
+name: Prospection e-mail 13 URGENT
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Tester la connexion ou traiter la campagne autorisee
+        type: choice
+        options: [probe, send]
+        default: probe
+  schedule:
+    - cron: '30 6,7 * * 1'
+permissions:
+  contents: write
+concurrency:
+  group: marketing-13urgent
+  cancel-in-progress: false
+jobs:
+  mail:
+    name: Envoyer depuis contact et conserver les copies dans Envoyes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verifier expeditrice, archive et absence de doublons
+        run: python -m unittest discover -s mailing -p test_commercial_agent.py
+      - name: Connexion ou campagne privee
+        env:
+          CONTACT_MAIL_PASSWORD: ${{ secrets.CONTACT_MAIL_PASSWORD }}
+          PROSPECTION_CAMPAIGN_JSON: ${{ secrets.PROSPECTION_CAMPAIGN_JSON }}
+          RUN_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'send' }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = schedule ]; then
+            python mailing/run_campaign.py --mode "$RUN_MODE" --scheduled
+          else
+            python mailing/run_campaign.py --mode "$RUN_MODE"
+          fi
