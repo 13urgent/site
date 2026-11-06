@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-07",
+  "topic": "deposer-transport",
+  "audience": "Donneurs d’ordre",
+  "video_file": "13urgent-deposer-transport-20261107.mp4",
+  "duration_seconds": 20,
+  "width": 1080,
+  "height": 1920,
+  "fps": 24,
+  "codec": "H.264/AAC",
+  "voiceover": false,
+  "caption": "Un transport à organiser ? Commencez par une demande précise. Découvrez comment déposer votre demande.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
+  "destination": "https://13urgent.fr/",
+  "sha256": "96807db5469a381216a7f44b20f865d5da63f4c8a005835c570a81a7a437bbb7",
+  "music": {
+    "kind": "original_synthesized_instrumental",
+    "bpm": 108,
+    "external_samples": false,
+    "commercial_trend_verified": false,
+    "source": "render_daily.py / original_music",
+    "restrictions": "Do not label this cue as a trending song. No existing recording or named artist has been used."
+  },
+  "visuals": {
+    "kind": "illustrated_product_journey",
+    "live_screen_recording": false,
+    "client_data": false,
+    "logo_source": "CHRONOSS / 13 URGENT official logo supplied with project"
+  },
+  "editorial_review": {
+    "claim_scope": "Current product journey only; no guaranteed availability, revenue, attribution or number of users",
+    "pending": "Editorial supervisor must check this topic against current product before scheduling"
+  },
+  "render_verification": "ffprobe technical properties passed",
+  "publication_status": "not_published"
+}
