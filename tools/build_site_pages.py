@@ -7,6 +7,7 @@ de cette présentation : les règles Supabase restent inchangées.
 from pathlib import Path
 import re
 from service_pages import EXTRA
+from tutorial_pages import HOME_TUTORIALS
 ROOT = Path(__file__).resolve().parents[1]
 PAGES = {
     'accueil': ('index.html', '13 URGENT — Transport express entre professionnels', None),
@@ -44,7 +45,8 @@ def navigation(page, current=None):
     page, count = re.subn(r'<nav>.*?</nav>', lambda _:menu, page, count=1)
     if count != 1:
         raise ValueError('Menu principal introuvable')
-    page = page.replace('</head>','<link rel="stylesheet" href="site-pages.css?v=20261106-tutoriels"><script src="site-navigation.js?v=20261106-tutoriels" defer></script></head>',1)
+    page = page.replace('</head>','<link rel="stylesheet" href="site-pages.css?v=20261106-home-videos"><script src="site-navigation.js?v=20261106-tutoriels" defer></script></head>',1)
+    page = page.replace('<button class="btn ghost" id="openAccount">', '<a class="btn secondary tutorial-header-button" href="tutoriels.html"><span aria-hidden="true">▶</span> Vidéos d’aide</a><button class="btn ghost" id="openAccount">',1)
     page = page.replace('</footer>','<a href="tutoriels.html">Vidéos d’aide</a></footer>',1)
     page = page.replace('</body>', '<noscript><style>@media(max-width:800px){.top #siteNavigation{display:grid;grid-template-columns:1fr 1fr}.top .site-menu-toggle{display:none}}</style></noscript></body>',1)
     return page
@@ -75,6 +77,10 @@ def build_pages():
             start=page.index('id="'+section+'"')
             end=page.index('</div>',start)+6
             page=page[:end]+'<p class="page-help"><a href="mon-espace.html">Mon compte, mes justificatifs et mes conditions d’accès →</a></p>'+page[end:]
+        if key=='accueil':
+            end=page.index('</section>',page.index('<section class="hero">'))+len('</section>')
+            page=page[:end]+HOME_TUTORIALS+page[end:]
+            page=page.replace('<div class="hero-stats">','<div class="actions"><a class="btn secondary" href="#videos-aide">▶ Découvrir la plateforme en vidéo</a></div><div class="hero-stats">',1)
         if key in EXTRA:
             page=page.replace('</main>',EXTRA[key][3]+'</main>',1)
         if key=='espace':
