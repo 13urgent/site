@@ -2,21 +2,64 @@ name: Marketing 13 URGENT
 on:
   push:
     branches: [main]
-    paths: [.github/workflows/marketing-13urgent.yml, marketing/probe.py]
+    paths: [.github/workflows/marketing-13urgent.yml, 'marketing/**']
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Lecture seule ou programmation automatique
+        type: choice
+        options: [probe, publish]
+        default: probe
+  schedule:
+    # Gate in Python keeps only the 8am Europe/Paris window, including DST.
+    - cron: '0 6,7 * * *'
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: marketing-13urgent
+  cancel-in-progress: false
 jobs:
-  connection:
-    name: Verifier Buffer sans publier
+  daily:
+    name: Preparer et programmer les publications
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Lire les comptes Buffer
+      - name: Installer le moteur video
+        run: |
+          python -m pip install --disable-pip-version-check -q -r marketing/requirements.txt
+          if ! command -v ffmpeg >/dev/null || ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          fi
+      - name: Verifier les textes et la protection contre les doublons
+        run: |
+          python marketing/content/validate_content.py
+          python -m unittest discover -s marketing/publisher -p 'test_*.py'
+          python -m unittest discover -s marketing -p test_pipeline.py
+      - name: Produire et programmer sans intervention manuelle
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-        run: python marketing/probe.py
+          RUN_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'publish' }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = schedule ]; then
+            python marketing/pipeline.py --mode "$RUN_MODE" --scheduled
+          else
+            python marketing/pipeline.py --mode "$RUN_MODE"
+          fi
+      - name: Conserver les videos produites
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos-13urgent
+          path: |
+            .runtime/output/*/*.mp4
+            .runtime/output/*/cover.jpg
+            .runtime/output/*/storyboard.jpg
+            .runtime/output/*/manifest.json
+          if-no-files-found: ignore
+          retention-days: 7

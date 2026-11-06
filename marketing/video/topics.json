@@ -1,0 +1,50 @@
+{
+  "donneurs_ordre": {
+    "audience": "Donneurs d’ordre",
+    "url": "https://13urgent.fr/donneurs-ordre.html",
+    "caption": "Un transport à organiser ? Un remplacement à trouver ? Découvrez le parcours 13 URGENT : demande, propositions, attribution et documents. https://13urgent.fr/donneurs-ordre.html #Transport #Logistique #Affretement",
+    "scenes": [
+      {"eyebrow": "UN BESOIN DE TRANSPORT ?", "title": "Organisez votre\nprochaine course.", "body": "Un besoin ponctuel, urgent\nou un remplacement à trouver.", "icon": "route", "labels": ["Votre trajet", "Vos contraintes", "Votre demande"]},
+      {"eyebrow": "1 · DÉPOSEZ VOTRE DEMANDE", "title": "Précisez le besoin.", "body": "Renseignez le trajet, les dates\net la marchandise à transporter.", "icon": "form", "labels": ["Enlèvement → Livraison", "Date et horaire", "Marchandise et dimensions"]},
+      {"eyebrow": "2 · ÉTUDIEZ LES PROPOSITIONS", "title": "Échangez avec les\ntransporteurs.", "body": "Recevez des propositions\net choisissez selon votre besoin.", "icon": "offers", "labels": ["Proposition A", "Proposition B", "Tarifs confidentiels"]},
+      {"eyebrow": "3 · ATTRIBUEZ LE TRANSPORT", "title": "Préparez aussi\nles documents.", "body": "Confirmation d’affrètement\net lettre de voiture imprimable.", "icon": "document", "labels": ["Transport attribué", "Confirmation d’affrètement", "Lettre de voiture"]},
+      {"eyebrow": "13 URGENT · PAR CHRONOSS", "title": "Organisez votre\nprochain transport.", "body": "Découvrez le fonctionnement\nsur 13urgent.fr.", "icon": "cta", "labels": ["Donneurs d’ordre", "Transporteurs", "13urgent.fr"]}
+    ]
+  },
+  "transporteurs": {
+    "audience": "Transporteurs",
+    "url": "https://13urgent.fr/transporteurs.html",
+    "caption": "Transporteurs : présentez votre activité, consultez les demandes et proposez votre tarif selon vos droits et votre forfait. Découvrez 13 URGENT. https://13urgent.fr/transporteurs.html #Transporteur #Transport #Logistique",
+    "scenes": [
+      {"eyebrow": "VOUS ÊTES TRANSPORTEUR ?", "title": "Présentez votre\nactivité.", "body": "Vos véhicules, vos zones\net vos capacités de transport.", "icon": "truck", "labels": ["Vos zones", "Vos véhicules", "Votre activité"]},
+      {"eyebrow": "1 · COMPLÉTEZ VOTRE DOSSIER", "title": "Un accès\nprofessionnel.", "body": "Identité, justificatifs et conditions :\ncomplétez les éléments demandés.", "icon": "form", "labels": ["Identité de l’entreprise", "Documents demandés", "Conditions et accès"]},
+      {"eyebrow": "2 · CONSULTEZ LES DEMANDES", "title": "Repérez un trajet\nqui vous correspond.", "body": "Étudiez les contraintes\navant de proposer votre tarif.", "icon": "route", "labels": ["Trajet", "Date et marchandise", "Contraintes de livraison"]},
+      {"eyebrow": "3 · PROPOSEZ VOTRE TARIF", "title": "Une proposition\nconfidentielle.", "body": "Selon votre forfait et vos droits.\nLe donneur d’ordre fait son choix.", "icon": "offers", "labels": ["Votre proposition", "Votre tarif", "Échange avec le donneur d’ordre"]},
+      {"eyebrow": "13 URGENT · PAR CHRONOSS", "title": "Découvrez\nla plateforme.", "body": "Retrouvez les conditions d’accès\nsur 13urgent.fr.", "icon": "cta", "labels": ["Transporteurs professionnels", "Votre activité", "13urgent.fr"]}
+    ]
+  },
+  "documents": {
+    "audience": "Donneurs d’ordre et transporteurs",
+    "url": "https://13urgent.fr/fonctionnement.html",
+    "caption": "Du transport attribué aux documents : confirmation d’affrètement et lettre de voiture imprimable avec les informations de votre entreprise. Découvrez 13 URGENT. https://13urgent.fr/fonctionnement.html #Affretement #Transport #LettreDeVoiture",
+    "scenes": [
+      {"eyebrow": "LE TRANSPORT EST ATTRIBUÉ ?", "title": "Préparez\nles documents.", "body": "Retrouvez les informations\ndu transport dans votre dossier.", "icon": "document", "labels": ["Trajet", "Intervenants", "Marchandise"]},
+      {"eyebrow": "CONFIRMATION D’AFFRÈTEMENT", "title": "Un document\nlié au transport.", "body": "Préparez la confirmation\ndepuis la plateforme.", "icon": "document", "labels": ["Donneur d’ordre", "Transporteur", "Informations du transport"]},
+      {"eyebrow": "LETTRE DE VOITURE", "title": "Votre entreprise\naussi à l’affiche.", "body": "Retrouvez les logos configurés\net les informations renseignées.", "icon": "form", "labels": ["Identité de l’entreprise", "Logo configuré", "Informations du transport"]},
+      {"eyebrow": "CÔTÉ TRANSPORTEUR", "title": "Complétez,\npuis imprimez.", "body": "Ajoutez le conducteur et le véhicule,\npuis préparez la signature papier.", "icon": "truck", "labels": ["Conducteur", "Véhicule", "Impression et signature papier"]},
+      {"eyebrow": "13 URGENT · PAR CHRONOSS", "title": "De l’attribution\naux documents.", "body": "Découvrez le parcours complet\nsur 13urgent.fr.", "icon": "cta", "labels": ["Confirmation d’affrètement", "Lettre de voiture", "13urgent.fr"]}
+    ]
+  },
+  "particuliers": {
+    "audience": "Particuliers",
+    "url": "https://13urgent.fr/demenagement.html",
+    "caption": "Un déménagement, un meuble ou un colis volumineux à transporter ? Décrivez votre besoin : CHRONOSS étudie votre demande avant devis et engagement, selon disponibilité. https://13urgent.fr/demenagement.html #Demenagement #ColisVolumineux #Transport",
+    "scenes": [
+      {"eyebrow": "DÉMÉNAGEMENT · COLIS VOLUMINEUX", "title": "Un meuble\nà transporter ?", "body": "Un déménagement ou un objet\nqui ne rentre pas dans votre voiture.", "icon": "boxes", "labels": ["Meubles", "Objets volumineux", "Déménagement"]},
+      {"eyebrow": "1 · DÉCRIVEZ VOTRE BESOIN", "title": "Les bonnes\ninformations.", "body": "Précisez les objets, leurs dimensions\net leur poids estimé.", "icon": "form", "labels": ["Nature et quantité", "Dimensions", "Poids estimé"]},
+      {"eyebrow": "2 · PRÉCISEZ LE TRAJET", "title": "Pensez aussi\naux accès.", "body": "Adresses, dates, étages, ascenseur\net aide nécessaire sur place.", "icon": "route", "labels": ["Enlèvement → Livraison", "Date et souplesse", "Accès et manutention"]},
+      {"eyebrow": "3 · DEMANDEZ UNE ÉTUDE", "title": "Un devis avant\nde vous engager.", "body": "CHRONOSS étudie votre besoin,\nselon les disponibilités.", "icon": "document", "labels": ["Demande détaillée", "Étude de faisabilité", "Devis avant engagement"]},
+      {"eyebrow": "13 URGENT · PAR CHRONOSS", "title": "Préparez votre\ndemande en ligne.", "body": "Sans compte professionnel\nni SIRET.", "icon": "cta", "labels": ["Particuliers", "Demande de devis", "13urgent.fr"]}
+    ]
+  }
+}

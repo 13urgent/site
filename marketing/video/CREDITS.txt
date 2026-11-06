@@ -1,0 +1,7 @@
+13 URGENT / CHRONOSS — Capsules de presentation.
+Logo : fichier officiel fourni dans le projet CHRONOSS / 13 URGENT.
+Illustrations et mise en page : creees par programme pour ce projet.
+Musique : composition instrumentale synthetisee localement par render_daily.py ; aucun echantillon ni enregistrement tiers.
+Cette musique n’est pas une chanson tendance verifiee ni une imitation d’artiste nomme.
+Polices : DejaVu Sans, licence du paquet fonts-dejavu-core du systeme.
+Aucune voix et aucune donnee de client reel.

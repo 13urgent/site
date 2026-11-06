@@ -1,0 +1,10 @@
+{
+  "topics": 4,
+  "scenes": 20,
+  "text_bounds": "passed",
+  "client_data": false,
+  "tested_date": "2026-11-06",
+  "audio_mean_db": -19.0,
+  "audio_max_db": -1.5,
+  "sample_verified": "example/13urgent-donneurs_ordre-20261106.mp4"
+}

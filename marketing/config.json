@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "enabled": true,
+  "timezone": "Europe/Paris",
+  "accounts": [
+    {
+      "name": "Haeckel Hamri",
+      "service": "linkedin",
+      "caption_key": "linkedin_founder",
+      "weekdays": [
+        0,
+        2,
+        4
+      ],
+      "hour": "12:15"
+    },
+    {
+      "name": "Chronos",
+      "service": "linkedin",
+      "caption_key": "linkedin_page",
+      "weekdays": [
+        0,
+        2,
+        4
+      ],
+      "hour": "17:15"
+    },
+    {
+      "name": "13urgentsite",
+      "service": "tiktok",
+      "caption_key": "tiktok",
+      "weekdays": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "hour": "18:00"
+    }
+  ],
+  "topic_epoch": "2026-11-07",
+  "media_branch": "gh-pages",
+  "media_prefix": "videos/quotidien",
+  "state_branch": "marketing-state",
+  "channel_matching": "Exact normalized names and service; reject ambiguous channels",
+  "music": "Original instrumental; no verified trending commercial track",
+  "dm_automation": false,
+  "catalogue_prepared_on": "2026-11-06"
+}
