@@ -48,5 +48,8 @@ if not args.open_registration:
 (output / 'index.html').write_text(html)
 if (root / 'CNAME').exists():
     shutil.copy2(root / 'CNAME', output / 'CNAME')
+tutorials_media = root / 'videos/tutoriels-20261106'
+if tutorials_media.is_dir():
+    shutil.copytree(tutorials_media, output / 'videos/tutoriels-20261106')
 (output / '.nojekyll').write_text('')
 print('Version créée : paiement Stripe désactivé, inscriptions '+('ouvertes aux demandes professionnelles' if args.open_registration else 'masquées')+', aucune pièce justificative copiée. Le mode commercial reste contrôlé en base.')

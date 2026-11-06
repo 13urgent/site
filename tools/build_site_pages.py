@@ -20,6 +20,7 @@ PAGES = {
 }
 PAGES.update({key:(v[0],v[1],v[2])for key,v in EXTRA.items()})
 DESCRIPTIONS = {
+    'tutorials':'Découvrez en vidéo comment créer votre compte professionnel, déposer une course et demander un devis de transport à CHRONOSS.',
     'chronoss':'Découvrez les services CHRONOSS : transport routier et express, trajets réguliers, déménagement et demandes de devis en France.',
     'moving':'Demandez un devis de déménagement ou de transport de meubles et objets volumineux en France auprès de CHRONOSS.',
     'quote':'Présentez votre besoin de transport à CHRONOSS : demande de devis gratuite pour particuliers et professionnels, sans paiement en ligne.',
@@ -37,13 +38,14 @@ def navigation(page, current=None):
     for section, (name, _, _) in PAGES.items():
         page = page.replace('href="#'+section+'"', 'href="'+name+'" data-section-link="'+section+'"')
     # Le menu est commun, avec de vrais liens utilisables sans JavaScript.
-    items = [('accueil','Accueil'),('fonctionnement','Fonctionnement'),('courses','Courses'),('suivi','Mes courses'),('deposer','Déposer une course'),('tarifs','Donneurs d’ordre'),('abonnement-transporteur','Transporteurs'),('espace','Mon espace'),('chronoss','Services CHRONOSS'),('moving','Déménagement'),('capacity','Retours à vide'),('quote','Devis CHRONOSS')]
+    items = [('accueil','Accueil'),('fonctionnement','Fonctionnement'),('courses','Courses'),('suivi','Mes courses'),('deposer','Déposer une course'),('tarifs','Donneurs d’ordre'),('abonnement-transporteur','Transporteurs'),('espace','Mon espace'),('chronoss','Services CHRONOSS'),('moving','Déménagement'),('capacity','Retours à vide'),('quote','Devis CHRONOSS'),('tutorials','Vidéos d’aide')]
     links = ''.join('<a href="'+PAGES[key][0]+'" data-section-link="'+key+'"'+(' aria-current="page"' if current==key else '')+'>'+label+'</a>' for key,label in items)
     menu = '<button type="button" class="site-menu-toggle btn secondary" aria-expanded="false" aria-controls="siteNavigation">Menu</button><nav id="siteNavigation" aria-label="Navigation principale">'+links+'</nav>'
     page, count = re.subn(r'<nav>.*?</nav>', lambda _:menu, page, count=1)
     if count != 1:
         raise ValueError('Menu principal introuvable')
-    page = page.replace('</head>','<link rel="stylesheet" href="site-pages.css?v=20261030-services"><script src="site-navigation.js?v=20261029-pages" defer></script></head>',1)
+    page = page.replace('</head>','<link rel="stylesheet" href="site-pages.css?v=20261106-tutoriels"><script src="site-navigation.js?v=20261106-tutoriels" defer></script></head>',1)
+    page = page.replace('</footer>','<a href="tutoriels.html">Vidéos d’aide</a></footer>',1)
     page = page.replace('</body>', '<noscript><style>@media(max-width:800px){.top #siteNavigation{display:grid;grid-template-columns:1fr 1fr}.top .site-menu-toggle{display:none}}</style></noscript></body>',1)
     return page
 
