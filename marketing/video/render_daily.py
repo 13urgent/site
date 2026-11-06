@@ -23,7 +23,7 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parent
 W, H, FPS, DURATION = 1080, 1920, 24, 20
 BG, PANEL, RED, WHITE, MUTED = '#0c1120', '#172238', '#ed263d', '#f5f7fb', '#b6c2d7'
-FONT_ROOT = Path('/usr/share/fonts/truetype/dejavu')
+FONT_ROOT = ROOT/'assets/fonts' if (ROOT/'assets/fonts').is_dir() else Path('/usr/share/fonts/truetype/dejavu')
 
 
 def font(size: int, bold: bool = True):

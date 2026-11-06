@@ -28,13 +28,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Installer le moteur video
+          cache: pip
+          cache-dependency-path: marketing/requirements.txt
+      - name: Installer Pillow
+        timeout-minutes: 2
+        run: python -m pip install --disable-pip-version-check --timeout 20 --retries 2 -r marketing/requirements.txt
+      - name: Verifier FFmpeg
+        timeout-minutes: 3
         run: |
-          python -m pip install --disable-pip-version-check -q -r marketing/requirements.txt
-          if ! command -v ffmpeg >/dev/null || ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf; then
-            sudo apt-get update -qq
-            sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
+            sudo timeout 120 apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install -y --no-install-recommends ffmpeg
           fi
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
       - name: Verifier les textes et la protection contre les doublons
         run: |
           python marketing/content/validate_content.py
