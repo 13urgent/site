@@ -57,9 +57,13 @@
     },
     "20261109-consulter-demandes-tiktok-v1": {
       "fingerprint": "260a6ebecc80338c8d6d7d6a6e5eeeab05de4cd1d5b73349d0e922563784331b",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-08T07:56:36.132539+00:00",
-      "due_at": "2026-11-09T17:00:00Z"
+      "due_at": "2026-11-09T17:00:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "466ea68a50dcd7a55b8261d210d48544d7d35d25822bae8c350b5443c53e3d72",
+      "updated_at": "2026-11-08T07:56:37.582511+00:00"
     }
   }
 }
