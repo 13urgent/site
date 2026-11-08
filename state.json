@@ -44,6 +44,12 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "9e66a909873147d9f9257889b3a1e7861d54a9ae93a46eec6d0ff96dda89e693",
       "updated_at": "2026-11-08T07:56:32.476806+00:00"
+    },
+    "20261109-consulter-demandes-entreprise-v1": {
+      "fingerprint": "800db1a1577f0c8ff04817c2ae50e5ed17968643742c9e23739728a8e4b9151f",
+      "status": "intent",
+      "created_at": "2026-11-08T07:56:33.454966+00:00",
+      "due_at": "2026-11-09T16:15:00Z"
     }
   }
 }
