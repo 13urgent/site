@@ -34,6 +34,12 @@
       "buffer_post_fingerprint": "eb6199df7b769bea7590f26ae85c6b16eefaa870783523a9cbb91fd3ddb1c1b9",
       "updated_at": "2026-11-07T07:55:57.540079+00:00",
       "last_verified_at": "2026-11-08T07:56:27.838307+00:00"
+    },
+    "20261109-consulter-demandes-fondateur-v1": {
+      "fingerprint": "12e21a15a360827c52e92ca43706173d6608d2f15f489362e911e2431755d786",
+      "status": "intent",
+      "created_at": "2026-11-08T07:56:30.858911+00:00",
+      "due_at": "2026-11-09T11:15:00Z"
     }
   }
 }
