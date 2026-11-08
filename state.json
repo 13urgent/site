@@ -3,14 +3,15 @@
   "posts": {
     "20261107-deposer-transport-tiktok-v1": {
       "fingerprint": "33752785980c726af12930c8b8cc6760da15dc675600e88a8d6059eb6f18fd64",
-      "status": "scheduled",
+      "status": "sent",
       "created_at": "2026-11-06T11:44:18.316157+00:00",
       "due_at": "2026-11-07T17:00:00.000Z",
-      "provider_status": "scheduled",
+      "provider_status": "sent",
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "e8e3cde499a7367bbc5664cb58b4693f7850cd555738a62efeaa40bd83820ac7",
       "updated_at": "2026-11-06T11:44:20.195374+00:00",
-      "last_verified_at": "2026-11-07T07:55:52.116181+00:00"
+      "last_verified_at": "2026-11-08T07:56:27.838335+00:00",
+      "sent_at": "2026-11-07T17:05:04.343Z"
     },
     "linkedin-network-20261106-v1": {
       "fingerprint": "3fb17a1417955bca94e23a2da49f91fb8f216643d59f33d0e6276cf3c643e90c",
@@ -19,7 +20,7 @@
       "buffer_post_fingerprint": "cf4009688d56863a50201327bff406cd6dd31735ea8871b9515f75255b39fe3a",
       "provider_status": "sent",
       "scheduling_type": "automatic",
-      "last_verified_at": "2026-11-07T07:55:52.116102+00:00",
+      "last_verified_at": "2026-11-08T07:56:27.838331+00:00",
       "sent_at": "2026-11-06T17:39:40.896Z",
       "external_link": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7524525929004478464"
     },
@@ -31,7 +32,8 @@
       "provider_status": "scheduled",
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "eb6199df7b769bea7590f26ae85c6b16eefaa870783523a9cbb91fd3ddb1c1b9",
-      "updated_at": "2026-11-07T07:55:57.540079+00:00"
+      "updated_at": "2026-11-07T07:55:57.540079+00:00",
+      "last_verified_at": "2026-11-08T07:56:27.838307+00:00"
     }
   }
 }
