@@ -54,6 +54,12 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "680d04ec18e027b35cd8fe1f8f201852751becfd39629fec55e1ab5b6e4c17e8",
       "updated_at": "2026-11-08T07:56:35.097140+00:00"
+    },
+    "20261109-consulter-demandes-tiktok-v1": {
+      "fingerprint": "260a6ebecc80338c8d6d7d6a6e5eeeab05de4cd1d5b73349d0e922563784331b",
+      "status": "intent",
+      "created_at": "2026-11-08T07:56:36.132539+00:00",
+      "due_at": "2026-11-09T17:00:00Z"
     }
   }
 }
