@@ -19,10 +19,12 @@
         "updated_at": "2026-11-09T14:57:05.262089+00:00"
       },
       "do-8": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "10a3ea0f78fea60d1b4b676e50646b5caccfac4e183ba9693ff1ec6f5ec0a3e6",
         "message_date": "Mon, 09 Nov 2026 14:57:08 +0000",
-        "created_at": "2026-11-09T14:57:08.705734+00:00"
+        "created_at": "2026-11-09T14:57:08.705734+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-09T14:57:11.554889+00:00"
       }
     }
   },
