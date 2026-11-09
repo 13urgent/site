@@ -84,8 +84,7 @@ class SentArchive:
             for flags,delimiter,name in mailbox_rows(rows):
                 if b'\\noselect' in flags:continue
                 label=mailbox_label(name)
-                for prefix in ('inbox.','inbox/'):
-                    if label.startswith(prefix):label=label[len(prefix):];break
+                label=re.sub(r'^(?:inbox[./])+','',label)
                 if b'\\sent' in flags:special.append(name)
                 if label in ('sent','sent items','sent messages','envoye','envoyes','messages envoyes','elements envoyes'):known.append(name)
             candidates=list(dict.fromkeys(special or known))

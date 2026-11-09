@@ -57,6 +57,10 @@ class Tests(unittest.TestCase):
   server=IMAP([b'(\\HasNoChildren) "." "INBOX"',b'(\\HasNoChildren \\Sent) "." "INBOX.Sent"'])
   archive=a.SentArchive('fake',imap_factory=lambda:server);m,_=a.message(ROW,'test');archive.append(m);archive.append(m)
   self.assertEqual(server.folder,'"INBOX.Sent"');self.assertEqual(len(server.append_calls),1)
+ def test_nested_inbox_namespace_sent_folder(self):
+  server=IMAP([b'(\\HasNoChildren) "." "INBOX.INBOX.Sent"'])
+  archive=a.SentArchive('fake',imap_factory=lambda:server)
+  self.assertEqual(archive.folder,'"INBOX.INBOX.Sent"')
  def test_french_singular_sent_folder(self):
   server=IMAP([b'(\\HasNoChildren) "." "INBOX.Envoy&AOk-"'])
   archive=a.SentArchive('fake',imap_factory=lambda:server)
