@@ -10,7 +10,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "e8e3cde499a7367bbc5664cb58b4693f7850cd555738a62efeaa40bd83820ac7",
       "updated_at": "2026-11-06T11:44:20.195374+00:00",
-      "last_verified_at": "2026-11-09T07:18:54.414195+00:00",
+      "last_verified_at": "2026-11-09T15:30:55.169020+00:00",
       "sent_at": "2026-11-07T17:05:04.343Z"
     },
     "linkedin-network-20261106-v1": {
@@ -20,7 +20,7 @@
       "buffer_post_fingerprint": "cf4009688d56863a50201327bff406cd6dd31735ea8871b9515f75255b39fe3a",
       "provider_status": "sent",
       "scheduling_type": "automatic",
-      "last_verified_at": "2026-11-09T07:18:54.414191+00:00",
+      "last_verified_at": "2026-11-09T15:30:55.169016+00:00",
       "sent_at": "2026-11-06T17:39:40.896Z",
       "external_link": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7524525929004478464"
     },
@@ -33,19 +33,20 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "eb6199df7b769bea7590f26ae85c6b16eefaa870783523a9cbb91fd3ddb1c1b9",
       "updated_at": "2026-11-07T07:55:57.540079+00:00",
-      "last_verified_at": "2026-11-09T07:18:54.414187+00:00",
+      "last_verified_at": "2026-11-09T15:30:55.169012+00:00",
       "sent_at": "2026-11-08T17:04:12.765Z"
     },
     "20261109-consulter-demandes-fondateur-v1": {
       "fingerprint": "12e21a15a360827c52e92ca43706173d6608d2f15f489362e911e2431755d786",
-      "status": "scheduled",
+      "status": "sent",
       "created_at": "2026-11-08T07:56:30.858911+00:00",
       "due_at": "2026-11-09T11:15:00.000Z",
-      "provider_status": "scheduled",
+      "provider_status": "sent",
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "9e66a909873147d9f9257889b3a1e7861d54a9ae93a46eec6d0ff96dda89e693",
       "updated_at": "2026-11-08T07:56:32.476806+00:00",
-      "last_verified_at": "2026-11-09T07:18:54.414183+00:00"
+      "last_verified_at": "2026-11-09T15:30:55.169008+00:00",
+      "sent_at": "2026-11-09T11:15:27.921Z"
     },
     "20261109-consulter-demandes-entreprise-v1": {
       "fingerprint": "800db1a1577f0c8ff04817c2ae50e5ed17968643742c9e23739728a8e4b9151f",
@@ -56,7 +57,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "680d04ec18e027b35cd8fe1f8f201852751becfd39629fec55e1ab5b6e4c17e8",
       "updated_at": "2026-11-08T07:56:35.097140+00:00",
-      "last_verified_at": "2026-11-09T07:18:54.414178+00:00"
+      "last_verified_at": "2026-11-09T15:30:55.169003+00:00"
     },
     "20261109-consulter-demandes-tiktok-v1": {
       "fingerprint": "260a6ebecc80338c8d6d7d6a6e5eeeab05de4cd1d5b73349d0e922563784331b",
@@ -67,7 +68,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "466ea68a50dcd7a55b8261d210d48544d7d35d25822bae8c350b5443c53e3d72",
       "updated_at": "2026-11-08T07:56:37.582511+00:00",
-      "last_verified_at": "2026-11-09T07:18:54.414154+00:00"
+      "last_verified_at": "2026-11-09T15:30:55.168997+00:00"
     },
     "20261110-offres-confidentielles-tiktok-v1": {
       "fingerprint": "4067bba9db9a44d598fca63da68ec26de44284f0047260576349920538d3245c",
@@ -77,7 +78,8 @@
       "provider_status": "scheduled",
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "01cc3247a208a04ce79ec316fb8bb499369d1be52a6ea33152beaa07dc122982",
-      "updated_at": "2026-11-09T07:18:58.986682+00:00"
+      "updated_at": "2026-11-09T07:18:58.986682+00:00",
+      "last_verified_at": "2026-11-09T15:30:55.168975+00:00"
     }
   }
 }
