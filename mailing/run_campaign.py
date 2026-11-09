@@ -8,6 +8,7 @@ ROOT=Path(__file__).resolve().parent
 sys.path.insert(0,str(ROOT.parent/'marketing'))
 import pipeline
 import commercial_agent as agent
+import delivery_status
 
 def checkpoint(state_dir):
     path=state_dir/'mail-state.json';data=json.loads(path.read_text())
@@ -20,9 +21,9 @@ def checkpoint(state_dir):
     pipeline.git(state_dir,'push','origin','HEAD:refs/heads/'+pipeline.config()['state_branch'])
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--mode',choices=['probe','send'],default='probe');parser.add_argument('--scheduled',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--mode',choices=['probe','send','verify'],default='probe');parser.add_argument('--scheduled',action='store_true');parser.add_argument('--reported-bounce-id');args=parser.parse_args()
     now=datetime.now(ZoneInfo('Europe/Paris'))
-    if args.scheduled and (now.weekday()!=0 or now.hour!=8):
+    if args.scheduled and args.mode=='send' and (now.weekday()!=0 or now.hour!=8):
         pipeline.write_summary({'status':'outside_Paris_Monday_window','emails_sent':0});return 0
     password=os.environ.get('CONTACT_MAIL_PASSWORD')
     if not password:raise agent.CampaignError('mail_access_not_connected')
@@ -35,6 +36,9 @@ def main():
     if now<not_before:
         pipeline.write_summary({'status':'before_campaign_date','emails_sent':0});return 0
     _,state_dir=pipeline.setup_runtime()
+    if args.mode=='verify':
+        result=delivery_status.verify(campaign,state_dir/'mail-state.json',password,lambda:checkpoint(state_dir),reported_id=args.reported_bounce_id)
+        pipeline.write_summary(result);return 0
     result=agent.run(campaign,state_dir/'mail-state.json',execute=True,password=password,checkpoint=lambda:checkpoint(state_dir))
     counts={}
     for row in result:counts[row['status']]=counts.get(row['status'],0)+1

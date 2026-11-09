@@ -5,10 +5,15 @@ on:
       mode:
         description: Tester la connexion ou traiter la campagne autorisee
         type: choice
-        options: [probe, send]
+        options: [probe, send, verify]
         default: probe
+      reported_bounce_id:
+        description: Identifiant interne du dossier dont un rejet a ete signale
+        type: string
+        required: false
   schedule:
     - cron: '30 6,7 * * 1'
+    - cron: '15 9,13,17 * * 1-5'
 permissions:
   contents: write
 concurrency:
@@ -25,16 +30,24 @@ jobs:
         with:
           python-version: '3.12'
       - name: Verifier expeditrice, archive et absence de doublons
-        run: python -m unittest discover -s mailing -p test_commercial_agent.py
+        run: python -m unittest discover -s mailing -p 'test_*.py'
       - name: Connexion ou campagne privee
         env:
           CONTACT_MAIL_PASSWORD: ${{ secrets.CONTACT_MAIL_PASSWORD }}
           PROSPECTION_CAMPAIGN_JSON: ${{ secrets.PROSPECTION_CAMPAIGN_JSON }}
           RUN_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'send' }}
           EVENT_NAME: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          REPORTED_BOUNCE_ID: ${{ inputs.reported_bounce_id }}
         run: |
           if [ "$EVENT_NAME" = schedule ]; then
-            python mailing/run_campaign.py --mode "$RUN_MODE" --scheduled
+            if [ "$SCHEDULE" = '15 9,13,17 * * 1-5' ]; then
+              python mailing/run_campaign.py --mode verify
+            else
+              python mailing/run_campaign.py --mode "$RUN_MODE" --scheduled
+            fi
+          elif [ -n "$REPORTED_BOUNCE_ID" ]; then
+            python mailing/run_campaign.py --mode "$RUN_MODE" --reported-bounce-id "$REPORTED_BOUNCE_ID"
           else
             python mailing/run_campaign.py --mode "$RUN_MODE"
           fi

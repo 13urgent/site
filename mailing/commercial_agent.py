@@ -153,6 +153,8 @@ def run(campaign,state_path,execute=False,smtp_factory=None,password=None,now=No
             if normalized in {v.lower() for v in state.get('suppressed',[])}:results.append({'id':row['id'],'status':'suppressed'});continue
             previous=records.get(row['id']);mail,fingerprint=message(row,cid,previous.get('message_date') if previous else None)
             if previous:
+                if previous.get('blocked_for_resend') or previous.get('delivery_status')=='hard_bounced':
+                    results.append({'id':row['id'],'status':'blocked_hard_bounce'});continue
                 if previous.get('fingerprint')!=fingerprint:results.append({'id':row['id'],'status':'content_conflict'});continue
                 if execute and previous.get('status')=='accepted_archive_pending':
                     try:get_archive().append(mail);previous['status']='accepted_and_archived';persist()
