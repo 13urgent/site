@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Private targeted email campaign with durable dedup and IMAP Sent copies."""
 from __future__ import annotations
-import argparse,hashlib,imaplib,json,os,re,smtplib,ssl,tempfile,time
+import argparse,base64,hashlib,imaplib,json,os,re,smtplib,ssl,tempfile,time,unicodedata
 from datetime import datetime,timezone
 from email import policy
 from email.message import EmailMessage
@@ -47,6 +47,32 @@ def message(row,campaign_id,message_date=None):
     m.set_content(body)
     return m,digest
 
+def mailbox_rows(rows):
+    result=[]
+    for row in rows or []:
+        literal=None
+        if isinstance(row,tuple) and len(row)==2:row,literal=row
+        if not isinstance(row,bytes):continue
+        match=re.fullmatch(rb'\(([^)]*)\)\s+(?:"([^"\r\n]*)"|NIL)\s+(.*)',row)
+        if not match:continue
+        flags,delimiter,raw=match.groups()
+        if literal is not None:raw=literal
+        elif raw.startswith(b'"') and raw.endswith(b'"'):raw=raw[1:-1].replace(b'\\"',b'"').replace(b'\\\\',b'\\')
+        try:name=raw.decode('ascii')
+        except (UnicodeDecodeError,AttributeError):continue
+        if any(c in name for c in '\r\n'):continue
+        result.append((flags.lower().split(),delimiter.decode('ascii') if delimiter else None,name))
+    return result
+
+def mailbox_label(name):
+    def utf7(match):
+        value=match.group(1)
+        if not value:return '&'
+        try:return base64.b64decode(value.replace(',','/')+'='*((-len(value))%4)).decode('utf-16-be')
+        except (ValueError,UnicodeError):return match.group(0)
+    name=re.sub(r'&([^-]*)-',utf7,name)
+    return ' '.join(''.join(c for c in unicodedata.normalize('NFKD',name) if not unicodedata.combining(c)).casefold().split())
+
 class SentArchive:
     def __init__(self,password,imap_factory=None):
         self.client=imap_factory() if imap_factory else imaplib.IMAP4_SSL('ssl0.ovh.net',993,ssl_context=ssl.create_default_context(),timeout=30)
@@ -55,21 +81,25 @@ class SentArchive:
             status,rows=self.client.list()
             if status!='OK':raise CampaignError('sent_folder_list_failed')
             special=[];known=[]
-            for row in rows or []:
-                if not isinstance(row,bytes):continue
-                match=re.fullmatch(rb'\(([^)]*)\)\s+(?:"[^"\r\n]*"|NIL)\s+(.*)',row)
-                if not match:continue
-                flags,raw=match.groups()
-                if raw.startswith(b'"') and raw.endswith(b'"'):raw=raw[1:-1].replace(b'\\"',b'"').replace(b'\\\\',b'\\')
-                try:name=raw.decode('ascii')
-                except UnicodeDecodeError:continue
-                if any(c in name for c in '\r\n'):continue
-                quoted='"'+name.replace('\\','\\\\').replace('"','\\"')+'"'
-                if b'\\sent' in flags.lower().split():special.append(quoted)
-                if name.lower() in ('sent','inbox.sent','sent items','inbox.sent items','sent messages','inbox.sent messages','envoy&aok-s','inbox.envoy&aok-s'):known.append(quoted)
-            candidates=special or known
-            if len(candidates)!=1:raise CampaignError('sent_folder_missing_or_ambiguous')
-            self.folder=candidates[0]
+            for flags,delimiter,name in mailbox_rows(rows):
+                if b'\\noselect' in flags:continue
+                label=mailbox_label(name)
+                for prefix in ('inbox.','inbox/'):
+                    if label.startswith(prefix):label=label[len(prefix):];break
+                if b'\\sent' in flags:special.append(name)
+                if label in ('sent','sent items','sent messages','envoye','envoyes','messages envoyes','elements envoyes'):known.append(name)
+            candidates=list(dict.fromkeys(special or known))
+            # Match Roundcube's visible subscribed folder when old clients left
+            # multiple conventional Sent folders. No personal labels are logged.
+            if len(candidates)>1 and hasattr(self.client,'lsub'):
+                status,subscribed=self.client.lsub()
+                if status=='OK':
+                    names={name for _,_,name in mailbox_rows(subscribed)}
+                    visible=[name for name in candidates if name in names]
+                    if len(visible)==1:candidates=visible
+            if not candidates:raise CampaignError('sent_folder_not_found')
+            if len(candidates)!=1:raise CampaignError('sent_folder_ambiguous')
+            self.folder='"'+candidates[0].replace('\\','\\\\').replace('"','\\"')+'"'
             status,_=self.client.select(self.folder)
             if status!='OK':raise CampaignError('sent_folder_not_accessible')
         except Exception:
