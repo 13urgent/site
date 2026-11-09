@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-10",
+  "topic": "offres-confidentielles",
+  "audience": "Donneurs d’ordre",
+  "video_file": "13urgent-offres-confidentielles-20261110.mp4",
+  "duration_seconds": 20,
+  "width": 1080,
+  "height": 1920,
+  "fps": 24,
+  "codec": "H.264/AAC",
+  "voiceover": false,
+  "caption": "Comparer des offres de transport dans un espace dédié. Découvrez le parcours d’une demande.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
+  "destination": "https://13urgent.fr/",
+  "sha256": "e4dd194bdbc359e35dd7e71afe1896f13540e78182b052e8f57c24b3de286d49",
+  "music": {
+    "kind": "original_synthesized_instrumental",
+    "bpm": 106,
+    "external_samples": false,
+    "commercial_trend_verified": false,
+    "source": "render_daily.py / original_music",
+    "restrictions": "Do not label this cue as a trending song. No existing recording or named artist has been used."
+  },
+  "visuals": {
+    "kind": "illustrated_product_journey",
+    "live_screen_recording": false,
+    "client_data": false,
+    "logo_source": "CHRONOSS / 13 URGENT official logo supplied with project"
+  },
+  "editorial_review": {
+    "claim_scope": "Current product journey only; no guaranteed availability, revenue, attribution or number of users",
+    "pending": "Editorial supervisor must check this topic against current product before scheduling"
+  },
+  "render_verification": "ffprobe technical properties passed",
+  "publication_status": "not_published"
+}
