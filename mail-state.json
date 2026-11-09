@@ -49,6 +49,12 @@
         "created_at": "2026-11-09T14:57:27.340003+00:00",
         "archived_in_sent": true,
         "updated_at": "2026-11-09T14:57:30.271828+00:00"
+      },
+      "tr-2": {
+        "status": "intent",
+        "fingerprint": "60556ba0e79432d21b1964e402434232b628143775a592cd3e830f62d2a47891",
+        "message_date": "Mon, 09 Nov 2026 14:57:33 +0000",
+        "created_at": "2026-11-09T14:57:33.605914+00:00"
       }
     }
   },
