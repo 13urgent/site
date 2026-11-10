@@ -154,10 +154,12 @@
         "recipient_fingerprint": "a8bbbfb089320565ca81d8d22776644a2fa0df7bd4c5b455379d5d9ad88dda24"
       },
       "new-do-20261110-07": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "33094a2c1738be669ef50bd03695154a21917bfcb1edcb83a4b1ab841b5a3e26",
         "message_date": "Tue, 10 Nov 2026 08:56:50 +0000",
         "created_at": "2026-11-10T08:56:50.218000+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-10T08:56:52.949026+00:00",
         "recipient_fingerprint": "c51897360281600d5ff9475b74d64f2d2bbf9c0a0c83e24b64b4fd14502bab9d"
       }
     }
