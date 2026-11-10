@@ -207,6 +207,13 @@
         "received_at": "2026-11-10T11:49:00+00:00",
         "task_archive_saved": true,
         "checked_at": "2026-11-10T13:37:20.383367+00:00"
+      },
+      "f343b7c806426822053d5da2d5c7100ed2b74b6c9593517cf9aabca464389c28": {
+        "inquiry_kind": "equipment_be_fr",
+        "workflow_status": "reply_prepared",
+        "received_at": "2026-11-10T11:47:19+00:00",
+        "task_archive_saved": false,
+        "checked_at": "2026-11-10T13:37:21.429952+00:00"
       }
     }
   },
