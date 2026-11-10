@@ -9,6 +9,22 @@
  function scheduleAccess(){const field=$('shipmentForm').elements.arrival;if(!field)return;field.closest('label').hidden=false;field.required=state.canScheduleShipments;field.disabled=!state.canScheduleShipments||!(state.canPublish||(state.profile?.role==='admin'&&$('testShipmentInput')?.checked));$('shipmentScheduleNotice').textContent=state.canScheduleShipments?'Horaire prévu, exprimé en heure de Paris.':'L’heure d’arrivée n’est pas encore disponible. L’horaire de départ reste enregistré.';}
  const next={assigned:'heading_pickup',heading_pickup:'at_pickup',at_pickup:'loaded',loaded:'delivery_reported'};
  const notice=(id,text)=>{$(id).hidden=false;$(id).textContent=text;};
+ const courseLinkValue=new URLSearchParams(location.search).get('course');
+ const courseLinkId=/\/courses\.html$/.test(location.pathname)&&typeof courseLinkValue==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(courseLinkValue)?courseLinkValue.toLowerCase():null;
+ let courseLinkUser=null;
+ const courseLinkNotice=make('div');courseLinkNotice.id='courseLinkNotice';courseLinkNotice.hidden=true;courseLinkNotice.setAttribute('role','status');courseLinkNotice.setAttribute('aria-live','polite');
+ const courseLinkMessage=make('p');const courseLinkLogin=button('Se connecter pour consulter cette demande',()=>{$('openAccount').click();});courseLinkNotice.append(courseLinkMessage,courseLinkLogin);$('courseFilters').after(courseLinkNotice);
+ function courseLinkStatus(message,login=false){courseLinkNotice.hidden=!courseLinkId||!message;courseLinkMessage.textContent=message;courseLinkLogin.hidden=!login;}
+ function requestedCourse(firstLoad){
+  if(!courseLinkId)return;
+  const shipment=state.shipments.find(s=>String(s.id).toLowerCase()===courseLinkId&&!s.archived_at&&s.status==='open'&&s.is_test===false&&new Date(s.pickup).getTime()>=Date.now());
+  if(!shipment){courseLinkStatus('Cette demande n’est pas disponible pour votre compte ou n’est plus ouverte.');return;}
+  const card=[...$('shipments').children].find(el=>String(el.dataset.shipmentId).toLowerCase()===courseLinkId);
+  if(!card){courseLinkStatus('La demande de ce lien est masquée par les filtres actuels.');return;}
+  courseLinkStatus('La demande de transport correspondant à ce lien est affichée ci-dessous.');
+  card.classList.add('shipment-linked');card.tabIndex=-1;card.style.outline='3px solid #cd1830';card.style.outlineOffset='4px';
+  if(firstLoad){card.focus({preventScroll:true});card.scrollIntoView({block:'center'});}
+ }
  const commercial=s=>window.urgentCommerce?.ready===true&&window.urgentCommerce.enabled===true&&!s?.is_test;
  const money=v=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(Number(v));
  const date=v=>new Date(v).toLocaleString('fr-FR',{timeZone:'Europe/Paris'});
@@ -76,7 +92,7 @@
    if(generation!==state.generation)return;
    const missingSession=current.error?.name==='AuthSessionMissingError'||current.error?.message==='Auth session missing!';
    if(current.error&&!missingSession)throw current.error;
-   if(missingSession||!current.data?.user){publicationStatus('Connectez-vous avec votre compte professionnel pour remplir et publier une demande de transport.',true);notice('courseCount','Connectez-vous ou inscrivez-vous avec votre compte professionnel pour consulter les courses disponibles.');return;}
+   if(missingSession||!current.data?.user){courseLinkUser=null;courseLinkStatus('Connectez-vous avec votre compte professionnel pour consulter cette demande et proposer une offre.',true);publicationStatus('Connectez-vous avec votre compte professionnel pour remplir et publier une demande de transport.',true);notice('courseCount','Connectez-vous ou inscrivez-vous avec votre compte professionnel pour consulter les courses disponibles.');return;}
    const profile=await sb.from('profiles').select('id,role,company_id').eq('id',current.data.user.id).single();
    if(generation!==state.generation)return;
    if(profile.error)throw profile.error;
@@ -107,6 +123,8 @@
   }catch(e){if(generation===state.generation){if(!state.profile){reset();publicationStatus('Impossible de vérifier votre accès. Reconnectez-vous ou réessayez dans quelques instants.',true);}notice('courseCount','Impossible de charger les courses pour le moment. Actualisez la page ou reconnectez-vous.');}}
  }
  function render(){
+  const firstCourseLinkLoad=Boolean(courseLinkId&&state.user&&courseLinkUser!==state.user.id);
+  if(firstCourseLinkLoad){$('courseSearch').value='';$('courseVehicle').value='';courseLinkUser=state.user.id;}
   const list=$('shipments');list.replaceChildren();const query=$('courseSearch').value.trim().toLocaleLowerCase('fr');const vehicle=$('courseVehicle').value;
   const visible=state.shipments.filter(s=>!s.archived_at&&s.status==='open'&&new Date(s.pickup).getTime()>=Date.now()&&(!vehicle||s.vehicle===vehicle)&&(!query||`${s.origin} ${s.destination}`.toLocaleLowerCase('fr').includes(query)));
   notice('courseCount',`${visible.length} course(s) ouverte(s) affichée(s). Service professionnel. Toutes les courses accessibles ont été chargées.`);
@@ -146,6 +164,7 @@
    }list.append(card);
   }
   if(!visible.length)list.append(make('p','Aucune course ouverte ne correspond à la recherche.'));
+  requestedCourse(firstCourseLinkLoad);
   renderTracking();
  }
  function openShipmentEditor(card,shipment,contact){
