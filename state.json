@@ -85,9 +85,13 @@
     },
     "20261111-attribution-transport-fondateur-v1": {
       "fingerprint": "7351021db8c95fbcec67e64dbf7233e962723c42fa1bb1ca77b15b80756fa1e5",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-10T08:54:34.997426+00:00",
-      "due_at": "2026-11-11T11:15:00Z"
+      "due_at": "2026-11-11T11:15:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "b2a6316028cf74d47ca644abccd6083060e158183fb6bf01904421e5f084110f",
+      "updated_at": "2026-11-10T08:54:36.903272+00:00"
     }
   }
 }
