@@ -125,6 +125,13 @@
         "archived_in_sent": true,
         "updated_at": "2026-11-10T08:56:30.035449+00:00",
         "recipient_fingerprint": "d6a0f9a67c60c02d380a4a9fd40650b827f1e3f74a0e536102a526b6f3a635d0"
+      },
+      "new-do-20261110-04": {
+        "status": "intent",
+        "fingerprint": "1d7a689d348f893067f1457af6743810bbcb3258358d6d3f7efe3d2864d2b602",
+        "message_date": "Tue, 10 Nov 2026 08:56:33 +0000",
+        "created_at": "2026-11-10T08:56:33.102046+00:00",
+        "recipient_fingerprint": "e813f419359aac532d36cfa0aab7fa7a0705d69ac47d0eb918ff2766adeec5cd"
       }
     }
   },
