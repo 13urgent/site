@@ -82,6 +82,12 @@
       "buffer_post_fingerprint": "01cc3247a208a04ce79ec316fb8bb499369d1be52a6ea33152beaa07dc122982",
       "updated_at": "2026-11-09T07:18:58.986682+00:00",
       "last_verified_at": "2026-11-10T08:54:31.371374+00:00"
+    },
+    "20261111-attribution-transport-fondateur-v1": {
+      "fingerprint": "7351021db8c95fbcec67e64dbf7233e962723c42fa1bb1ca77b15b80756fa1e5",
+      "status": "intent",
+      "created_at": "2026-11-10T08:54:34.997426+00:00",
+      "due_at": "2026-11-11T11:15:00Z"
     }
   }
 }
