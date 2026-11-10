@@ -1,0 +1,31 @@
+name: Verifier les acces des agents 13 URGENT
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  configuration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Verifier uniquement la presence des acces necessaires
+        env:
+          MAIL_ACCESS: ${{ secrets.CONTACT_MAIL_PASSWORD }}
+          SOCIAL_ACCESS: ${{ secrets.BUFFER_API_KEY }}
+          DATABASE_ACCESS: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DEPLOYMENT_ACCESS: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          AGENT_LOGIN: ${{ secrets.SUPABASE_AGENT_EMAIL }}
+          AGENT_LOGIN_ACCESS: ${{ secrets.SUPABASE_AGENT_PASSWORD }}
+        run: |
+          python - <<'PY'
+          import json, os
+          print(json.dumps({
+              'mail_configured': bool(os.environ.get('MAIL_ACCESS')),
+              'social_configured': bool(os.environ.get('SOCIAL_ACCESS')),
+              'database_server_access_configured': bool(os.environ.get('DATABASE_ACCESS')),
+              'deployment_access_configured': bool(os.environ.get('DEPLOYMENT_ACCESS')),
+              'dedicated_agent_login_configured': bool(os.environ.get('AGENT_LOGIN') and os.environ.get('AGENT_LOGIN_ACCESS')),
+              'emails_sent': 0,
+              'courses_published': 0,
+          }))
+          PY

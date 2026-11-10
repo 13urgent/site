@@ -137,11 +137,13 @@ def select_requests(messages, mode, now=None):
     if mode in ('probe_requests', 'reply_requests'):
         selected = []
         for kind in ('pallets_uk', 'equipment_be_fr'):
-            candidates = [x for x in rows if x['kind'] == kind and not x['follows_own']]
-            if candidates: selected.append(max(candidates, key=lambda x: x['received_at']))
+            candidates = [x for x in rows if x['kind'] == kind]
+            if candidates:
+                chosen = max(candidates, key=lambda x: x['received_at'])
+                selected.append({**chosen, 'explicitly_requested_reply': mode == 'reply_requests'})
         return selected
     return sorted((x for x in rows if x['received_at'] >= max(ACTIVATED_AT, now - timedelta(days=2))),
-                  key=lambda x: x['received_at'])[:30]
+                  key=lambda x: x['received_at'])
 
 
 def missing_fields(request):
@@ -261,13 +263,35 @@ def note(state_path, request, status, checkpoint, task_saved=False):
     agent.save(state_path, state); checkpoint()
 
 
-def process(requests, state_path, password, checkpoint, client, deliver=service.deliver):
+def unprocessed_requests(requests, state_path):
+    state_path = Path(state_path)
+    state = json.loads(state_path.read_text()) if state_path.exists() else {'campaigns': {}}
+    records = state.get('campaigns', {}).get('inbound-requests-v1', {})
+    terminal = {'accepted_and_archived', 'already_recorded', 'archive_reconciled_without_resend',
+                'attachments_need_review', 'followup_needs_review', 'uncertain_do_not_retry',
+                'blocked_previous_uncertain_result', 'blocked_previous_intent', 'partial_acceptance',
+                'content_conflict'}
+    pending, skipped = [], 0
+    for request in requests:
+        record = records.get(request['source_hash'], {})
+        if record.get('task_archive_saved') is True and record.get('workflow_status') in terminal:
+            skipped += 1
+        else:
+            # Accepted-but-not-archived deliveries and failed private task copies
+            # remain eligible for their existing repair paths; never resend them.
+            pending.append(request)
+    return pending[:30], skipped
+
+
+def process(requests, state_path, password, checkpoint, client, deliver=service.deliver, automatic=False):
+    skipped = 0
+    if automatic: requests, skipped = unprocessed_requests(requests, state_path)
     counts = {}; sent = copies = task_failures = 0; domains = {}
     for request in requests:
         domain = request['recipient'].lower().split('@')[-1]
         if sent >= 10 or domains.get(domain, 0) >= 2: status = 'rate_limit_held'
         elif request['attachments'] and request['kind'] not in ('pallets_uk', 'equipment_be_fr'): status = 'attachments_need_review'
-        elif request['follows_own']: status = 'followup_needs_review'
+        elif request['follows_own'] and not request.get('explicitly_requested_reply', False): status = 'followup_needs_review'
         else:
             payload = payload_for(request)
             digest = hashlib.sha256(json.dumps({'payload': payload, 'parent': request['message_id']}, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
@@ -285,6 +309,7 @@ def process(requests, state_path, password, checkpoint, client, deliver=service.
         counts[status] = counts.get(status, 0) + 1
     return {'status': 'incoming_requests_processed', 'counts': counts, 'emails_sent': sent,
             'copies_saved_in_sent': copies, 'private_task_archive_failures': task_failures,
+            'already_processed_skipped': skipped,
             'delivery_to_recipient_not_verified': True, 'price_or_booking_confirmed': False,
             'publications_created': 0}
 
@@ -307,7 +332,7 @@ def main():
                               'scan_limited': limited, 'emails_sent': 0})); return 0
         _, state_dir = run_campaign.pipeline.setup_runtime()
         result = process(requests, state_dir / 'mail-state.json', password,
-                         lambda: run_campaign.checkpoint(state_dir), client)
+                         lambda: run_campaign.checkpoint(state_dir), client, automatic=args.mode == 'automatic')
         result['scan_limited'] = limited
         print(json.dumps(result))
         return 0 if not any(key in result['counts'] for key in ('uncertain_do_not_retry', 'accepted_archive_pending', 'partial_acceptance', 'blocked_previous_uncertain_result')) else 2

@@ -47,7 +47,11 @@ class IncomingTests(unittest.TestCase):
         reply = mail(In_Reply_To='<'+'a'*64+'@13urgent.fr>')
         request = incoming.describe(reply.as_bytes(), NOW)
         self.assertTrue(request['follows_own'])
-        self.assertEqual(incoming.select_requests([(reply.as_bytes(), NOW)], 'reply_requests'), [])
+        explicit = incoming.select_requests([(reply.as_bytes(), NOW)], 'reply_requests')
+        self.assertEqual(len(explicit), 1)
+        self.assertTrue(explicit[0]['explicitly_requested_reply'])
+        probe = incoming.select_requests([(reply.as_bytes(), NOW)], 'probe_requests')
+        self.assertFalse(probe[0]['explicitly_requested_reply'])
         forwarded = mail('Bonjour\n\nFrom: Test Client\nMerci offre transport 3 palettes Tandoori 100 kg.\nTest Client')
         self.assertIsNone(incoming.describe(forwarded.as_bytes(), NOW))
         short = mail('Mardi, hayon oui.', In_Reply_To='<'+'a'*64+'@13urgent.fr>')
@@ -117,6 +121,48 @@ class IncomingTests(unittest.TestCase):
                 result=incoming.process([request],Path(directory)/'state.json','test',lambda:None,client,
                                        deliver=lambda *a,**k:self.fail('must not send'))
             self.assertEqual(result['counts'],{'attachments_need_review':1})
+
+    def test_automatic_filters_completed_requests_before_thirty_item_limit(self):
+        messages = [(mail(message_id='<request-'+str(i)+'@example.net>').as_bytes(), NOW) for i in range(32)]
+        requests = incoming.select_requests(messages, 'automatic', NOW)
+        self.assertEqual(len(requests), 32)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)/'state.json'
+            completed = {r['source_hash']: {'workflow_status': 'accepted_and_archived', 'task_archive_saved': True} for r in requests[:31]}
+            path.write_text(json.dumps({'schema_version':1,'campaigns':{'inbound-requests-v1':completed},'suppressed':[]}))
+            sent = []
+            def send(payload, *args, **kwargs):
+                sent.append(payload['request_id'])
+                return {'status':'accepted_and_archived','emails_sent':1,'copy_saved_in_sent':True}
+            with patch.object(incoming,'private_task',return_value=True):
+                result = incoming.process(requests,path,'test',lambda:None,object(),deliver=send,automatic=True)
+            self.assertEqual(result['already_processed_skipped'],31)
+            self.assertEqual(sent,['inbound-'+requests[31]['source_hash']])
+
+    def test_pending_archive_repairs_and_failed_task_copies_are_not_skipped(self):
+        request=incoming.describe(mail().as_bytes(),NOW)
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'state.json'
+            for record in ({'workflow_status':'accepted_archive_pending','task_archive_saved':True},
+                           {'workflow_status':'accepted_and_archived','task_archive_saved':False}):
+                path.write_text(json.dumps({'campaigns':{'inbound-requests-v1':{request['source_hash']:record}}}))
+                selected,skipped=incoming.unprocessed_requests([request],path)
+                self.assertEqual(selected,[request]);self.assertEqual(skipped,0)
+
+    def test_only_explicit_targeted_selection_may_reply_to_prior_outreach_thread(self):
+        raw=mail(In_Reply_To='<'+'a'*64+'@13urgent.fr>').as_bytes()
+        explicit=incoming.select_requests([(raw,NOW)],'reply_requests',NOW)
+        automatic=incoming.select_requests([(raw,NOW)],'automatic',NOW)
+        with tempfile.TemporaryDirectory() as directory, patch.object(incoming,'private_task',return_value=True):
+            calls=[]
+            def send(payload,*args,**kwargs):
+                calls.append(payload['request_id'])
+                return {'status':'accepted_and_archived','emails_sent':1,'copy_saved_in_sent':True}
+            result=incoming.process(explicit,Path(directory)/'explicit.json','test',lambda:None,object(),deliver=send)
+            self.assertEqual(result['emails_sent'],1)
+            result=incoming.process(automatic,Path(directory)/'automatic.json','test',lambda:None,object(),deliver=send,automatic=True)
+            self.assertEqual(result['counts'],{'followup_needs_review':1})
+            self.assertEqual(len(calls),1)
 
 
 if __name__ == '__main__': unittest.main()
