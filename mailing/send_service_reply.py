@@ -107,7 +107,7 @@ def build_message(payload, digest, date):
     return mail
 
 
-def deliver(payload, digest, state_path, password, checkpoint, smtp_factory=None, archive_factory=None):
+def deliver(payload, digest, state_path, password, checkpoint, smtp_factory=None, archive_factory=None, message_builder=None):
     if not password:
         raise agent.CampaignError('mail_access_not_connected')
     state_path = Path(state_path)
@@ -123,7 +123,7 @@ def deliver(payload, digest, state_path, password, checkpoint, smtp_factory=None
     if record and record['status'] not in ('intent', 'accepted_archive_pending'):
         return {'status': 'blocked_previous_uncertain_result', 'emails_sent': 0, 'copy_saved_in_sent': record.get('archived_in_sent', False)}
     date = record['message_date'] if record else format_datetime(datetime.now(timezone.utc))
-    mail = build_message(payload, digest, date)
+    mail = (message_builder or build_message)(payload, digest, date)
     archive = archive_factory() if archive_factory else agent.SentArchive(password)
     smtp = None
     def persist():

@@ -1,0 +1,32 @@
+name: Traiter les demandes de transport entrantes
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Rechercher les demandes ciblees, y repondre, ou traiter les nouvelles demandes
+        type: choice
+        options: [probe_requests, reply_requests, automatic]
+        default: probe_requests
+  schedule:
+    - cron: '*/15 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: marketing-13urgent
+  cancel-in-progress: false
+jobs:
+  incoming:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verifier le tri et les reponses sans risque de doublon
+        run: python -m unittest discover -s mailing -p 'test_*.py'
+      - name: Traiter les demandes sans exporter leur contenu prive
+        env:
+          CONTACT_MAIL_PASSWORD: ${{ secrets.CONTACT_MAIL_PASSWORD }}
+          RUN_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'automatic' }}
+        run: python mailing/incoming_quotes.py --mode "$RUN_MODE"
