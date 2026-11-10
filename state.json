@@ -105,9 +105,13 @@
     },
     "20261111-attribution-transport-tiktok-v1": {
       "fingerprint": "564c8f8aca8f43eb5111ea9e1793192ee7a89a7091bef45c15a5a54f25343268",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-10T08:54:41.219364+00:00",
-      "due_at": "2026-11-11T17:00:00Z"
+      "due_at": "2026-11-11T17:00:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "b46c513a119330e2842fa48776b1cb3ae24594c11355b2791280831de95f5d5d",
+      "updated_at": "2026-11-10T08:54:42.920212+00:00"
     }
   }
 }
