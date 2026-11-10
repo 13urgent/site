@@ -1,0 +1,30 @@
+name: Verifier les destinations et liens Buffer
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: marketing-13urgent
+  cancel-in-progress: false
+jobs:
+  visibility:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verifier le filtrage des comptes et des URLs publiques
+        run: python -m unittest discover -s marketing -p test_visibility.py
+      - name: Lire les statuts et liens sans publier
+        env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+        run: python marketing/diagnose_visibility.py
+      - name: Conserver uniquement le rapport public filtre
+        uses: actions/upload-artifact@v4
+        with:
+          name: buffer-public-visibility
+          path: .runtime/visibility-report.json
+          if-no-files-found: error
+          retention-days: 3
