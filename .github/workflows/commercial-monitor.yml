@@ -1,0 +1,25 @@
+name: Suivi des retours commerciaux 13 URGENT
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 9,13,17 * * 1-5'
+permissions:
+  contents: write
+concurrency:
+  group: marketing-13urgent
+  cancel-in-progress: false
+jobs:
+  monitor:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verifier le rapprochement des retours
+        run: python -m unittest discover -s mailing -p test_monitor_replies.py
+      - name: Lire uniquement les retours lies aux envois
+        env:
+          CONTACT_MAIL_PASSWORD: ${{ secrets.CONTACT_MAIL_PASSWORD }}
+        run: python mailing/monitor_replies.py
