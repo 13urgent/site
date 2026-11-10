@@ -91,7 +91,7 @@
     "service-replies-v1": {
       "devis-20261110-93aa9309-clarification-v1": {
         "fingerprint": "3e74957d49b4d50fbe0fe4ce06a03c3b7077f798a7b5ec9c3ad885fafaf61482",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Tue, 10 Nov 2026 08:31:06 +0000",
         "created_at": "2026-11-10T08:31:07.985381+00:00"
       }
