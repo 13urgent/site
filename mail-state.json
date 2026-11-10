@@ -203,10 +203,10 @@
     "inbound-requests-v1": {
       "926fb7458fab929f367455077b25c446910571a02973629845c79111f38d8548": {
         "inquiry_kind": "pallets_uk",
-        "workflow_status": "reply_prepared",
+        "workflow_status": "accepted_and_archived",
         "received_at": "2026-11-10T11:49:00+00:00",
-        "task_archive_saved": false,
-        "checked_at": "2026-11-10T13:37:12.162843+00:00"
+        "task_archive_saved": true,
+        "checked_at": "2026-11-10T13:37:20.383367+00:00"
       }
     }
   },
