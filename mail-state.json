@@ -101,7 +101,7 @@
       },
       "inbound-926fb7458fab929f367455077b25c446910571a02973629845c79111f38d8548": {
         "fingerprint": "08c0f3f93179cd66296558f1fc31f464f03e9ac6e3e95c4ee2f2c202eb1efec0",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Tue, 10 Nov 2026 13:37:13 +0000",
         "created_at": "2026-11-10T13:37:14.892998+00:00"
       }
