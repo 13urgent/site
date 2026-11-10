@@ -97,6 +97,15 @@
         "archived_in_sent": true,
         "updated_at": "2026-11-10T08:31:11.098886+00:00"
       }
+    },
+    "acquisition-20261110-nouveaux-expediteurs-v1": {
+      "new-do-20261110-01": {
+        "status": "intent",
+        "fingerprint": "f414e04adddf24228e4b6f8b5ab15ef7db59b2e3d307834f9edb58ba32b4a6af",
+        "message_date": "Tue, 10 Nov 2026 08:56:13 +0000",
+        "created_at": "2026-11-10T08:56:15.804057+00:00",
+        "recipient_fingerprint": "30c8df3174d6ce838e68b834e654b18351bec8ae375539480d62b8bfaa414b79"
+      }
     }
   },
   "suppressed": []
