@@ -1,0 +1,44 @@
+name: Campagne ciblee chiffree 13 URGENT
+on:
+  workflow_dispatch:
+    inputs:
+      request_id:
+        description: Identifiant opaque de la campagne autorisee
+        type: string
+        required: true
+      payload_sha256:
+        description: Empreinte du contenu autorise
+        type: string
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: marketing-13urgent
+  cancel-in-progress: false
+jobs:
+  campaign:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      REQUEST_ID: ${{ inputs.request_id }}
+      PAYLOAD_SHA256: ${{ inputs.payload_sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verifier les protections de la campagne
+        run: python -m unittest discover -s mailing -p 'test_*.py'
+      - name: Preparer une cle ephemere privee
+        run: python mailing/send_sealed_campaign.py prepare
+      - name: Publier uniquement le certificat public
+        uses: actions/upload-artifact@v4
+        with:
+          name: sealed-campaign-public-cert-${{ inputs.request_id }}
+          path: ${{ runner.temp }}/service-reply/${{ inputs.request_id }}/public.crt
+          retention-days: 1
+          if-no-files-found: error
+      - name: Recevoir et executer la campagne autorisee
+        env:
+          CONTACT_MAIL_PASSWORD: ${{ secrets.CONTACT_MAIL_PASSWORD }}
+        run: python mailing/send_sealed_campaign.py send

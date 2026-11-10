@@ -2,14 +2,14 @@
   "schema_version": 1,
   "brand": "13 URGENT",
   "operator": "CHRONOSS",
-  "prepared_on": "2026-11-06",
-  "status": "catalogue_editorial_prepare_non_publie",
+  "prepared_on": "2026-11-10",
+  "status": "catalogue_prepare_pour_diffusion_autorisee",
   "review_mode": "controle_deterministe_du_brief_et_des_formats",
   "limitations": [
     "Ce catalogue est une sélection éditoriale préparée ; il ne constitue pas un agent IA permanent.",
     "Aucune veille réelle des tendances ni mesure actuelle de performance n’a été exécutée pour ces sujets.",
     "Le validateur contrôle des règles explicites ; il ne certifie ni le fonctionnement de la production ni l’exhaustivité des faits.",
-    "Aucun envoi, aucune programmation et aucune dépense ne sont effectués par ces fichiers."
+    "La diffusion depend du programme GitHub Actions et de la confirmation Buffer ; les conversions ne sont pas connues par ce catalogue."
   ],
   "topics": [
     {
@@ -89,17 +89,17 @@
       "audience": "donneur_ordre",
       "feature": "attribution",
       "landing_url": "https://13urgent.fr/",
-      "linkedin_founder": "De la demande de transport à son attribution.\n\nAvec 13 URGENT, nous rapprochons les étapes qui suivent une demande de transport.\n\nDéposez votre besoin, échangez avec les transporteurs et choisissez une proposition. 13 URGENT permet ensuite de préparer les documents du transport attribué.\n\nDécouvrez comment organiser votre prochain transport.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
-      "linkedin_page": "De la demande de transport à son attribution.\n\nDéposez votre besoin, échangez avec les transporteurs et choisissez une proposition. 13 URGENT permet ensuite de préparer les documents du transport attribué.\n\nDécouvrez comment organiser votre prochain transport.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
-      "tiktok": "De la demande de transport à son attribution. Découvrez comment organiser votre prochain transport.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
+      "linkedin_founder": "Achats, logistique, expéditions : quel transport devez-vous organiser ?\n\nAvec CHRONOSS, nous développons 13 URGENT pour rapprocher besoins de transport et professionnels.\n\nUne palette à livrer, des pièces attendues ou un remplacement à trouver ? Déposez le trajet, la date, la marchandise, le poids et le volume sur 13 URGENT. Étudiez les offres confidentielles reçues avant de choisir votre transporteur, selon les conditions d’accès.\n\nPrésentez votre prochain transport sur 13 URGENT.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
+      "linkedin_page": "Achats, logistique, expéditions : quel transport devez-vous organiser ?\n\nUne palette à livrer, des pièces attendues ou un remplacement à trouver ? Déposez le trajet, la date, la marchandise, le poids et le volume sur 13 URGENT. Étudiez les offres confidentielles reçues avant de choisir votre transporteur, selon les conditions d’accès.\n\nPrésentez votre prochain transport sur 13 URGENT.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
+      "tiktok": "Achats, logistique, expéditions : quel transport devez-vous organiser ?\nPrésentez votre prochain transport sur 13 URGENT.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
       "scenes": [
-        "Déposez un besoin précis",
-        "Échangez avec les transporteurs",
-        "Choisissez une proposition",
-        "Préparez les documents après attribution",
-        "13urgent.fr · Découvrez le fonctionnement"
+        "Un transport à organiser ?",
+        "Départ, arrivée et date",
+        "Marchandise, poids et volume",
+        "Étudiez les offres puis attribuez",
+        "13urgent.fr · Déposez votre besoin"
       ],
-      "cta": "Découvrez comment organiser votre prochain transport.",
+      "cta": "Présentez votre prochain transport sur 13 URGENT.",
       "claim_basis": "Fonction décrite dans le brief produit CHRONOSS / 13 URGENT du 6 novembre 2026 ; aucune mesure de performance revendiquée."
     },
     {
@@ -107,17 +107,17 @@
       "audience": "donneur_ordre",
       "feature": "confirmation_affretement",
       "landing_url": "https://13urgent.fr/",
-      "linkedin_founder": "Votre transport attribué, préparez sa confirmation d’affrètement.\n\nLes documents font partie du travail quotidien. Nous les avons intégrés au parcours de 13 URGENT.\n\n13 URGENT intègre la préparation de la confirmation d’affrètement. Retrouvez les informations du transport dans un document que le transporteur peut consulter et imprimer.\n\nDécouvrez les documents intégrés à la plateforme.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
-      "linkedin_page": "Votre transport attribué, préparez sa confirmation d’affrètement.\n\n13 URGENT intègre la préparation de la confirmation d’affrètement. Retrouvez les informations du transport dans un document que le transporteur peut consulter et imprimer.\n\nDécouvrez les documents intégrés à la plateforme.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
-      "tiktok": "Votre transport attribué, préparez sa confirmation d’affrètement. Découvrez les documents intégrés à la plateforme.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
+      "linkedin_founder": "Une expédition ponctuelle à préparer cette semaine ?\n\nAvec CHRONOSS, nous développons 13 URGENT pour rapprocher besoins de transport et professionnels.\n\nIndiquez le trajet, la date, le poids et le volume dans votre demande. Après étude des offres reçues et attribution, préparez la confirmation d’affrètement depuis 13 URGENT, selon les conditions d’accès.\n\nDéposez votre besoin pour préparer votre prochain départ.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
+      "linkedin_page": "Une expédition ponctuelle à préparer cette semaine ?\n\nIndiquez le trajet, la date, le poids et le volume dans votre demande. Après étude des offres reçues et attribution, préparez la confirmation d’affrètement depuis 13 URGENT, selon les conditions d’accès.\n\nDéposez votre besoin pour préparer votre prochain départ.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
+      "tiktok": "Une expédition ponctuelle à préparer cette semaine ?\nDéposez votre besoin pour préparer votre prochain départ.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
       "scenes": [
-        "Le transport est attribué",
-        "Préparez la confirmation d’affrètement",
-        "Retrouvez les informations de la mission",
-        "Un document consultable et imprimable",
-        "13urgent.fr · Découvrez les documents"
+        "Un départ de marchandises ?",
+        "Trajet, date, poids et volume",
+        "Déposez un besoin précis",
+        "Après attribution : confirmation d’affrètement",
+        "13urgent.fr · Présentez votre besoin"
       ],
-      "cta": "Découvrez les documents intégrés à la plateforme.",
+      "cta": "Déposez votre besoin pour préparer votre prochain départ.",
       "claim_basis": "Fonction décrite dans le brief produit CHRONOSS / 13 URGENT du 6 novembre 2026 ; aucune mesure de performance revendiquée."
     },
     {
@@ -125,17 +125,17 @@
       "audience": "donneur_ordre",
       "feature": "lettre_voiture_logo",
       "landing_url": "https://13urgent.fr/",
-      "linkedin_founder": "Une lettre de voiture aux couleurs de votre entreprise.\n\nNous avons voulu des documents utiles sur le terrain, avec une place pour l’identité de votre entreprise.\n\nPréparez une lettre de voiture imprimable depuis 13 URGENT, avec les logos renseignés dans les espaces d’identité. Les informations du transport restent regroupées pour préparer la mission.\n\nDécouvrez la préparation de la lettre de voiture.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
-      "linkedin_page": "Une lettre de voiture aux couleurs de votre entreprise.\n\nPréparez une lettre de voiture imprimable depuis 13 URGENT, avec les logos renseignés dans les espaces d’identité. Les informations du transport restent regroupées pour préparer la mission.\n\nDécouvrez la préparation de la lettre de voiture.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
-      "tiktok": "Une lettre de voiture aux couleurs de votre entreprise. Découvrez la préparation de la lettre de voiture.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
+      "linkedin_founder": "Un transport prévu, des documents à préparer ?\n\nAvec CHRONOSS, nous développons 13 URGENT pour rapprocher besoins de transport et professionnels.\n\nCommencez par décrire votre transport : trajet, date, marchandise, poids et volume. Après attribution, préparez votre lettre de voiture imprimable avec les logos renseignés dans votre espace professionnel.\n\nPrésentez votre prochain trajet sur 13 URGENT.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
+      "linkedin_page": "Un transport prévu, des documents à préparer ?\n\nCommencez par décrire votre transport : trajet, date, marchandise, poids et volume. Après attribution, préparez votre lettre de voiture imprimable avec les logos renseignés dans votre espace professionnel.\n\nPrésentez votre prochain trajet sur 13 URGENT.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
+      "tiktok": "Un transport prévu, des documents à préparer ?\nPrésentez votre prochain trajet sur 13 URGENT.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
       "scenes": [
-        "Préparez votre lettre de voiture",
-        "Retrouvez les informations du transport",
-        "Affichez les logos renseignés",
-        "Imprimez le document pour la mission",
-        "13urgent.fr · Découvrez les documents"
+        "Quel est votre prochain trajet ?",
+        "Départ, arrivée et date",
+        "Décrivez marchandise, poids et volume",
+        "Après attribution : lettre de voiture",
+        "13urgent.fr · Déposez votre besoin"
       ],
-      "cta": "Découvrez la préparation de la lettre de voiture.",
+      "cta": "Présentez votre prochain trajet sur 13 URGENT.",
       "claim_basis": "Fonction décrite dans le brief produit CHRONOSS / 13 URGENT du 6 novembre 2026 ; aucune mesure de performance revendiquée."
     },
     {
@@ -143,17 +143,17 @@
       "audience": "transporteur",
       "feature": "conducteur_vehicule",
       "landing_url": "https://13urgent.fr/",
-      "linkedin_founder": "Préparer le conducteur et le véhicule avant le départ.\n\nUn document préparé doit rester utile à celui qui effectue le transport. C’est l’un des points que nous avons intégrés.\n\nLe transporteur peut compléter les informations du conducteur et du véhicule sur la lettre de voiture préparée dans 13 URGENT, puis imprimer le document pour la mission.\n\nDécouvrez la préparation des documents côté transporteur.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
-      "linkedin_page": "Préparer le conducteur et le véhicule avant le départ.\n\nLe transporteur peut compléter les informations du conducteur et du véhicule sur la lettre de voiture préparée dans 13 URGENT, puis imprimer le document pour la mission.\n\nDécouvrez la préparation des documents côté transporteur.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
-      "tiktok": "Préparer le conducteur et le véhicule avant le départ. Découvrez la préparation des documents côté transporteur.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
+      "linkedin_founder": "Transporteurs : où et quand avez-vous une disponibilité ?\n\nAvec CHRONOSS, nous développons 13 URGENT pour rapprocher besoins de transport et professionnels.\n\nUtilitaire ou porteur : précisez vos zones, vos dates, votre véhicule et votre capacité. Une fois votre accès validé, étudiez les demandes et proposez votre tarif selon votre forfait. Le conducteur et le véhicule peuvent être renseignés sur la lettre de voiture.\n\nPrésentez votre activité et consultez les demandes disponibles.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
+      "linkedin_page": "Transporteurs : où et quand avez-vous une disponibilité ?\n\nUtilitaire ou porteur : précisez vos zones, vos dates, votre véhicule et votre capacité. Une fois votre accès validé, étudiez les demandes et proposez votre tarif selon votre forfait. Le conducteur et le véhicule peuvent être renseignés sur la lettre de voiture.\n\nPrésentez votre activité et consultez les demandes disponibles.\nhttps://13urgent.fr/\n\n#Transport #Logistique #13URGENT",
+      "tiktok": "Transporteurs : où et quand avez-vous une disponibilité ?\nPrésentez votre activité et consultez les demandes disponibles.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
       "scenes": [
-        "Un transport vous est attribué",
-        "Ouvrez la lettre de voiture",
-        "Complétez conducteur et véhicule",
-        "Imprimez votre document avant le départ",
+        "Une disponibilité transport ?",
+        "Vos zones et vos dates",
+        "Véhicule, capacité et contraintes",
+        "Étudiez les demandes adaptées",
         "13urgent.fr · Découvrez le parcours transporteur"
       ],
-      "cta": "Découvrez la préparation des documents côté transporteur.",
+      "cta": "Présentez votre activité et consultez les demandes disponibles.",
       "claim_basis": "Fonction décrite dans le brief produit CHRONOSS / 13 URGENT du 6 novembre 2026 ; aucune mesure de performance revendiquée."
     },
     {
