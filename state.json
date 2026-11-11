@@ -116,6 +116,12 @@
       "buffer_post_fingerprint": "b46c513a119330e2842fa48776b1cb3ae24594c11355b2791280831de95f5d5d",
       "updated_at": "2026-11-10T08:54:42.920212+00:00",
       "last_verified_at": "2026-11-11T07:02:51.229157+00:00"
+    },
+    "20261112-confirmation-affretement-tiktok-v1": {
+      "fingerprint": "e0cc3467a816c904c4eb15fa551ffbcf1ee857f95fb163fdd46b9d09a3ca3c60",
+      "status": "intent",
+      "created_at": "2026-11-11T07:02:54.454110+00:00",
+      "due_at": "2026-11-12T17:00:00Z"
     }
   }
 }
