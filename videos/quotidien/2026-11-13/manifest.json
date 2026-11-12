@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-13",
+  "topic": "lettre-voiture-logo",
+  "audience": "Donneurs d’ordre",
+  "video_file": "13urgent-lettre-voiture-logo-20261113.mp4",
+  "duration_seconds": 20,
+  "width": 1080,
+  "height": 1920,
+  "fps": 24,
+  "codec": "H.264/AAC",
+  "voiceover": false,
+  "caption": "Un transport prévu, des documents à préparer ?\nPrésentez votre prochain trajet sur 13 URGENT.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
+  "destination": "https://13urgent.fr/",
+  "sha256": "b571ec503e652647877543fb5f2b792a39a447225eb93086851b926639cb06c8",
+  "music": {
+    "kind": "original_synthesized_instrumental",
+    "bpm": 104,
+    "external_samples": false,
+    "commercial_trend_verified": false,
+    "source": "render_daily.py / original_music",
+    "restrictions": "Do not label this cue as a trending song. No existing recording or named artist has been used."
+  },
+  "visuals": {
+    "kind": "illustrated_product_journey",
+    "live_screen_recording": false,
+    "client_data": false,
+    "logo_source": "CHRONOSS / 13 URGENT official logo supplied with project"
+  },
+  "editorial_review": {
+    "claim_scope": "Current product journey only; no guaranteed availability, revenue, attribution or number of users",
+    "pending": "Editorial supervisor must check this topic against current product before scheduling"
+  },
+  "render_verification": "ffprobe technical properties passed",
+  "publication_status": "not_published"
+}
