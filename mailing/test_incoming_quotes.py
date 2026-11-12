@@ -164,5 +164,81 @@ class IncomingTests(unittest.TestCase):
             self.assertEqual(result['counts'],{'followup_needs_review':1})
             self.assertEqual(len(calls),1)
 
+    def followup_state(self):
+        source = hashlib.sha256(b'<original@example.net>').hexdigest()
+        return {'schema_version': 1, 'suppressed': [], 'campaigns': {
+            'inbound-requests-v1': {source: {'inquiry_kind': 'equipment_be_fr'}},
+            'service-replies-v1': {'inbound-'+source: {'fingerprint': 'b'*64,
+                                                      'status': 'accepted_and_archived'}}}}
+
+    def photo_followup(self):
+        message = mail('Bonjour, le colis est prêt pour enlèvement immédiat. '
+                       'La photo est jointe. Prévoir un camion avec hayon au déchargement.',
+                       message_id='<photo-reply@example.net>', In_Reply_To='<'+'b'*64+'@13urgent.fr>')
+        message.add_attachment(b'x'*400000, maintype='image', subtype='jpeg', filename='photo.jpg')
+        return message
+
+    def test_photo_larger_than_read_limit_keeps_text_for_private_triage(self):
+        raw = self.photo_followup().as_bytes()[:262144]
+        client = type('Client', (), {'select': lambda *a, **k: ('OK', []),
+            'uid': lambda self, cmd, *args: ('OK', [b'7']) if cmd == 'SEARCH' else
+                ('OK', [(b'7 (INTERNALDATE "12-Nov-2026 11:00:00 +0000")', raw)])})()
+        messages, _ = incoming.read_messages(client, 'automatic', NOW)
+        self.assertEqual(len(messages), 1)
+        request = incoming.describe(*messages[0])
+        self.assertTrue(request['source_truncated'])
+        self.assertTrue(request['attachments'])
+        self.assertIn('hayon', request['text'])
+        with tempfile.TemporaryDirectory() as directory, patch.object(incoming, 'private_task', return_value=True):
+            result = incoming.process([request], Path(directory)/'state.json', 'test', lambda:None,
+                object(), deliver=lambda *a, **k:self.fail('partial automatic message must not send'))
+        self.assertEqual(result['counts'], {'partial_message_needs_review': 1})
+
+    def test_target_followup_requires_exact_sender_and_known_parent(self):
+        raw = self.photo_followup().as_bytes()[:262144]
+        target = hashlib.sha256(b'customer@example.net').hexdigest()
+        selected = incoming.select_followup([(raw, NOW)], self.followup_state(), target)
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]['parent_kind'], 'equipment_be_fr')
+        self.assertTrue(selected[0]['source_truncated'])
+        self.assertFalse(incoming.select_followup([(raw, NOW)], self.followup_state(), '0'*64))
+        self.assertFalse(incoming.select_followup([(raw, NOW)], {'campaigns': {}}, target))
+        audit = {}
+        incoming.select_followup([(raw, NOW)], {'campaigns': {}}, target, audit=audit)
+        self.assertEqual(audit, {'target_sender_messages_seen': 1,
+                                'target_ready_candidates_seen': 1, 'linked_candidates_seen': 0})
+        with self.assertRaises(incoming.agent.CampaignError):
+            incoming.select_followup([(raw, NOW)], self.followup_state(), 'not-a-hash')
+
+    def test_original_reference_resolves_parent_but_other_quote_does_not(self):
+        target = hashlib.sha256(b'customer@example.net').hexdigest()
+        related = mail('Le colis est prêt, hayon nécessaire.', In_Reply_To='<original@example.net>')
+        self.assertEqual(incoming.select_followup([(related.as_bytes(), NOW)], self.followup_state(), target)[0]['parent_kind'], 'equipment_be_fr')
+        unrelated = mail('Le colis est prêt, hayon nécessaire.', In_Reply_To='<unknown@example.net>')
+        self.assertFalse(incoming.select_followup([(unrelated.as_bytes(), NOW)], self.followup_state(), target))
+
+    def test_followup_reply_stays_threaded_deduplicated_and_has_no_price(self):
+        raw = self.photo_followup().as_bytes()[:262144]
+        target = hashlib.sha256(b'customer@example.net').hexdigest()
+        state = self.followup_state()
+        request = incoming.select_followup([(raw, NOW)], state, target)
+        smtp, archive = SMTP(), Archive()
+        def deliver(payload, digest, path, password, checkpoint, **kwargs):
+            return incoming.service.deliver(payload, digest, path, password, checkpoint,
+                smtp_factory=lambda:smtp, archive_factory=lambda:archive, **kwargs)
+        with tempfile.TemporaryDirectory() as directory, patch.object(incoming, 'private_task', return_value=True):
+            path = Path(directory)/'state.json';path.write_text(json.dumps(state))
+            first = incoming.process_followup(request, path, 'test', lambda:None, object(), deliver=deliver)
+            second = incoming.process_followup(request, path, 'test', lambda:None, object(), deliver=deliver)
+            self.assertEqual(first['status'], 'accepted_and_archived')
+            self.assertEqual(second['status'], 'already_recorded')
+            self.assertNotIn('customer@example.net', path.read_text())
+        self.assertEqual(len(smtp.calls), 1)
+        message = smtp.calls[0][0]
+        self.assertEqual(message['In-Reply-To'], '<photo-reply@example.net>')
+        self.assertNotIn('€', message.get_content())
+        self.assertNotIn('douani', message.get_content())
+        self.assertIn('horaires exacts', message.get_content())
+
 
 if __name__ == '__main__': unittest.main()

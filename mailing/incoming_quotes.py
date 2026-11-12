@@ -82,7 +82,7 @@ def single_address(header):
     return address if EMAIL.fullmatch(address) and len(address) <= 254 else None
 
 
-def describe(raw, received_at=None):
+def describe(raw, received_at=None, allow_followup=False):
     message = BytesParser(policy=policy.default).parsebytes(raw)
     sender = single_address(message.get('From'))
     if not sender or sender.lower() in (agent.SENDER, agent.COPY): return None
@@ -122,13 +122,95 @@ def describe(raw, received_at=None):
     facts = sum(bool(re.search(pattern, normalized)) for pattern in
                 (r'\b\d+(?:[.,]\d+)?\s*kg\b', r'\bpalettes?\b', r'\b(?:adresse|address|pick.up)\b', r'\b\d{4,5}\b', r'\b(?:dimensions?|mm|cm)\b'))
     if not kind and request and facts >= 2: kind = 'generic_quote'
+    if not kind and allow_followup and text.strip(): kind = 'unclassified_followup'
     if not kind: return None
     clean_subject = ' '.join(str(message.get('Subject', 'Demande de transport')).split())[:180]
     source_hash = hashlib.sha256(mid.encode()).hexdigest()
     return {'kind': kind, 'sender': sender, 'recipient': reply_to, 'message_id': mid,
             'references': list(dict.fromkeys(references))[-18:], 'subject': clean_subject,
             'text': text, 'attachments': attachments, 'follows_own': follows_own,
-            'source_hash': source_hash, 'received_at': received_at.astimezone(timezone.utc)}
+            'source_hash': source_hash, 'received_at': received_at.astimezone(timezone.utc),
+            'source_truncated': len(raw) >= 262144}
+
+
+def parent_inquiry(request, state):
+    """Resolve a source inquiry through known message hashes, never subject guessing."""
+    campaigns = state.get('campaigns', {})
+    inquiries = campaigns.get('inbound-requests-v1', {})
+    outgoing = campaigns.get('service-replies-v1', {})
+    fingerprints = {r.get('fingerprint'): key[len('inbound-'):]
+                    for key, r in outgoing.items() if key.startswith('inbound-')}
+    parents = set()
+    for reference in request['references']:
+        source_hash = hashlib.sha256(reference.encode()).hexdigest()
+        if source_hash in inquiries: parents.add(source_hash)
+        if OWN_ID.fullmatch(reference):
+            known = fingerprints.get(reference[1:].split('@', 1)[0].lower())
+            if known in inquiries: parents.add(known)
+    if len(parents) != 1: return None
+    record = inquiries[next(iter(parents))]
+    kind = record.get('inquiry_kind')
+    return kind if kind in ('pallets_uk', 'equipment_be_fr') else None
+
+
+def select_followup(messages, state, sender_hash, audit=None):
+    if not re.fullmatch(r'[0-9a-f]{64}', sender_hash or ''):
+        raise agent.CampaignError('followup_sender_hash_invalid')
+    selected = []
+    counts = {'target_sender_messages_seen': 0, 'target_ready_candidates_seen': 0,
+              'linked_candidates_seen': 0}
+    for raw, received in messages:
+        header = BytesParser(policy=policy.default).parsebytes(raw, headersonly=True)
+        sender = single_address(header.get('From'))
+        if not sender or hashlib.sha256(sender.lower().encode()).hexdigest() != sender_hash:
+            continue
+        counts['target_sender_messages_seen'] += 1
+        request = describe(raw, received, allow_followup=True)
+        if not request: continue
+        kind = parent_inquiry(request, state)
+        if kind: counts['linked_candidates_seen'] += 1
+        text = folded(request['text'])
+        ready = bool(re.search(r'\b(?:pret|prete|prets|pretes|immediat|immediate)\b', text)
+                     and any(word in text for word in ('hayon', 'chariot')))
+        if ready: counts['target_ready_candidates_seen'] += 1
+        if kind and ready:
+            selected.append({**request, 'parent_kind': kind})
+    if audit is not None: audit.update(counts)
+    return [max(selected, key=lambda r: r['received_at'])] if selected else []
+
+
+def followup_body(request):
+    questions = [
+        '- les horaires exacts d’ouverture aux deux adresses ;',
+        '- si un chariot élévateur ou un autre moyen de chargement est disponible à l’enlèvement ;',
+    ]
+    if request['parent_kind'] == 'equipment_be_fr':
+        questions.append('- le nombre de colis ou palettes prêts et les dimensions finales du conditionnement.')
+    else:
+        questions.append('- qui prend en charge les formalités douanières d’exportation et d’importation.')
+    return ('Bonjour,\n\nMerci pour votre retour et la photo. Nous avons bien noté que le colis est prêt '
+            'pour un enlèvement dès que possible pendant les horaires de travail, et qu’un hayon ou un chariot '
+            'est nécessaire au déchargement.\n\nPour finaliser notre étude, pouvez-vous préciser :\n'
+            + '\n'.join(questions)
+            + '\n\nCordialement,\nL’équipe CHRONOSS — 13 URGENT\ncontact@13urgent.fr')
+
+
+def process_followup(requests, state_path, password, checkpoint, client, deliver=service.deliver):
+    if not requests:
+        return {'status': 'followup_not_matched', 'emails_sent': 0, 'copies_saved_in_sent': 0}
+    request = requests[0]
+    payload = payload_for(request)
+    payload['request_id'] = 'followup-' + request['source_hash']
+    payload['body'] = followup_body(request)
+    digest = hashlib.sha256(json.dumps({'payload': payload, 'parent': request['message_id']},
+                                      ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+    result = deliver(payload, digest, state_path, password, checkpoint,
+                     message_builder=message_builder(request))
+    try: saved = private_task(client, request, 'EN_ATTENTE_PRECISIONS')
+    except Exception: saved = False
+    note(state_path, request, result['status'], checkpoint, saved)
+    return {**result, 'parent_kind': request['parent_kind'], 'private_task_archive_saved': saved,
+            'price_or_booking_confirmed': False, 'publications_created': 0}
 
 
 def select_requests(messages, mode, now=None):
@@ -213,7 +295,7 @@ def message_builder(request):
 def read_messages(client, mode, now):
     status, _ = client.select('INBOX', readonly=True)
     if status != 'OK': raise agent.CampaignError('incoming_inbox_not_accessible')
-    since = '01-Oct-2026' if mode in ('probe_requests', 'reply_requests') else (now - timedelta(days=2)).strftime('%d-%b-%Y')
+    since = '01-Oct-2026' if mode in ('probe_requests', 'reply_requests', 'probe_followup', 'reply_followup') else (now - timedelta(days=2)).strftime('%d-%b-%Y')
     status, data = client.uid('SEARCH', None, 'SINCE', since)
     if status != 'OK': raise agent.CampaignError('incoming_search_failed')
     ids = b' '.join(x for x in data or [] if isinstance(x, bytes)).split()
@@ -228,7 +310,9 @@ def read_messages(client, mode, now):
             if match:
                 try: received = datetime.strptime(match.group(1).decode('ascii'), '%d-%b-%Y %H:%M:%S %z')
                 except ValueError: pass
-            if len(part[1]) < 262144: messages.append((part[1], received))
+            # Keep the readable text/header prefix of photo-heavy messages for
+            # private triage. Attachments are neither opened nor fetched fully.
+            messages.append((part[1], received))
     return messages, len(ids) > 300
 
 
@@ -270,7 +354,7 @@ def unprocessed_requests(requests, state_path):
     terminal = {'accepted_and_archived', 'already_recorded', 'archive_reconciled_without_resend',
                 'attachments_need_review', 'followup_needs_review', 'uncertain_do_not_retry',
                 'blocked_previous_uncertain_result', 'blocked_previous_intent', 'partial_acceptance',
-                'content_conflict'}
+                'content_conflict', 'partial_message_needs_review'}
     pending, skipped = [], 0
     for request in requests:
         record = records.get(request['source_hash'], {})
@@ -290,6 +374,7 @@ def process(requests, state_path, password, checkpoint, client, deliver=service.
     for request in requests:
         domain = request['recipient'].lower().split('@')[-1]
         if sent >= 10 or domains.get(domain, 0) >= 2: status = 'rate_limit_held'
+        elif request.get('source_truncated') and not request.get('explicitly_requested_reply', False): status = 'partial_message_needs_review'
         elif request['attachments'] and request['kind'] not in ('pallets_uk', 'equipment_be_fr'): status = 'attachments_need_review'
         elif request['follows_own'] and not request.get('explicitly_requested_reply', False): status = 'followup_needs_review'
         else:
@@ -301,7 +386,7 @@ def process(requests, state_path, password, checkpoint, client, deliver=service.
             copies += int(result.get('copy_saved_in_sent') is True)
             domains[domain] = domains.get(domain, 0) + result.get('emails_sent', 0)
         task_status = ('A_COMPLETER' if request['kind'] in ('pallets_uk', 'equipment_be_fr') or missing_fields(request) else 'A_CHIFFRER')
-        if status in ('attachments_need_review', 'followup_needs_review'): task_status = 'A_VERIFIER'
+        if status in ('attachments_need_review', 'followup_needs_review', 'partial_message_needs_review'): task_status = 'A_VERIFIER'
         try: saved = private_task(client, request, task_status)
         except Exception: saved = False
         if not saved: task_failures += 1
@@ -315,7 +400,7 @@ def process(requests, state_path, password, checkpoint, client, deliver=service.
 
 
 def main():
-    parser = argparse.ArgumentParser(); parser.add_argument('--mode', choices=['probe_requests', 'reply_requests', 'automatic'], default='probe_requests')
+    parser = argparse.ArgumentParser(); parser.add_argument('--mode', choices=['probe_requests', 'reply_requests', 'probe_followup', 'reply_followup', 'automatic'], default='probe_requests')
     args = parser.parse_args(); password = os.environ.get('CONTACT_MAIL_PASSWORD')
     if not password: raise agent.CampaignError('mail_access_not_connected')
     now = datetime.now(timezone.utc)
@@ -323,6 +408,24 @@ def main():
     try:
         client.login(agent.SENDER, password)
         messages, limited = read_messages(client, args.mode, now)
+        if args.mode in ('probe_followup', 'reply_followup'):
+            _, state_dir = run_campaign.pipeline.setup_runtime()
+            state_path = state_dir / 'mail-state.json'
+            audit = {}
+            requests = select_followup(messages, json.loads(state_path.read_text()),
+                                       os.environ.get('TARGET_SENDER_SHA256', ''), audit=audit)
+            if args.mode == 'probe_followup':
+                print(json.dumps({'status': 'followup_probe', 'requests_found': len(requests),
+                    'parent_kinds': [r['parent_kind'] for r in requests],
+                    'received_dates': [r['received_at'].date().isoformat() for r in requests],
+                    'source_truncated': [r['source_truncated'] for r in requests],
+                    'attachments_present': [r['attachments'] for r in requests],
+                    'scan_limited': limited, 'emails_sent': 0, **audit})); return 0
+            result = process_followup(requests, state_path, password,
+                lambda: run_campaign.checkpoint(state_dir), client)
+            result['scan_limited'] = limited
+            print(json.dumps(result))
+            return 0 if result['status'] in ('accepted_and_archived', 'already_recorded', 'archive_reconciled_without_resend', 'followup_not_matched') else 2
         requests = select_requests(messages, args.mode, now)
         if args.mode == 'probe_requests':
             print(json.dumps({'status': 'incoming_quote_probe', 'requests_found': len(requests),
