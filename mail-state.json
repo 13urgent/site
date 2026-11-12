@@ -270,6 +270,13 @@
         "received_at": "2026-11-12T11:54:30+00:00",
         "task_archive_saved": true,
         "checked_at": "2026-11-12T12:36:07.712465+00:00"
+      },
+      "31f87e6aa74f50a8e4c5daebfbe82d500556762017abf04c46eaad8ac3038127": {
+        "inquiry_kind": "linked_followup",
+        "workflow_status": "accepted_and_archived",
+        "received_at": "2026-11-12T12:03:36+00:00",
+        "task_archive_saved": true,
+        "checked_at": "2026-11-12T12:36:17.489437+00:00"
       }
     }
   },
