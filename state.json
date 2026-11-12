@@ -153,9 +153,13 @@
     },
     "20261113-lettre-voiture-logo-tiktok-v1": {
       "fingerprint": "5c5ae06b30d70cd4dd257bc3ece9f5e373791907160e5942e6c8d75acbe09de6",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-12T07:07:08.918087+00:00",
-      "due_at": "2026-11-13T17:00:00Z"
+      "due_at": "2026-11-13T17:00:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "daebef5ab9212c170e91b6aa54d25ea79d64a698fa621901307d3a414a3bbe2c",
+      "updated_at": "2026-11-12T07:07:10.562051+00:00"
     }
   }
 }
