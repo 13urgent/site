@@ -137,16 +137,18 @@ def parent_inquiry(request, state):
     """Resolve a source inquiry through known message hashes, never subject guessing."""
     campaigns = state.get('campaigns', {})
     inquiries = campaigns.get('inbound-requests-v1', {})
+    original_inquiries = {key for key, record in inquiries.items()
+                          if record.get('inquiry_kind') in ('pallets_uk', 'equipment_be_fr')}
     outgoing = campaigns.get('service-replies-v1', {})
     fingerprints = {r.get('fingerprint'): key[len('inbound-'):]
                     for key, r in outgoing.items() if key.startswith('inbound-')}
     parents = set()
     for reference in request['references']:
         source_hash = hashlib.sha256(reference.encode()).hexdigest()
-        if source_hash in inquiries: parents.add(source_hash)
+        if source_hash in original_inquiries: parents.add(source_hash)
         if OWN_ID.fullmatch(reference):
             known = fingerprints.get(reference[1:].split('@', 1)[0].lower())
-            if known in inquiries: parents.add(known)
+            if known in original_inquiries: parents.add(known)
     if len(parents) != 1: return None
     record = inquiries[next(iter(parents))]
     kind = record.get('inquiry_kind')

@@ -217,6 +217,13 @@ class IncomingTests(unittest.TestCase):
         unrelated = mail('Le colis est prêt, hayon nécessaire.', In_Reply_To='<unknown@example.net>')
         self.assertFalse(incoming.select_followup([(unrelated.as_bytes(), NOW)], self.followup_state(), target))
 
+    def test_prior_customer_followup_in_references_does_not_hide_original_inquiry(self):
+        state = self.followup_state()
+        prior_id = '<earlier-followup@example.net>'
+        state['campaigns']['inbound-requests-v1'][hashlib.sha256(prior_id.encode()).hexdigest()] = {'inquiry_kind': 'linked_followup'}
+        request = {'references': ['<original@example.net>', prior_id]}
+        self.assertEqual(incoming.parent_inquiry(request, state), 'equipment_be_fr')
+
     def test_followup_reply_stays_threaded_deduplicated_and_has_no_price(self):
         raw = self.photo_followup().as_bytes()[:262144]
         target = hashlib.sha256(b'customer@example.net').hexdigest()
