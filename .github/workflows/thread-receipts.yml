@@ -1,0 +1,33 @@
+name: Accuser reception des retours clients autorises
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [probe, send]
+        default: probe
+      target_sender_sha256:
+        type: string
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: marketing-13urgent
+  cancel-in-progress: false
+jobs:
+  receipt:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verifier le ciblage et les protections des reponses
+        run: python -m unittest discover -s mailing -p 'test_thread_receipts.py'
+      - name: Accuse et alerte sans exporter le contenu prive
+        env:
+          CONTACT_MAIL_PASSWORD: ${{ secrets.CONTACT_MAIL_PASSWORD }}
+          TARGET_SENDER_SHA256: ${{ inputs.target_sender_sha256 }}
+          RUN_MODE: ${{ inputs.mode }}
+        run: python mailing/thread_receipts.py --mode "$RUN_MODE"
