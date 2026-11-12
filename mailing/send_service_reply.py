@@ -74,7 +74,7 @@ def validate_payload(raw, request_id, digest):
     return value
 
 
-def fetch_payload(request_id, directory, wait=time.sleep):
+def fetch_payload(request_id, directory, wait=time.sleep, max_sealed_bytes=50000):
     repo = run_campaign.pipeline.REPO
     for _ in range(60):
         fetch = subprocess.run(['git', '-C', str(repo), 'fetch', '--depth=1', 'origin',
@@ -84,7 +84,7 @@ def fetch_payload(request_id, directory, wait=time.sleep):
                                      f'FETCH_HEAD:requests/{request_id}.cms'],
                                     capture_output=True, timeout=30)
             if result.returncode == 0:
-                if len(result.stdout) > 50000:
+                if len(result.stdout) > max_sealed_bytes:
                     raise agent.CampaignError('sealed_request_too_large')
                 sealed = directory / 'request.cms'
                 sealed.write_bytes(result.stdout)
@@ -146,7 +146,7 @@ def deliver(payload, digest, state_path, password, checkpoint, smtp_factory=None
         records[payload['request_id']] = record
         persist()
         try:
-            refused = smtp.send_message(mail, from_addr=agent.SENDER, to_addrs=[payload['to'], agent.COPY])
+            refused = smtp.send_message(mail, from_addr=agent.SENDER, to_addrs=list(dict.fromkeys([payload['to'], agent.COPY])))
         except Exception:
             record['status'] = 'uncertain_do_not_retry'
             persist()
