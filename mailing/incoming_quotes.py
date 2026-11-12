@@ -158,7 +158,7 @@ def parent_inquiry(request, state):
 def select_followup(messages, state, sender_hash, audit=None):
     if not re.fullmatch(r'[0-9a-f]{64}', sender_hash or ''):
         raise agent.CampaignError('followup_sender_hash_invalid')
-    selected = []
+    selected = []; latest = None
     counts = {'target_sender_messages_seen': 0, 'target_ready_candidates_seen': 0,
               'linked_candidates_seen': 0}
     for raw, received in messages:
@@ -170,6 +170,8 @@ def select_followup(messages, state, sender_hash, audit=None):
         request = describe(raw, received, allow_followup=True)
         if not request: continue
         kind = parent_inquiry(request, state)
+        if latest is None or request['received_at']>latest[0]['received_at']:
+            latest=(request,kind)
         if kind: counts['linked_candidates_seen'] += 1
         text = folded(request['text'])
         ready = bool(re.search(r'\b(?:pret|prete|prets|pretes|immediat|immediate)\b', text)
@@ -177,7 +179,13 @@ def select_followup(messages, state, sender_hash, audit=None):
         if ready: counts['target_ready_candidates_seen'] += 1
         if kind and ready:
             selected.append({**request, 'parent_kind': kind})
-    if audit is not None: audit.update(counts)
+    if audit is not None:
+        audit.update(counts)
+        if latest:
+            request,kind=latest
+            record=state.get('campaigns',{}).get('inbound-requests-v1',{}).get(request['source_hash'],{})
+            audit.update(latest_target_received_at=request['received_at'].isoformat(),latest_target_kind=request['kind'],
+                         latest_target_parent_kind=kind,latest_target_workflow_status=record.get('workflow_status','not_recorded'))
     return [max(selected, key=lambda r: r['received_at'])] if selected else []
 
 

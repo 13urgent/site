@@ -205,8 +205,8 @@ class IncomingTests(unittest.TestCase):
         self.assertFalse(incoming.select_followup([(raw, NOW)], {'campaigns': {}}, target))
         audit = {}
         incoming.select_followup([(raw, NOW)], {'campaigns': {}}, target, audit=audit)
-        self.assertEqual(audit, {'target_sender_messages_seen': 1,
-                                'target_ready_candidates_seen': 1, 'linked_candidates_seen': 0})
+        self.assertEqual({key:audit[key] for key in ('target_sender_messages_seen','target_ready_candidates_seen','linked_candidates_seen')},
+                         {'target_sender_messages_seen':1,'target_ready_candidates_seen':1,'linked_candidates_seen':0})
         with self.assertRaises(incoming.agent.CampaignError):
             incoming.select_followup([(raw, NOW)], self.followup_state(), 'not-a-hash')
 
@@ -216,6 +216,17 @@ class IncomingTests(unittest.TestCase):
         self.assertEqual(incoming.select_followup([(related.as_bytes(), NOW)], self.followup_state(), target)[0]['parent_kind'], 'equipment_be_fr')
         unrelated = mail('Le colis est prêt, hayon nécessaire.', In_Reply_To='<unknown@example.net>')
         self.assertFalse(incoming.select_followup([(unrelated.as_bytes(), NOW)], self.followup_state(), target))
+
+    def test_probe_reports_latest_short_reply_even_without_ready_keywords(self):
+        target=hashlib.sha256(b'customer@example.net').hexdigest()
+        old=mail('Le colis est prêt, hayon nécessaire.',message_id='<old-ready@example.net>',In_Reply_To='<original@example.net>')
+        new=mail('Ouverture de 8h à 17h.',message_id='<new-short@example.net>',In_Reply_To='<original@example.net>')
+        audit={};selected=incoming.select_followup([(old.as_bytes(),NOW-timedelta(days=1)),(new.as_bytes(),NOW)],self.followup_state(),target,audit=audit)
+        self.assertEqual(selected[0]['message_id'],'<old-ready@example.net>')
+        self.assertEqual(audit['latest_target_received_at'],NOW.isoformat())
+        self.assertEqual(audit['latest_target_parent_kind'],'equipment_be_fr')
+        self.assertEqual(audit['latest_target_workflow_status'],'not_recorded')
+        self.assertNotIn('Ouverture',json.dumps(audit));self.assertNotIn('customer@example.net',json.dumps(audit))
 
     def test_prior_customer_followup_in_references_does_not_hide_original_inquiry(self):
         state = self.followup_state()
