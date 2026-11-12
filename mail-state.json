@@ -127,9 +127,11 @@
       },
       "chronoss-pilote-windows-20261112-v2": {
         "fingerprint": "5bf7d03672e5069f8998e65bd9ebc20d4247f02c995a24b8df7cd57a7a0f05b7",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Thu, 12 Nov 2026 12:24:52 +0000",
-        "created_at": "2026-11-12T12:24:55.028211+00:00"
+        "created_at": "2026-11-12T12:24:55.028211+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-12T12:24:59.917941+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
