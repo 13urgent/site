@@ -240,5 +240,16 @@ class IncomingTests(unittest.TestCase):
         self.assertNotIn('douani', message.get_content())
         self.assertIn('horaires exacts', message.get_content())
 
+    def test_delayed_followup_reconfirms_availability_instead_of_assuming_still_ready(self):
+        request = {'parent_kind': 'equipment_be_fr', 'received_at': NOW}
+        from datetime import timedelta
+        fresh = incoming.followup_body(request, now=NOW)
+        delayed = incoming.followup_body(request, now=NOW+timedelta(days=2))
+        self.assertNotIn('toujours disponible', fresh)
+        self.assertIn('toujours disponible', delayed)
+        self.assertIn('excuser pour le délai', delayed)
+        self.assertIn('au déchargement est bien pris en compte', delayed)
+        self.assertNotIn('€', delayed)
+
 
 if __name__ == '__main__': unittest.main()

@@ -179,7 +179,9 @@ def select_followup(messages, state, sender_hash, audit=None):
     return [max(selected, key=lambda r: r['received_at'])] if selected else []
 
 
-def followup_body(request):
+def followup_body(request, now=None):
+    now = now or datetime.now(timezone.utc)
+    delayed = now - request['received_at'] > timedelta(days=1)
     questions = [
         '- les horaires exacts d’ouverture aux deux adresses ;',
         '- si un chariot élévateur ou un autre moyen de chargement est disponible à l’enlèvement ;',
@@ -188,9 +190,14 @@ def followup_body(request):
         questions.append('- le nombre de colis ou palettes prêts et les dimensions finales du conditionnement.')
     else:
         questions.append('- qui prend en charge les formalités douanières d’exportation et d’importation.')
-    return ('Bonjour,\n\nMerci pour votre retour et la photo. Nous avons bien noté que le colis est prêt '
-            'pour un enlèvement dès que possible pendant les horaires de travail, et qu’un hayon ou un chariot '
-            'est nécessaire au déchargement.\n\nPour finaliser notre étude, pouvez-vous préciser :\n'
+    if delayed:
+        questions.insert(0, '- si le colis est toujours disponible à l’enlèvement ;')
+    introduction = 'Merci pour votre retour et la photo.'
+    if delayed:
+        introduction += ' Veuillez nous excuser pour le délai de réponse.'
+    return ('Bonjour,\n\n' + introduction + ' Vous nous avez indiqué que le colis était prêt '
+            'pour un enlèvement dès que possible pendant les horaires de travail. Le besoin d’un hayon ou d’un chariot '
+            'au déchargement est bien pris en compte.\n\nPour finaliser notre étude, pouvez-vous préciser :\n'
             + '\n'.join(questions)
             + '\n\nCordialement,\nL’équipe CHRONOSS — 13 URGENT\ncontact@13urgent.fr')
 
@@ -201,7 +208,14 @@ def process_followup(requests, state_path, password, checkpoint, client, deliver
     request = requests[0]
     payload = payload_for(request)
     payload['request_id'] = 'followup-' + request['source_hash']
-    payload['body'] = followup_body(request)
+    state = json.loads(Path(state_path).read_text())
+    previous = state.get('campaigns', {}).get('service-replies-v1', {}).get(payload['request_id'])
+    if previous and previous.get('status') == 'accepted_and_archived':
+        return {'status': 'already_recorded', 'emails_sent': 0, 'copy_saved_in_sent': True,
+                'parent_kind': request['parent_kind'], 'price_or_booking_confirmed': False,
+                'publications_created': 0}
+    reply_time = parsedate_to_datetime(previous['message_date']) if previous and previous.get('message_date') else None
+    payload['body'] = followup_body(request, now=reply_time)
     digest = hashlib.sha256(json.dumps({'payload': payload, 'parent': request['message_id']},
                                       ensure_ascii=False, sort_keys=True).encode()).hexdigest()
     result = deliver(payload, digest, state_path, password, checkpoint,
