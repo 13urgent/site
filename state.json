@@ -140,6 +140,12 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "cdeb3f32a3bd65f54d4fbbce15f832da6b138115e614b5f01dae629e06bf8971",
       "updated_at": "2026-11-12T07:07:05.429019+00:00"
+    },
+    "20261113-lettre-voiture-logo-entreprise-v1": {
+      "fingerprint": "f682fe391a449a09db75914763d0626e646a4f2db489f1539023170128778b60",
+      "status": "intent",
+      "created_at": "2026-11-12T07:07:06.475694+00:00",
+      "due_at": "2026-11-13T16:15:00Z"
     }
   }
 }
