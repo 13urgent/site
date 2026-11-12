@@ -155,7 +155,7 @@
       },
       "chronoss-pilote-serveur-20261112-v3": {
         "fingerprint": "0d05b5b6be76cd8668788be7e04287beb51b11830ba9d88b2679cf94545c7bd0",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Thu, 12 Nov 2026 14:40:01 +0000",
         "created_at": "2026-11-12T14:40:04.136753+00:00"
       }
