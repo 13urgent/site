@@ -163,9 +163,11 @@
       },
       "chronoss-maj-ecmr-20261112-v4": {
         "fingerprint": "23d742c3d71534e499a480fe3a3b49993c4b2eb204432248fa413c60b54a5c06",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Thu, 12 Nov 2026 16:20:26 +0000",
-        "created_at": "2026-11-12T16:20:28.011716+00:00"
+        "created_at": "2026-11-12T16:20:28.011716+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-12T16:20:32.174720+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
