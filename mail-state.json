@@ -135,7 +135,7 @@
       },
       "receipt-0a0c7a6ab209acd98f9e17b67d5f328f1177386f64ec22dcb60155839844a361": {
         "fingerprint": "3f2765d2a5a04f4f3e4ba1b178b89e38d673734caeb4d05c2b6c251cba925667",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Thu, 12 Nov 2026 12:35:59 +0000",
         "created_at": "2026-11-12T12:36:02.434052+00:00"
       }
