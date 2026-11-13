@@ -179,7 +179,7 @@
       },
       "chronoss-planning-v5-nomme-20261113": {
         "fingerprint": "e64773a5ab7e59e73eddf9091da2bbc0c72cd9867576860935885e2e5af65c45",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Fri, 13 Nov 2026 10:57:24 +0000",
         "created_at": "2026-11-13T10:57:26.926125+00:00"
       }
