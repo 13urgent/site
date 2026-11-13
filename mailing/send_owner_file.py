@@ -19,6 +19,7 @@ import send_service_reply as sealed
 MAX_RAW=3_000_000
 MAX_ZIP=2_000_000
 FILENAME='CHRONOSS-ECMR-pilote-Windows.zip'
+ALLOWED_FILENAMES={FILENAME,'CHRONOSS-PLANNING-V5.zip'}
 
 
 def validate_payload(raw,request_id,digest):
@@ -30,7 +31,7 @@ def validate_payload(raw,request_id,digest):
     canonical=json.dumps(base).encode();sealed.validate_payload(canonical,request_id,hashlib.sha256(canonical).hexdigest())
     if value['to']!=agent.SENDER:raise agent.CampaignError('owner_file_recipient_not_owner')
     file=value['attachment']
-    if not isinstance(file,dict) or set(file)!={'filename','sha256','content_base64'} or file['filename']!=FILENAME:raise agent.CampaignError('owner_file_attachment_invalid')
+    if not isinstance(file,dict) or set(file)!={'filename','sha256','content_base64'} or not isinstance(file['filename'],str) or file['filename'] not in ALLOWED_FILENAMES:raise agent.CampaignError('owner_file_attachment_invalid')
     try:
         data=base64.b64decode(file['content_base64'],validate=True)
     except (ValueError,TypeError,binascii.Error):raise agent.CampaignError('owner_file_attachment_invalid') from None
@@ -52,7 +53,7 @@ def build_message(payload,digest,date):
     mail['From']='CHRONOSS <'+agent.SENDER+'>';mail['To']=agent.SENDER
     mail['Reply-To']=agent.SENDER;mail['Subject']=payload['subject'];mail['Date']=date;mail['Message-ID']='<'+digest+'@13urgent.fr>'
     mail.set_content(payload['body'])
-    mail.add_attachment(base64.b64decode(payload['attachment']['content_base64']),maintype='application',subtype='zip',filename=FILENAME)
+    mail.add_attachment(base64.b64decode(payload['attachment']['content_base64']),maintype='application',subtype='zip',filename=payload['attachment']['filename'])
     return mail
 
 

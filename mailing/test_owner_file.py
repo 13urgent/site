@@ -52,5 +52,18 @@ class OwnerFileTests(unittest.TestCase):
         raw=json.dumps(self.payload).encode()
         with self.assertRaises(owner.agent.CampaignError):owner.validate_payload(raw,self.payload['request_id'],'0'*64)
 
+    def test_planning_archive_keeps_its_distinct_filename(self):
+        payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':'CHRONOSS-PLANNING-V5.zip'}}
+        checked=self.validate(payload)
+        message=owner.build_message(checked,'a'*64,'Fri, 13 Nov 2026 10:00:00 +0000')
+        attachment=list(message.iter_attachments())[0]
+        self.assertEqual(attachment.get_filename(),'CHRONOSS-PLANNING-V5.zip')
+        self.assertEqual(attachment.get_content(),self.file)
+
+    def test_other_attachment_names_remain_rejected(self):
+        for name in ('another.zip','../CHRONOSS-PLANNING-V5.zip',['CHRONOSS-PLANNING-V5.zip']):
+            payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':name}}
+            with self.assertRaises(owner.agent.CampaignError):self.validate(payload)
+
 
 if __name__=='__main__':unittest.main()
