@@ -164,6 +164,12 @@
       "buffer_post_fingerprint": "daebef5ab9212c170e91b6aa54d25ea79d64a698fa621901307d3a414a3bbe2c",
       "updated_at": "2026-11-12T07:07:10.562051+00:00",
       "last_verified_at": "2026-11-13T07:04:31.086469+00:00"
+    },
+    "20261114-conducteur-vehicule-tiktok-v1": {
+      "fingerprint": "1dd6ccf0a23072d6eb1b5505d4be1bbae340991ada02bf0c25286c8c415b69b4",
+      "status": "intent",
+      "created_at": "2026-11-13T07:04:34.322572+00:00",
+      "due_at": "2026-11-14T17:00:00Z"
     }
   }
 }
