@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-14",
+  "topic": "conducteur-vehicule",
+  "audience": "Transporteurs",
+  "video_file": "13urgent-conducteur-vehicule-20261114.mp4",
+  "duration_seconds": 20,
+  "width": 1080,
+  "height": 1920,
+  "fps": 24,
+  "codec": "H.264/AAC",
+  "voiceover": false,
+  "caption": "Transporteurs : où et quand avez-vous une disponibilité ?\nPrésentez votre activité et consultez les demandes disponibles.\nhttps://13urgent.fr/\n#Transport #Logistique #13URGENT",
+  "destination": "https://13urgent.fr/",
+  "sha256": "fa5a0953d9358248af15a4093f620b6bb6979176e083bfe0b33491c43f0b2453",
+  "music": {
+    "kind": "original_synthesized_instrumental",
+    "bpm": 106,
+    "external_samples": false,
+    "commercial_trend_verified": false,
+    "source": "render_daily.py / original_music",
+    "restrictions": "Do not label this cue as a trending song. No existing recording or named artist has been used."
+  },
+  "visuals": {
+    "kind": "illustrated_product_journey",
+    "live_screen_recording": false,
+    "client_data": false,
+    "logo_source": "CHRONOSS / 13 URGENT official logo supplied with project"
+  },
+  "editorial_review": {
+    "claim_scope": "Current product journey only; no guaranteed availability, revenue, attribution or number of users",
+    "pending": "Editorial supervisor must check this topic against current product before scheduling"
+  },
+  "render_verification": "ffprobe technical properties passed",
+  "publication_status": "not_published"
+}
