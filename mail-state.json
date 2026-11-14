@@ -184,6 +184,12 @@
         "created_at": "2026-11-13T10:57:26.926125+00:00",
         "archived_in_sent": true,
         "updated_at": "2026-11-13T10:57:31.795799+00:00"
+      },
+      "chronoss-operations-v6-20261114": {
+        "fingerprint": "9b1d297b8c6432e3ae23328f883267e285630ce3148d476e34077035b5dc883c",
+        "status": "intent",
+        "message_date": "Sat, 14 Nov 2026 15:01:33 +0000",
+        "created_at": "2026-11-14T15:01:35.624597+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
