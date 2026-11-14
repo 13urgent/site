@@ -181,9 +181,13 @@
     },
     "20261115-acces-mobile-tiktok-v1": {
       "fingerprint": "7ea183969990b8c50e9eee4864000ec28dab82e34319a75ab130a72afb336485",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-14T07:56:59.240127+00:00",
-      "due_at": "2026-11-15T17:00:00Z"
+      "due_at": "2026-11-15T17:00:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "ecf6f8bbf6d93ff9b96aecfe195513d7b5794ee48c2569cf96c3d68aa8f86e20",
+      "updated_at": "2026-11-14T07:57:00.690350+00:00"
     }
   }
 }
