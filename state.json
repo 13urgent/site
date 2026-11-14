@@ -178,6 +178,12 @@
       "buffer_post_fingerprint": "a4aabc1f2dc4da5c44383c41161ffba9f20effadbd6821cc6b9798d7204f8b59",
       "updated_at": "2026-11-13T07:04:35.869648+00:00",
       "last_verified_at": "2026-11-14T07:56:56.217010+00:00"
+    },
+    "20261115-acces-mobile-tiktok-v1": {
+      "fingerprint": "7ea183969990b8c50e9eee4864000ec28dab82e34319a75ab130a72afb336485",
+      "status": "intent",
+      "created_at": "2026-11-14T07:56:59.240127+00:00",
+      "due_at": "2026-11-15T17:00:00Z"
     }
   }
 }
