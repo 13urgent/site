@@ -60,6 +60,12 @@ class OwnerFileTests(unittest.TestCase):
         self.assertEqual(attachment.get_filename(),'CHRONOSS-PLANNING-V5.zip')
         self.assertEqual(attachment.get_content(),self.file)
 
+    def test_operations_archive_keeps_its_distinct_filename(self):
+        payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':'CHRONOSS-OPERATIONS-V6.zip'}}
+        checked=self.validate(payload)
+        message=owner.build_message(checked,'a'*64,'Sat, 14 Nov 2026 10:00:00 +0000')
+        self.assertEqual(list(message.iter_attachments())[0].get_filename(),'CHRONOSS-OPERATIONS-V6.zip')
+
     def test_other_attachment_names_remain_rejected(self):
         for name in ('another.zip','../CHRONOSS-PLANNING-V5.zip',['CHRONOSS-PLANNING-V5.zip']):
             payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':name}}
