@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-17",
+  "topic": "devis-demenagement",
+  "audience": "Particuliers",
+  "video_file": "13urgent-devis-demenagement-20261117.mp4",
+  "duration_seconds": 20,
+  "width": 1080,
+  "height": 1920,
+  "fps": 24,
+  "codec": "H.264/AAC",
+  "voiceover": false,
+  "caption": "Un déménagement à préparer ? Décrivez votre projet. Présentez votre projet pour demander un devis.\nhttps://13urgent.fr/demenagement.html\n#Demenagement #Transport #13URGENT",
+  "destination": "https://13urgent.fr/demenagement.html",
+  "sha256": "5867fb8c164c4cfa0144706dd75cb038736958a0cfedea8cdb2c2c1edf7cf101",
+  "music": {
+    "kind": "original_synthesized_instrumental",
+    "bpm": 104,
+    "external_samples": false,
+    "commercial_trend_verified": false,
+    "source": "render_daily.py / original_music",
+    "restrictions": "Do not label this cue as a trending song. No existing recording or named artist has been used."
+  },
+  "visuals": {
+    "kind": "illustrated_product_journey",
+    "live_screen_recording": false,
+    "client_data": false,
+    "logo_source": "CHRONOSS / 13 URGENT official logo supplied with project"
+  },
+  "editorial_review": {
+    "claim_scope": "Current product journey only; no guaranteed availability, revenue, attribution or number of users",
+    "pending": "Editorial supervisor must check this topic against current product before scheduling"
+  },
+  "render_verification": "ffprobe technical properties passed",
+  "publication_status": "not_published"
+}
