@@ -203,9 +203,11 @@
       },
       "chronoss-principal-cmr-v7-20261116": {
         "fingerprint": "2d416e56a19c70c130000ad558b2f3f1b624bbc5007b38af364eba54a30cd4ae",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Mon, 16 Nov 2026 07:40:51 +0000",
-        "created_at": "2026-11-16T07:40:53.831821+00:00"
+        "created_at": "2026-11-16T07:40:53.831821+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-16T07:40:58.290493+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
