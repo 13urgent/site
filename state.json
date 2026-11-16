@@ -212,6 +212,12 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "2c48da259e16c6f2586d979bda5b957d7c763cbe00790b2623614dc457046706",
       "updated_at": "2026-11-16T09:36:06.751016+00:00"
+    },
+    "20261116-profil-professionnel-entreprise-v1": {
+      "fingerprint": "8f9e0adf8090ccc25bb48b4c68649d11b4a2aa22166b68ebf428fffc670ca88b",
+      "status": "intent",
+      "created_at": "2026-11-16T09:36:07.814606+00:00",
+      "due_at": "2026-11-16T16:15:00Z"
     }
   }
 }
