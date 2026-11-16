@@ -225,9 +225,13 @@
     },
     "20261116-profil-professionnel-tiktok-v1": {
       "fingerprint": "2c80a055e7b54b7ec4dc84d4f836b39eacc1979ecce3dbb3e61837610c35390e",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-16T09:36:10.769015+00:00",
-      "due_at": "2026-11-16T17:00:00Z"
+      "due_at": "2026-11-16T17:00:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "9cd8d9f79840cac92d9481051b6e067db949f9f6998a39c5f6fae03a7b65b8b3",
+      "updated_at": "2026-11-16T09:36:12.439322+00:00"
     }
   }
 }
