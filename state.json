@@ -10,7 +10,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "e8e3cde499a7367bbc5664cb58b4693f7850cd555738a62efeaa40bd83820ac7",
       "updated_at": "2026-11-06T11:44:20.195374+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829736+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089142+00:00",
       "sent_at": "2026-11-07T17:05:04.343Z"
     },
     "linkedin-network-20261106-v1": {
@@ -20,7 +20,7 @@
       "buffer_post_fingerprint": "cf4009688d56863a50201327bff406cd6dd31735ea8871b9515f75255b39fe3a",
       "provider_status": "sent",
       "scheduling_type": "automatic",
-      "last_verified_at": "2026-11-16T09:35:53.829733+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089138+00:00",
       "sent_at": "2026-11-06T17:39:40.896Z",
       "external_link": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7524525929004478464"
     },
@@ -33,7 +33,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "eb6199df7b769bea7590f26ae85c6b16eefaa870783523a9cbb91fd3ddb1c1b9",
       "updated_at": "2026-11-07T07:55:57.540079+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829729+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089134+00:00",
       "sent_at": "2026-11-08T17:04:12.765Z"
     },
     "20261109-consulter-demandes-fondateur-v1": {
@@ -45,7 +45,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "9e66a909873147d9f9257889b3a1e7861d54a9ae93a46eec6d0ff96dda89e693",
       "updated_at": "2026-11-08T07:56:32.476806+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829726+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089131+00:00",
       "sent_at": "2026-11-09T11:15:27.921Z"
     },
     "20261109-consulter-demandes-entreprise-v1": {
@@ -57,7 +57,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "680d04ec18e027b35cd8fe1f8f201852751becfd39629fec55e1ab5b6e4c17e8",
       "updated_at": "2026-11-08T07:56:35.097140+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829722+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089127+00:00",
       "sent_at": "2026-11-09T16:15:49.396Z"
     },
     "20261109-consulter-demandes-tiktok-v1": {
@@ -69,7 +69,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "466ea68a50dcd7a55b8261d210d48544d7d35d25822bae8c350b5443c53e3d72",
       "updated_at": "2026-11-08T07:56:37.582511+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829720+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089123+00:00",
       "sent_at": "2026-11-09T17:06:09.206Z"
     },
     "20261110-offres-confidentielles-tiktok-v1": {
@@ -81,7 +81,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "01cc3247a208a04ce79ec316fb8bb499369d1be52a6ea33152beaa07dc122982",
       "updated_at": "2026-11-09T07:18:58.986682+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829718+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089119+00:00",
       "sent_at": "2026-11-10T17:06:11.741Z"
     },
     "20261111-attribution-transport-fondateur-v1": {
@@ -93,7 +93,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "b2a6316028cf74d47ca644abccd6083060e158183fb6bf01904421e5f084110f",
       "updated_at": "2026-11-10T08:54:36.903272+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829716+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089116+00:00",
       "sent_at": "2026-11-11T11:15:34.930Z"
     },
     "20261111-attribution-transport-entreprise-v1": {
@@ -105,7 +105,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "ba85c1b7796dd9561357a369e5854a3a6d0c3c3e95a5bdc7a196f24bd06e9c27",
       "updated_at": "2026-11-10T08:54:39.953889+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829713+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089112+00:00",
       "sent_at": "2026-11-11T16:15:29.622Z"
     },
     "20261111-attribution-transport-tiktok-v1": {
@@ -117,7 +117,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "b46c513a119330e2842fa48776b1cb3ae24594c11355b2791280831de95f5d5d",
       "updated_at": "2026-11-10T08:54:42.920212+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829711+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089108+00:00",
       "sent_at": "2026-11-11T17:06:34.935Z"
     },
     "20261112-confirmation-affretement-tiktok-v1": {
@@ -129,7 +129,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "0faeb0a24e8374389e249ef1014bbf2f2cb3ca8da7fc40de2462ab6f04a2272e",
       "updated_at": "2026-11-11T07:02:56.001571+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829709+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089104+00:00",
       "sent_at": "2026-11-12T17:05:33.949Z"
     },
     "20261113-lettre-voiture-logo-fondateur-v1": {
@@ -141,7 +141,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "cdeb3f32a3bd65f54d4fbbce15f832da6b138115e614b5f01dae629e06bf8971",
       "updated_at": "2026-11-12T07:07:05.429019+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829707+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089100+00:00",
       "sent_at": "2026-11-13T11:15:40.396Z"
     },
     "20261113-lettre-voiture-logo-entreprise-v1": {
@@ -153,7 +153,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "02c1a5149c1d77cc0899c9aae8b973468df46281f492edb9de6787c8097db1c0",
       "updated_at": "2026-11-12T07:07:07.934640+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829704+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089097+00:00",
       "sent_at": "2026-11-13T16:15:47.776Z"
     },
     "20261113-lettre-voiture-logo-tiktok-v1": {
@@ -165,7 +165,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "daebef5ab9212c170e91b6aa54d25ea79d64a698fa621901307d3a414a3bbe2c",
       "updated_at": "2026-11-12T07:07:10.562051+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829702+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089093+00:00",
       "sent_at": "2026-11-13T17:05:59.209Z"
     },
     "20261114-conducteur-vehicule-tiktok-v1": {
@@ -177,7 +177,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "a4aabc1f2dc4da5c44383c41161ffba9f20effadbd6821cc6b9798d7204f8b59",
       "updated_at": "2026-11-13T07:04:35.869648+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829698+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089089+00:00",
       "sent_at": "2026-11-14T17:06:05.292Z"
     },
     "20261115-acces-mobile-tiktok-v1": {
@@ -189,7 +189,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "ecf6f8bbf6d93ff9b96aecfe195513d7b5794ee48c2569cf96c3d68aa8f86e20",
       "updated_at": "2026-11-14T07:57:00.690350+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829694+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089085+00:00",
       "sent_at": "2026-11-15T17:05:37.247Z"
     },
     "20261117-devis-demenagement-tiktok-v1": {
@@ -201,7 +201,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "a2dd6cb8010b4996da7d294a941da40da03862d62c5af6ac3da4b49307bb6d54",
       "updated_at": "2026-11-16T09:34:40.535944+00:00",
-      "last_verified_at": "2026-11-16T09:35:53.829671+00:00"
+      "last_verified_at": "2026-11-16T09:37:52.089081+00:00"
     },
     "20261116-profil-professionnel-fondateur-v1": {
       "fingerprint": "6d63681d7054948363b10e948194935cd9be926ff6e1d9da8e7db826a428bd90",
@@ -211,7 +211,8 @@
       "provider_status": "scheduled",
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "2c48da259e16c6f2586d979bda5b957d7c763cbe00790b2623614dc457046706",
-      "updated_at": "2026-11-16T09:36:06.751016+00:00"
+      "updated_at": "2026-11-16T09:36:06.751016+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089076+00:00"
     },
     "20261116-profil-professionnel-entreprise-v1": {
       "fingerprint": "8f9e0adf8090ccc25bb48b4c68649d11b4a2aa22166b68ebf428fffc670ca88b",
@@ -221,7 +222,8 @@
       "provider_status": "scheduled",
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "d69100e6099b6d6aa5dcd0c6bd73b25e8640ecd4a4f2ba1caef06883b233e354",
-      "updated_at": "2026-11-16T09:36:09.648056+00:00"
+      "updated_at": "2026-11-16T09:36:09.648056+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089070+00:00"
     },
     "20261116-profil-professionnel-tiktok-v1": {
       "fingerprint": "2c80a055e7b54b7ec4dc84d4f836b39eacc1979ecce3dbb3e61837610c35390e",
@@ -231,7 +233,8 @@
       "provider_status": "scheduled",
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "9cd8d9f79840cac92d9481051b6e067db949f9f6998a39c5f6fae03a7b65b8b3",
-      "updated_at": "2026-11-16T09:36:12.439322+00:00"
+      "updated_at": "2026-11-16T09:36:12.439322+00:00",
+      "last_verified_at": "2026-11-16T09:37:52.089049+00:00"
     }
   }
 }
