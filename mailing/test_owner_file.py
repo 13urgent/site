@@ -78,6 +78,12 @@ class OwnerFileTests(unittest.TestCase):
         message=owner.build_message(checked,'a'*64,'Mon, 16 Nov 2026 09:00:00 +0000')
         self.assertEqual(list(message.iter_attachments())[0].get_filename(),'CHRONOSS-CMR-COORDONNEES-V8.zip')
 
+    def test_driver_email_archive_keeps_its_distinct_filename(self):
+        payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':'CHRONOSS-CMR-CORRECTIONS-V9.zip'}}
+        checked=self.validate(payload)
+        message=owner.build_message(checked,'a'*64,'Mon, 16 Nov 2026 09:00:00 +0000')
+        self.assertEqual(list(message.iter_attachments())[0].get_filename(),'CHRONOSS-CMR-CORRECTIONS-V9.zip')
+
     def test_other_attachment_names_remain_rejected(self):
         for name in ('another.zip','../CHRONOSS-PLANNING-V5.zip',['CHRONOSS-PLANNING-V5.zip']):
             payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':name}}
