@@ -235,7 +235,7 @@
       },
       "tms-13urgent-demo-v1-windows-fix-20261116": {
         "fingerprint": "ff37b46d480f872562d490bc5acf75bc33d59647a8f05c902a8b1ffea15ee9b8",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Mon, 16 Nov 2026 10:06:27 +0000",
         "created_at": "2026-11-16T10:06:29.546828+00:00"
       }
