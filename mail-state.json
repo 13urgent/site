@@ -227,9 +227,11 @@
       },
       "tms-13urgent-demo-v1-20261116": {
         "fingerprint": "e6deebd4aa5c20efa96ac7605e12685733ba254a64ad0751877ca72e06168c14",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Mon, 16 Nov 2026 09:50:07 +0000",
-        "created_at": "2026-11-16T09:50:09.807183+00:00"
+        "created_at": "2026-11-16T09:50:09.807183+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-16T09:50:15.683449+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
