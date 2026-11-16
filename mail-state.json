@@ -267,9 +267,11 @@
       },
       "tms-complet-v1-4-b-20261116": {
         "fingerprint": "73b5e653b01f703676858f1d7f70e2669abd9bc7e539a473909ec18091640cae",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Mon, 16 Nov 2026 14:17:48 +0000",
-        "created_at": "2026-11-16T14:17:51.111207+00:00"
+        "created_at": "2026-11-16T14:17:51.111207+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-16T14:17:56.884995+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
