@@ -8,11 +8,15 @@ on:
       mode:
         description: Lecture seule ou programmation automatique
         type: choice
-        options: [probe, publish]
+        options: [probe, verify, publish]
         default: probe
+      date:
+        description: Date éditoriale facultative AAAA-MM-JJ (sinon demain à Paris)
+        type: string
+        required: false
   schedule:
-    # Gate in Python keeps only the 8am Europe/Paris window, including DST.
-    - cron: '0 6,7 * * *'
+    # Retries after 08:00 Paris survive GitHub delays; the durable ledger deduplicates.
+    - cron: '17 6,7,10 * * *'
 permissions:
   contents: write
 concurrency:
@@ -51,12 +55,12 @@ jobs:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
           RUN_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'publish' }}
           EVENT_NAME: ${{ github.event_name }}
+          REQUESTED_DATE: ${{ inputs.date }}
         run: |
-          if [ "$EVENT_NAME" = schedule ]; then
-            python marketing/pipeline.py --mode "$RUN_MODE" --scheduled
-          else
-            python marketing/pipeline.py --mode "$RUN_MODE"
-          fi
+          args=(--mode "$RUN_MODE")
+          if [ "$EVENT_NAME" = schedule ]; then args+=(--scheduled); fi
+          if [ -n "$REQUESTED_DATE" ]; then args+=(--date "$REQUESTED_DATE"); fi
+          python marketing/pipeline.py "${args[@]}"
       - name: Conserver les videos produites
         if: always()
         uses: actions/upload-artifact@v4

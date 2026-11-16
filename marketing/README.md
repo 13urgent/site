@@ -4,7 +4,7 @@ Déployé pour l’activation demandée le 6 novembre 2026. Les accès Buffer so
 
 ## Exécution
 
-Le workflow `Marketing 13 URGENT` prépare les contenus du lendemain vers 8 h à Paris. Deux passages UTC couvrent l’heure d’été et d’hiver ; seul celui correspondant à 8 h à Paris est exécuté. GitHub peut retarder le déclenchement ; il ne s’agit pas d’une garantie à la minute.
+Le workflow `Marketing 13 URGENT` prépare les contenus du lendemain vers 8 h à Paris. Trois passages UTC sont prévus, avec reprise après 8 h à Paris en cas de retard de GitHub. Un lancement retardé n’est plus ignoré parce qu’il dépasse 9 h. Le registre durable empêche les doublons et les vidéos déjà utilisées ne sont pas régénérées. GitHub peut retarder le déclenchement ; il ne s’agit pas d’une garantie à la minute.
 
 - TikTok : une capsule à 18 h chaque jour.
 - LinkedIn profil : lundi, mercredi, vendredi à 12 h 15.
@@ -32,7 +32,8 @@ Les erreurs et les états incertains doivent être examinés dans Buffer avant t
 ## Utilisation
 
 - Test de connexion sans publication : lancer le workflow avec `mode: probe`.
-- Préparation et programmation : `mode: publish`.
+- Vérification des envois effectifs, sans nouvelle publication : `mode: verify`.
+- Préparation et programmation : `mode: publish`. La date éditoriale facultative permet de reprendre une journée manquante ; les créneaux déjà passés ne sont jamais reprogrammés à une autre heure automatiquement.
 - Arrêt : désactiver `Marketing 13 URGENT` dans l’onglet Actions, ou mettre `enabled: false` dans `marketing/config.json`. Les posts déjà programmés restent à annuler dans Buffer si nécessaire.
 - La clé Buffer expire selon le choix effectué à sa création ; la remplacer dans le même secret avant l’échéance.
 

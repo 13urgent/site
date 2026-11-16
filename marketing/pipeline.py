@@ -142,6 +142,15 @@ def publish_media(output,day,media):
     verify_public_media(url)
     return url
 
+def scheduled_window_open(now):
+    # Actions cron may start late or wait behind another job. Never discard a
+    # delayed morning run just because it no longer starts within hour 8.
+    return now.astimezone(PARIS).hour >= 8
+
+def expected_media_url(day,topic,settings):
+    relative=Path(settings['media_prefix'])/day.isoformat()/f'13urgent-{topic["id"]}-{day:%Y%m%d}.mp4'
+    return 'https://raw.githubusercontent.com/13urgent/site/'+settings['media_branch']+'/'+str(relative)
+
 def write_summary(value):
     # This summary is public. Counts and static states only, no account metadata.
     print(json.dumps(value,ensure_ascii=False))
@@ -151,13 +160,13 @@ def write_summary(value):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--mode',choices=['probe','publish','preview'],default='probe')
+    parser.add_argument('--mode',choices=['probe','verify','publish','preview'],default='probe')
     parser.add_argument('--date',help='Editorial date in Paris; normally tomorrow')
     parser.add_argument('--scheduled',action='store_true')
     args=parser.parse_args()
     settings=config()
     now=datetime.now(PARIS)
-    if args.scheduled and now.hour!=8:
+    if args.scheduled and not scheduled_window_open(now):
         write_summary({'status':'outside_Paris_daily_window','sent_posts':0});return 0
     day=date.fromisoformat(args.date) if args.date else now.date()+timedelta(days=1)
     catalogue=json.loads((ROOT/'content/catalogue.json').read_text())
@@ -173,9 +182,9 @@ def main():
         report=publisher.run(client,'probe',plan,REPO/'.runtime/unused-state.json',REPO/'.runtime/probe.json')
         write_summary({'status':'connection_and_authorized_channels_checked','ok':report['ok'],'sent_posts':0});return 0
     output=REPO/'.runtime/output'/day.isoformat()
-    renderer=load_module('video_renderer',ROOT/'video/render_daily.py')
-    renderer.render(topic['id'],day,output,topic_override=render_topic(topic))
     if args.mode=='preview':
+        renderer=load_module('video_renderer',ROOT/'video/render_daily.py')
+        renderer.render(topic['id'],day,output,topic_override=render_topic(topic))
         plan=build_plan(day,topic,'https://13urgent.fr/videos/preview.mp4',settings)
         publisher.validate_plan(plan)
         (output/'preview-plan.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n')
@@ -186,11 +195,25 @@ def main():
     publisher.run(client,'probe',probe,REPO/'.runtime/unused-state.json',REPO/'.runtime/probe.json')
     media,state=setup_runtime()
     previous=json.loads((state/'state.json').read_text())
-    if previous.get('posts'):
+    if previous.get('posts') or args.mode=='verify':
         delivery=publisher.verify_delivery(client,state/'state.json',REPO/'.runtime/delivery-report.json',checkpoint=lambda:checkpoint(state))
         write_summary({'status':'previous_deliveries_checked',**delivery['counts'],'scan_complete':delivery['scan_complete']})
-    url=publish_media(output,day,media)
+        if args.mode=='verify':
+            return 0 if delivery['ok'] else 2
+    url=expected_media_url(day,topic,settings)
     plan=build_plan(day,topic,url,settings)
+    recorded=previous.get('posts',{})
+    # Reconcile identical IDs through the publisher, including quarantined
+    # intents. A retry must never re-render or overwrite an already used video.
+    if not all(post['id'] in recorded for post in plan['posts']):
+        target=media/settings['media_prefix']/day.isoformat()/f'13urgent-{topic["id"]}-{day:%Y%m%d}.mp4'
+        if target.exists():
+            verify_public_media(url)
+        else:
+            renderer=load_module('video_renderer',ROOT/'video/render_daily.py')
+            renderer.render(topic['id'],day,output,topic_override=render_topic(topic))
+            if publish_media(output,day,media)!=url:
+                raise Failure('unexpected_media_url')
     report=publisher.run(client,'publish',plan,state/'state.json',REPO/'.runtime/publish-report.json',checkpoint=lambda:checkpoint(state))
     outcomes=report['posts']
     write_summary({'status':'scheduled' if report['ok'] else 'needs_attention','ok':report['ok'],'scheduled':sum(p['status']=='scheduled' for p in outcomes),'already_recorded':sum(p['status']=='already_recorded' for p in outcomes),'attention':sum(p['status'] not in ('scheduled','already_recorded') for p in outcomes),'publication_sent_not_yet_verified':True})
