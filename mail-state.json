@@ -211,9 +211,11 @@
       },
       "chronoss-cmr-corrections-v9-20261116": {
         "fingerprint": "677c482710dcaaf568f332fee8f4eb4879b1c77847390b85a787d313befabf29",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Mon, 16 Nov 2026 08:02:11 +0000",
-        "created_at": "2026-11-16T08:02:13.549289+00:00"
+        "created_at": "2026-11-16T08:02:13.549289+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-16T08:02:17.574829+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
