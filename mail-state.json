@@ -256,6 +256,12 @@
         "created_at": "2026-11-16T12:10:15.283330+00:00",
         "archived_in_sent": true,
         "updated_at": "2026-11-16T12:10:21.344095+00:00"
+      },
+      "chronoss-xpo-chargement-v11-20261116": {
+        "fingerprint": "b17fca1b639505992976714099fca99f5498fbc52f7ce3f29498208869ac34bd",
+        "status": "intent",
+        "message_date": "Mon, 16 Nov 2026 14:10:47 +0000",
+        "created_at": "2026-11-16T14:10:48.510744+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
