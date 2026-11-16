@@ -215,9 +215,13 @@
     },
     "20261116-profil-professionnel-entreprise-v1": {
       "fingerprint": "8f9e0adf8090ccc25bb48b4c68649d11b4a2aa22166b68ebf428fffc670ca88b",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-16T09:36:07.814606+00:00",
-      "due_at": "2026-11-16T16:15:00Z"
+      "due_at": "2026-11-16T16:15:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "d69100e6099b6d6aa5dcd0c6bd73b25e8640ecd4a4f2ba1caef06883b233e354",
+      "updated_at": "2026-11-16T09:36:09.648056+00:00"
     }
   }
 }
