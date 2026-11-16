@@ -114,6 +114,18 @@ class OwnerFileTests(unittest.TestCase):
         message=owner.build_message(checked,'a'*64,'Mon, 16 Nov 2026 12:00:00 +0000')
         self.assertEqual(list(message.iter_attachments())[0].get_filename(),'TMS-13URGENT-ROLES-TARIFS-V1-3.zip')
 
+    def test_tms_complete_v14_keeps_its_distinct_filename(self):
+        name='TMS-13URGENT-TOURNEES-FACTURATION-V1-4.zip'
+        payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':name}}
+        message=owner.build_message(self.validate(payload),'a'*64,'Mon, 16 Nov 2026 14:00:00 +0000')
+        self.assertEqual(list(message.iter_attachments())[0].get_filename(),name)
+
+    def test_chronoss_xpo_v11_keeps_its_distinct_filename(self):
+        name='CHRONOSS-XPO-CHARGEMENT-V11.zip'
+        payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':name}}
+        message=owner.build_message(self.validate(payload),'a'*64,'Mon, 16 Nov 2026 14:00:00 +0000')
+        self.assertEqual(list(message.iter_attachments())[0].get_filename(),name)
+
     def test_other_attachment_names_remain_rejected(self):
         for name in ('another.zip','../CHRONOSS-PLANNING-V5.zip',['CHRONOSS-PLANNING-V5.zip']):
             payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':name}}
