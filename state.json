@@ -194,9 +194,13 @@
     },
     "20261117-devis-demenagement-tiktok-v1": {
       "fingerprint": "7f41a7aef23c84557f62230abd2dd610854d839d93658ef89fce612dae349f89",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-16T09:34:38.804325+00:00",
-      "due_at": "2026-11-17T17:00:00Z"
+      "due_at": "2026-11-17T17:00:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "a2dd6cb8010b4996da7d294a941da40da03862d62c5af6ac3da4b49307bb6d54",
+      "updated_at": "2026-11-16T09:34:40.535944+00:00"
     }
   }
 }
