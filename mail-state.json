@@ -216,6 +216,12 @@
         "created_at": "2026-11-16T08:02:13.549289+00:00",
         "archived_in_sent": true,
         "updated_at": "2026-11-16T08:02:17.574829+00:00"
+      },
+      "chronoss-modeles-tournees-v10-20261116": {
+        "fingerprint": "52d0af930240fc42512cc459362bc38f81d6139ddb76c6b0b3e2fdc2c883802f",
+        "status": "intent",
+        "message_date": "Mon, 16 Nov 2026 08:47:05 +0000",
+        "created_at": "2026-11-16T08:47:06.805584+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
