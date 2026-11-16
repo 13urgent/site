@@ -12,7 +12,8 @@ on:
         type: string
         required: false
   schedule:
-    - cron: '30 6,7 * * 1'
+    # A later retry survives delayed GitHub dispatch; campaign ledger blocks duplicates.
+    - cron: '37 6,7,10 * * 1'
     - cron: '15 9,13,17 * * 1-5'
 permissions:
   contents: write

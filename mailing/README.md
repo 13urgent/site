@@ -7,7 +7,7 @@ Le workflow nécessite deux secrets GitHub Actions :
 - `CONTACT_MAIL_PASSWORD` : mot de passe de la boîte e-mail contact, pas celui du compte administrateur OVH.
 - `PROSPECTION_CAMPAIGN_JSON` : campagne privée préparée (30 dossiers, uniquement les adresses professionnelles publiées et vérifiées sont éligibles). Ce fichier et ses aperçus ne sont pas dans ce dépôt public.
 
-Le mode `probe` vérifie SMTP et l’accès au dossier IMAP « Envoyés », sans envoyer de message. Le mode `send` respecte la date de campagne et ses destinataires autorisés. Le déclenchement prévu est le lundi vers 8 h 30 Paris ; GitHub peut retarder un passage. Tant que les accès ne sont pas configurés, aucun envoi ne peut partir.
+Le mode `probe` vérifie SMTP et l’accès au dossier IMAP « Envoyés », sans envoyer de message. Le mode `send` respecte la date de campagne et ses destinataires autorisés. Les passages du lundi sont acceptés à partir de 8 h Paris, y compris s’ils démarrent en retard ; un passage supplémentaire permet la reprise en fin de matinée. Le registre conserve chaque envoi et empêche les doublons de la campagne autorisée. Tant que les accès ne sont pas configurés, aucun envoi ne peut partir.
 
 L’envoi utilise OVH SMTP SSL 465 et IMAP SSL 993, avec vérification TLS. Une copie est ajoutée au dossier Sent existant identifié par son attribut IMAP ou son nom conventionnel. Le dossier doit être accessible avant tout envoi externe. Le champ Cc reste contact@13urgent.fr selon la demande initiale.
 

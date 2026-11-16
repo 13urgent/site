@@ -20,10 +20,14 @@ def checkpoint(state_dir):
         pipeline.git(state_dir,'commit','-m','Update commercial mail delivery state')
     pipeline.git(state_dir,'push','origin','HEAD:refs/heads/'+pipeline.config()['state_branch'])
 
+def scheduled_send_window_open(now):
+    local=now.astimezone(ZoneInfo('Europe/Paris'))
+    return local.weekday()==0 and local.hour>=8
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--mode',choices=['probe','send','verify'],default='probe');parser.add_argument('--scheduled',action='store_true');parser.add_argument('--reported-bounce-id');args=parser.parse_args()
     now=datetime.now(ZoneInfo('Europe/Paris'))
-    if args.scheduled and args.mode=='send' and (now.weekday()!=0 or now.hour!=8):
+    if args.scheduled and args.mode=='send' and not scheduled_send_window_open(now):
         pipeline.write_summary({'status':'outside_Paris_Monday_window','emails_sent':0});return 0
     password=os.environ.get('CONTACT_MAIL_PASSWORD')
     if not password:raise agent.CampaignError('mail_access_not_connected')
