@@ -291,9 +291,11 @@
       },
       "chronoss-xpo-planning-mail-archives-v11-4-20261117": {
         "fingerprint": "9de9ada5f371b0400f6f20e5964cbe7c85c4a76ea9403ceeae7ed71b920beb4b",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Tue, 17 Nov 2026 15:35:41 +0000",
-        "created_at": "2026-11-17T15:35:43.268311+00:00"
+        "created_at": "2026-11-17T15:35:43.268311+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-17T15:35:47.933801+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
