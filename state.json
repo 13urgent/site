@@ -248,6 +248,12 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "0c99c975bc2235dc3ab63a7fe9fec3ebbc83eeec435d5704d5f8b426d517646f",
       "updated_at": "2026-11-17T15:59:38.496930+00:00"
+    },
+    "20261118-devis-colis-volumineux-entreprise-v1": {
+      "fingerprint": "b92d6925fde90a26956e9e0455ad74694605f63cd08f2cb628942ca028a08d99",
+      "status": "intent",
+      "created_at": "2026-11-17T15:59:39.617116+00:00",
+      "due_at": "2026-11-18T16:15:00Z"
     }
   }
 }
