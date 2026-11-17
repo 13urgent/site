@@ -315,7 +315,7 @@
       },
       "tms-activation-chronoss-20261117": {
         "fingerprint": "4a27cdc3d1a4fed0515d89410037620bdb401778bc0c3f42849acbe2bd32859c",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Tue, 17 Nov 2026 16:48:48 +0000",
         "created_at": "2026-11-17T16:48:51.629864+00:00"
       }
