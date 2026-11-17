@@ -320,6 +320,12 @@
         "created_at": "2026-11-17T16:48:51.629864+00:00",
         "archived_in_sent": true,
         "updated_at": "2026-11-17T16:48:55.764487+00:00"
+      },
+      "tms-activation-siret52-20261117": {
+        "fingerprint": "543ae1d07f099130901dc4f519c9a692ee0f7c4ee861b2e78aaf6052dddc2f47",
+        "status": "intent",
+        "message_date": "Tue, 17 Nov 2026 17:10:35 +0000",
+        "created_at": "2026-11-17T17:10:37.605022+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
