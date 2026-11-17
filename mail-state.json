@@ -307,9 +307,11 @@
       },
       "tms-site-correctif-montage-v1-6-1-20261117": {
         "fingerprint": "057d23364f15af95bfdf4a3b2b2f2a387dde7b1584d278d53add9aa235e7a743",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Tue, 17 Nov 2026 16:31:01 +0000",
-        "created_at": "2026-11-17T16:31:03.525993+00:00"
+        "created_at": "2026-11-17T16:31:03.525993+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-17T16:31:09.801717+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
