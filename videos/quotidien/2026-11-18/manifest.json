@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-18",
+  "topic": "devis-colis-volumineux",
+  "audience": "Particuliers",
+  "video_file": "13urgent-devis-colis-volumineux-20261118.mp4",
+  "duration_seconds": 20,
+  "width": 1080,
+  "height": 1920,
+  "fps": 24,
+  "codec": "H.264/AAC",
+  "voiceover": false,
+  "caption": "Un meuble ou un colis volumineux à transporter ? Décrivez votre objet pour demander un devis.\nhttps://13urgent.fr/demander-un-devis.html\n#ColisVolumineux #Transport #13URGENT",
+  "destination": "https://13urgent.fr/demander-un-devis.html",
+  "sha256": "19aeb99731015962ac807c9b68a2e650ee5877ca45e315ee3e4e8472fec3c37c",
+  "music": {
+    "kind": "original_synthesized_instrumental",
+    "bpm": 106,
+    "external_samples": false,
+    "commercial_trend_verified": false,
+    "source": "render_daily.py / original_music",
+    "restrictions": "Do not label this cue as a trending song. No existing recording or named artist has been used."
+  },
+  "visuals": {
+    "kind": "illustrated_product_journey",
+    "live_screen_recording": false,
+    "client_data": false,
+    "logo_source": "CHRONOSS / 13 URGENT official logo supplied with project"
+  },
+  "editorial_review": {
+    "claim_scope": "Current product journey only; no guaranteed availability, revenue, attribution or number of users",
+    "pending": "Editorial supervisor must check this topic against current product before scheduling"
+  },
+  "render_verification": "ffprobe technical properties passed",
+  "publication_status": "not_published"
+}
