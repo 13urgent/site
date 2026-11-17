@@ -283,7 +283,7 @@
       },
       "tms-pilote-chronoss-v1-5-20261117": {
         "fingerprint": "ad3b91e0d43648983df98c31e6f00df35a38da44912a8dd447a0f6320d1c655b",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Tue, 17 Nov 2026 15:19:41 +0000",
         "created_at": "2026-11-17T15:19:43.631169+00:00"
       }
