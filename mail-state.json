@@ -395,7 +395,7 @@
       },
       "trackio-documents-recette-v202-20261118": {
         "fingerprint": "34e96fa567fbc0cebe1c7532be45f72dfc51e25613b3c425d095588694ce5693",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Wed, 18 Nov 2026 18:31:58 +0000",
         "created_at": "2026-11-18T18:32:00.375193+00:00"
       }
