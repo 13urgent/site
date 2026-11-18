@@ -331,7 +331,7 @@
       },
       "chronoss-xpo-gestion-v11-5-20261118": {
         "fingerprint": "aa1ce78f7d9169b8dec2dea9e02f4e33a89b5dd1165dbbf9773278c1d76b09d4",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Wed, 18 Nov 2026 11:12:42 +0000",
         "created_at": "2026-11-18T11:12:44.023460+00:00"
       }
