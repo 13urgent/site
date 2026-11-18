@@ -156,6 +156,11 @@ class OwnerFileTests(unittest.TestCase):
         message=owner.build_message(self.validate(payload),'a'*64,'Wed, 18 Nov 2026 14:00:00 +0100')
         self.assertEqual(list(message.iter_attachments())[0].get_filename(),name)
 
+    def test_trackio_pilot_v2_filename_is_authorized(self):
+        name='TRACKIO-PILOTE-TMS-DRIVER-STOCK-V2.zip'
+        payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':name}}
+        self.assertEqual(self.validate(payload)['attachment']['filename'],name)
+
     def test_other_attachment_names_remain_rejected(self):
         for name in ('another.zip','../CHRONOSS-PLANNING-V5.zip',['CHRONOSS-PLANNING-V5.zip']):
             payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':name}}
