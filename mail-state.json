@@ -347,9 +347,11 @@
       },
       "tms-fichiers-ecmr-v1-8-20261118": {
         "fingerprint": "3a1c453de9bbc4b7d773671751f93caf6a13c99eac5d09e9f07324546f542c81",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Wed, 18 Nov 2026 12:30:12 +0000",
-        "created_at": "2026-11-18T12:30:14.295552+00:00"
+        "created_at": "2026-11-18T12:30:14.295552+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-18T12:30:18.931899+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
