@@ -352,6 +352,12 @@
         "created_at": "2026-11-18T12:30:14.295552+00:00",
         "archived_in_sent": true,
         "updated_at": "2026-11-18T12:30:18.931899+00:00"
+      },
+      "chronoss-recepisses-xpo-v11-8-20261118": {
+        "fingerprint": "27e66ff2d933a52a6546cf8305d7bcb876ccf497872a61f2a10a0adc5d605444",
+        "status": "intent",
+        "message_date": "Wed, 18 Nov 2026 13:02:46 +0000",
+        "created_at": "2026-11-18T13:02:48.021292+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
