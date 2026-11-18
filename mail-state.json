@@ -339,7 +339,7 @@
       },
       "chronoss-email-facultatif-v11-7-20261118": {
         "fingerprint": "eaffdddd52de4098c622dad598b5f5f83bfb7433f9099bb7fe57417336c8bf66",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Wed, 18 Nov 2026 12:11:52 +0000",
         "created_at": "2026-11-18T12:11:54.627321+00:00"
       }
