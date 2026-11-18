@@ -161,6 +161,11 @@ class OwnerFileTests(unittest.TestCase):
         payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':name}}
         self.assertEqual(self.validate(payload)['attachment']['filename'],name)
 
+    def test_trackio_signup_fix_filename_is_authorized(self):
+        name='TRACKIO-CORRECTIF-INSCRIPTION-V2-0-1.zip'
+        payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':name}}
+        self.assertEqual(self.validate(payload)['attachment']['filename'],name)
+
     def test_other_attachment_names_remain_rejected(self):
         for name in ('another.zip','../CHRONOSS-PLANNING-V5.zip',['CHRONOSS-PLANNING-V5.zip']):
             payload={**self.payload,'attachment':{**self.payload['attachment'],'filename':name}}
