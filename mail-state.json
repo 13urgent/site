@@ -392,6 +392,12 @@
         "created_at": "2026-11-18T17:07:02.999451+00:00",
         "archived_in_sent": true,
         "updated_at": "2026-11-18T17:07:07.700203+00:00"
+      },
+      "trackio-documents-recette-v202-20261118": {
+        "fingerprint": "34e96fa567fbc0cebe1c7532be45f72dfc51e25613b3c425d095588694ce5693",
+        "status": "intent",
+        "message_date": "Wed, 18 Nov 2026 18:31:58 +0000",
+        "created_at": "2026-11-18T18:32:00.375193+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
