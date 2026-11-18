@@ -387,7 +387,7 @@
       },
       "trackio-inscription-v201-20261118": {
         "fingerprint": "1322c565c00c7dae240b03cb0f3c33763435a5c0d6b8e7245ece7acc707a0c4f",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Wed, 18 Nov 2026 17:07:01 +0000",
         "created_at": "2026-11-18T17:07:02.999451+00:00"
       }
