@@ -411,9 +411,11 @@
       },
       "chronoss-correctif-mails-v11-10-20261119": {
         "fingerprint": "bf4f3958f35d0400c2a5d0989ca3f3eb6e3d02d4f0607fd68e264881738858f8",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Thu, 19 Nov 2026 16:33:21 +0000",
-        "created_at": "2026-11-19T16:33:24.393862+00:00"
+        "created_at": "2026-11-19T16:33:24.393862+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-19T16:33:29.733135+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
