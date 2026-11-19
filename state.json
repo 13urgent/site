@@ -277,9 +277,13 @@
     },
     "20261120-remplacement-ponctuel-fondateur-v1": {
       "fingerprint": "39332b34d34e437d04cbb53877c0dfdc52c2d53f8dda2756f56fb4acb0f1837e",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-19T15:45:42.283769+00:00",
-      "due_at": "2026-11-20T11:15:00Z"
+      "due_at": "2026-11-20T11:15:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "b7d38db8a2cd9f124ca8572a57e864781e0cd74ad7aa76528e65588e273a0af7",
+      "updated_at": "2026-11-19T15:45:44.332974+00:00"
     }
   }
 }
