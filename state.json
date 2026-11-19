@@ -294,6 +294,12 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "310dab665451ee41086069210d9bb06f8be1d93efcbab4b86721340346ba914f",
       "updated_at": "2026-11-19T15:45:47.518606+00:00"
+    },
+    "20261120-remplacement-ponctuel-tiktok-v1": {
+      "fingerprint": "7e9de06ecd46df17ffdcc5495f8740db3c5386091177ffb7833c1851dd110ca0",
+      "status": "intent",
+      "created_at": "2026-11-19T15:45:48.640233+00:00",
+      "due_at": "2026-11-20T17:00:00Z"
     }
   }
 }
