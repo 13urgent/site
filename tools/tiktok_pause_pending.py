@@ -11,16 +11,19 @@ def pause_known(client,ledger,now):
     if len(channels)!=1:raise module.SafeFailure('tiktok_identity_not_unique')
     known={r.get('buffer_post_fingerprint'):key for key,r in ledger.get('posts',{}).items() if key.endswith('-tiktok-v1') and r.get('buffer_post_fingerprint')}
     observations,complete=client.verification_posts(channels)
-    result={'posts_created':0,'posts_deleted':0,'tiktok_moved_to_draft':0,'linkedin_modified':0,'scan_complete':complete,'records':[]}
+    result={'posts_created':0,'posts_deleted':0,'tiktok_moved_to_draft':0,'tiktok_already_in_draft':0,'linkedin_modified':0,'scan_complete':complete,'records':[]}
     for post in observations:
         key=known.get(hashlib.sha256(post['id'].encode()).hexdigest())
-        if not key or post['status']!='scheduled':continue
+        if not key:continue
+        if post['status']=='draft':
+            result['tiktok_already_in_draft']+=1;result['records'].append({'ledger_key':key,'status':'draft','already_in_draft':True});continue
+        if post['status']!='scheduled':continue
         try:due=datetime.fromisoformat(post['dueAt'].replace('Z','+00:00'))
         except (TypeError,KeyError,ValueError):continue
         if due<=now:continue
         client.query('mutation { editPost(input: { id: '+json.dumps(post['id'])+', saveToDraft: true }) { __typename } }')
         checked=client.post_status(post['id'])
-        if checked['status']!='draft':raise module.SafeFailure('tiktok_draft_not_confirmed')
+        if checked['provider_status']!='draft':raise module.SafeFailure('tiktok_draft_not_confirmed')
         result['tiktok_moved_to_draft']+=1;result['records'].append({'ledger_key':key,'status':'draft','due_at_before':post['dueAt']})
     return result
 
@@ -33,4 +36,6 @@ def main():
     print(json.dumps(result))
 if __name__=='__main__':
     try:main()
-    except Exception:print(json.dumps({'status':'tiktok_pause_requires_review','posts_created':0,'posts_deleted':0,'modification_result_not_confirmed':True}));sys.exit(2)
+    except Exception as error:
+        code=str(error) if isinstance(error,module.SafeFailure) else 'tiktok_pause_unconfirmed'
+        print(json.dumps({'status':'tiktok_pause_requires_review','error':code,'posts_created':0,'posts_deleted':0,'modification_result_not_confirmed':True}));sys.exit(2)
