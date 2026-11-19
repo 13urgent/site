@@ -297,9 +297,13 @@
     },
     "20261120-remplacement-ponctuel-tiktok-v1": {
       "fingerprint": "7e9de06ecd46df17ffdcc5495f8740db3c5386091177ffb7833c1851dd110ca0",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-19T15:45:48.640233+00:00",
-      "due_at": "2026-11-20T17:00:00Z"
+      "due_at": "2026-11-20T17:00:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "9f9b0ef1d1a35cf3e1086adb6e0ad06bdb74c11d2d1ceffaeddd72e3fa629c2a",
+      "updated_at": "2026-11-19T15:45:50.241445+00:00"
     }
   }
 }
