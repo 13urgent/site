@@ -403,7 +403,7 @@
       },
       "chronoss-diagnostic-envois-20261119": {
         "fingerprint": "32b87b53c279dc6c6cd9c8cc55689ba959907aa315acc67ec0d40e4436362d7d",
-        "status": "intent",
+        "status": "accepted_archive_pending",
         "message_date": "Thu, 19 Nov 2026 15:23:36 +0000",
         "created_at": "2026-11-19T15:23:38.963616+00:00"
       }
