@@ -287,9 +287,13 @@
     },
     "20261120-remplacement-ponctuel-entreprise-v1": {
       "fingerprint": "71ba38f5d729a691aaa354aaade00843e0a06953e92f5d59813c895c103e7e25",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-19T15:45:45.743758+00:00",
-      "due_at": "2026-11-20T16:15:00Z"
+      "due_at": "2026-11-20T16:15:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "310dab665451ee41086069210d9bb06f8be1d93efcbab4b86721340346ba914f",
+      "updated_at": "2026-11-19T15:45:47.518606+00:00"
     }
   }
 }
