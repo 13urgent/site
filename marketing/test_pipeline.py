@@ -7,7 +7,7 @@ p=importlib.util.module_from_spec(SPEC);SPEC.loader.exec_module(p)
 
 class PipelineTests(unittest.TestCase):
     def setUp(self):
-        self.settings=p.config()
+        self.settings=p.config();self.settings.pop('publication_holds',None)
         self.catalogue=json.loads((p.ROOT/'content/catalogue.json').read_text())
         self.topic=self.catalogue['topics'][0]
     def test_paris_schedule_handles_summer_and_winter(self):
@@ -19,6 +19,12 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual([x['service'] for x in p.build_plan(date(2026,11,7),self.topic,'https://13urgent.fr/videos/check.mp4',self.settings)['posts']],['tiktok'])
         monday=p.build_plan(date(2026,11,9),self.topic,'https://13urgent.fr/videos/check.mp4',self.settings)['posts']
         self.assertEqual(len(monday),3);self.assertEqual(len({x['id'] for x in monday}),3)
+    def test_tiktok_hold_keeps_linkedin_and_never_changes_post_ids(self):
+        day=date(2026,11,9);before=p.build_plan(day,self.topic,'https://13urgent.fr/videos/check.mp4',self.settings)
+        held={**self.settings,'publication_holds':{'tiktok':{'reason':'moderation review'}}};after=p.build_plan(day,self.topic,'https://13urgent.fr/videos/check.mp4',held)
+        self.assertEqual(after['posts'],[row for row in before['posts'] if row['service']=='linkedin'])
+        self.assertEqual(p.build_plan(date(2026,11,7),self.topic,'https://13urgent.fr/videos/check.mp4',held)['posts'],[])
+
     def test_topic_rotation_is_repeatable_and_content_link_is_own(self):
         self.assertEqual(p.topic_for(date(2026,11,7),self.catalogue,'2026-11-07')['id'],self.topic['id'])
         self.assertEqual(p.topic_for(date(2026,11,19),self.catalogue,'2026-11-07')['id'],self.topic['id'])
@@ -50,7 +56,7 @@ class PipelineTests(unittest.TestCase):
                 if name=='editorial_validator':return validator
                 if name=='buffer_publish':return publisher
                 self.fail('Renderer must not load during verification or a fully recorded retry')
-            with patch.object(p,'REPO',root),patch.object(p,'load_module',side_effect=module),patch.object(p,'setup_runtime',return_value=(root/'media',state)),patch.object(p,'write_summary'),patch.object(p,'publish_media') as upload,patch('sys.argv',['pipeline','--mode',mode,'--date',day.isoformat()]):
+            with patch.object(p,'REPO',root),patch.object(p,'load_module',side_effect=module),patch.object(p,'setup_runtime',return_value=(root/'media',state)),patch.object(p,'write_summary'),patch.object(p,'config',return_value=self.settings),patch.object(p,'publish_media') as upload,patch('sys.argv',['pipeline','--mode',mode,'--date',day.isoformat()]):
                 result=p.main()
             upload.assert_not_called()
             publisher.verify_delivery.assert_called_once()

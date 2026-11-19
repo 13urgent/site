@@ -48,5 +48,11 @@
   "channel_matching": "Exact normalized names and service; reject ambiguous channels",
   "music": "Original instrumental; no verified trending commercial track",
   "dm_automation": false,
-  "catalogue_prepared_on": "2026-11-06"
+  "catalogue_prepared_on": "2026-11-06",
+  "publication_holds": {
+    "tiktok": {
+      "since": "2026-11-19",
+      "reason": "Signalements de modération TikTok à examiner avec le propriétaire."
+    }
+  }
 }

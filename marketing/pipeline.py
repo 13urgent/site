@@ -104,6 +104,7 @@ def render_topic(topic):
 def build_plan(day,topic,video_url,settings):
     posts=[]
     for account in settings['accounts']:
+        if settings.get('publication_holds',{}).get(account['service']):continue
         if day.weekday() not in account['weekdays']:continue
         hour,minute=map(int,account['hour'].split(':'))
         due=datetime(day.year,day.month,day.day,hour,minute,tzinfo=PARIS).astimezone(timezone.utc)
@@ -173,6 +174,8 @@ def main():
     validator=load_module('editorial_validator',ROOT/'content/validate_content.py')
     if validator.validate_catalogue(catalogue):raise Failure('editorial_validation_failed')
     topic=topic_for(day,catalogue,settings['topic_epoch'])
+    if args.mode in ('publish','preview') and not build_plan(day,topic,'https://13urgent.fr/videos/hold-check.mp4',settings)['posts']:
+        write_summary({'status':'no_active_publication_for_day','sent_posts':0,'paused_services':list(settings.get('publication_holds',{}))});return 0
     publisher=load_module('buffer_publish',ROOT/'publisher/buffer_publish.py')
     client=publisher.BufferClient(os.environ.get('BUFFER_API_KEY')) if args.mode!='preview' else None
     if args.mode=='probe':

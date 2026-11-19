@@ -1,0 +1,28 @@
+name: Mettre en brouillon les TikTok programmes pendant examen moderation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: marketing-13urgent
+  cancel-in-progress: false
+jobs:
+  pause:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tools -p test_tiktok_pause_pending.py
+      - name: Conserver en brouillon uniquement nos futurs TikTok connus
+        env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+        run: python tools/tiktok_pause_pending.py
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: tiktok-pause-confirmed
+          path: .runtime/tiktok-paused.json
+          retention-days: 3
