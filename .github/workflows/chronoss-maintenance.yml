@@ -1,0 +1,61 @@
+name: Maintenance privee CHRONOSS eCMR et TMS
+on:
+  workflow_dispatch:
+    inputs:
+      application:
+        type: choice
+        options: [ecmr, tms]
+        default: ecmr
+        required: true
+      operation:
+        type: choice
+        options: [status, diagnose, deploy]
+        default: status
+        required: true
+      request_id:
+        type: string
+        default: ''
+      payload_sha256:
+        type: string
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: chronoss-maintenance-${{ inputs.application }}
+  cancel-in-progress: false
+jobs:
+  maintenance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      MAINTENANCE_OPERATION: ${{ inputs.operation }}
+      MAINTENANCE_APPLICATION: ${{ inputs.application }}
+      REQUEST_ID: ${{ inputs.request_id }}
+      PAYLOAD_SHA256: ${{ inputs.payload_sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verifier les limites de maintenance
+        run: python -m unittest discover -s tools/maintenance -p test_server.py
+      - name: Preparer un certificat ephemere pour le paquet prive
+        if: inputs.operation == 'deploy'
+        run: python tools/maintenance/runner.py prepare
+      - uses: actions/upload-artifact@v4
+        if: inputs.operation == 'deploy'
+        with:
+          name: maintenance-public-cert-${{ inputs.request_id }}
+          path: ${{ runner.temp }}/service-reply/${{ inputs.request_id }}/public.crt
+          retention-days: 1
+          if-no-files-found: error
+      - name: Maintenance avec cle dediee et identite serveur verifiee
+        env:
+          CHRONOSS_MAINTENANCE_SSH_KEY: ${{ secrets.CHRONOSS_MAINTENANCE_SSH_KEY }}
+        run: python tools/maintenance/runner.py run
+      - uses: actions/upload-artifact@v4
+        with:
+          name: maintenance-result-${{ inputs.application }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/maintenance-result.json
+          retention-days: 3
+          if-no-files-found: error
