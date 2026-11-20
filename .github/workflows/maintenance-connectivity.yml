@@ -25,3 +25,12 @@ jobs:
               print(json.dumps({'ssh_reachable': False, 'error_type': type(error).__name__, 'authentication_attempted': False, 'server_changes': 0}))
               raise SystemExit(1)
           PY
+      - name: Lire la cle publique du serveur
+        run: |
+          ssh-keyscan -T 10 -t ed25519 31.70.119.118 > host-key.txt
+          ssh-keygen -lf host-key.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chronoss-host-public-key
+          path: host-key.txt
+          retention-days: 1
