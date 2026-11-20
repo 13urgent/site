@@ -1,0 +1,27 @@
+name: Verification reseau maintenance CHRONOSS
+on:
+  push:
+    branches: [maintenance/ssh-connectivity-20261120]
+    paths: [.github/workflows/maintenance-connectivity.yml]
+permissions: {}
+jobs:
+  ssh-reachability:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Lire uniquement la banniere SSH sans identification
+        run: |
+          python3 - <<'PY'
+          import json, socket
+          try:
+              with socket.create_connection(('31.70.119.118', 22), timeout=12) as connection:
+                  connection.settimeout(12)
+                  banner = connection.recv(256).split(b'\n')[0].decode('ascii', errors='replace').strip()
+                  valid = banner.startswith('SSH-2.0-')
+                  print(json.dumps({'ssh_reachable': valid, 'authentication_attempted': False, 'server_changes': 0}))
+                  if not valid:
+                      raise SystemExit(1)
+          except OSError as error:
+              print(json.dumps({'ssh_reachable': False, 'error_type': type(error).__name__, 'authentication_attempted': False, 'server_changes': 0}))
+              raise SystemExit(1)
+          PY
