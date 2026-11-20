@@ -427,9 +427,11 @@
       },
       "chronoss-correctifs-groupes-v11-11-20261120": {
         "fingerprint": "3f88a4102a1eeffeb6e5e77c196c63155831f4827595792f9f15e6e3df66d88b",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Fri, 20 Nov 2026 06:55:49 +0000",
-        "created_at": "2026-11-20T06:55:52.409331+00:00"
+        "created_at": "2026-11-20T06:55:52.409331+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-20T06:55:57.566825+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
