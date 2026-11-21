@@ -432,6 +432,12 @@
         "created_at": "2026-11-20T06:55:52.409331+00:00",
         "archived_in_sent": true,
         "updated_at": "2026-11-20T06:55:57.566825+00:00"
+      },
+      "videos-voix-off-seule-proprietaire-20261121-v1": {
+        "fingerprint": "2232ffc9bad4df52fbf0c4cbac8d8a1f5c3354645539d19d6be80be96e4a81f6",
+        "status": "intent",
+        "message_date": "Sat, 21 Nov 2026 11:13:20 +0000",
+        "created_at": "2026-11-21T11:13:23.095066+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
