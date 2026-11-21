@@ -1,0 +1,43 @@
+name: Envoi prive des videos au proprietaire
+on:
+  workflow_dispatch:
+    inputs:
+      request_id:
+        description: Identifiant de la livraison explicitement demandee
+        type: string
+        required: true
+      payload_sha256:
+        description: Empreinte du contenu prive autorise
+        type: string
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: marketing-13urgent
+  cancel-in-progress: false
+jobs:
+  deliver:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      REQUEST_ID: ${{ inputs.request_id }}
+      PAYLOAD_SHA256: ${{ inputs.payload_sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verifier le destinataire unique et les pieces jointes privees
+        run: python -m unittest discover -s mailing -p test_owner_media.py
+      - name: Preparer la cle ephemere
+        run: python mailing/send_owner_media.py prepare
+      - uses: actions/upload-artifact@v4
+        with:
+          name: owner-media-public-cert-${{ inputs.request_id }}
+          path: ${{ runner.temp }}/service-reply/${{ inputs.request_id }}/public.crt
+          retention-days: 1
+          if-no-files-found: error
+      - name: Envoyer uniquement au proprietaire puis archiver
+        env:
+          CONTACT_MAIL_PASSWORD: ${{ secrets.CONTACT_MAIL_PASSWORD }}
+        run: python mailing/send_owner_media.py send
