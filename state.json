@@ -10,7 +10,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "e8e3cde499a7367bbc5664cb58b4693f7850cd555738a62efeaa40bd83820ac7",
       "updated_at": "2026-11-06T11:44:20.195374+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061762+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902648+00:00",
       "sent_at": "2026-11-07T17:05:04.343Z"
     },
     "linkedin-network-20261106-v1": {
@@ -20,7 +20,7 @@
       "buffer_post_fingerprint": "cf4009688d56863a50201327bff406cd6dd31735ea8871b9515f75255b39fe3a",
       "provider_status": "sent",
       "scheduling_type": "automatic",
-      "last_verified_at": "2026-11-19T17:24:22.061759+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902646+00:00",
       "sent_at": "2026-11-06T17:39:40.896Z",
       "external_link": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7524525929004478464"
     },
@@ -33,7 +33,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "eb6199df7b769bea7590f26ae85c6b16eefaa870783523a9cbb91fd3ddb1c1b9",
       "updated_at": "2026-11-07T07:55:57.540079+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061757+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902644+00:00",
       "sent_at": "2026-11-08T17:04:12.765Z"
     },
     "20261109-consulter-demandes-fondateur-v1": {
@@ -45,7 +45,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "9e66a909873147d9f9257889b3a1e7861d54a9ae93a46eec6d0ff96dda89e693",
       "updated_at": "2026-11-08T07:56:32.476806+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061754+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902642+00:00",
       "sent_at": "2026-11-09T11:15:27.921Z"
     },
     "20261109-consulter-demandes-entreprise-v1": {
@@ -57,7 +57,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "680d04ec18e027b35cd8fe1f8f201852751becfd39629fec55e1ab5b6e4c17e8",
       "updated_at": "2026-11-08T07:56:35.097140+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061752+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902639+00:00",
       "sent_at": "2026-11-09T16:15:49.396Z"
     },
     "20261109-consulter-demandes-tiktok-v1": {
@@ -69,7 +69,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "466ea68a50dcd7a55b8261d210d48544d7d35d25822bae8c350b5443c53e3d72",
       "updated_at": "2026-11-08T07:56:37.582511+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061749+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902637+00:00",
       "sent_at": "2026-11-09T17:06:09.206Z"
     },
     "20261110-offres-confidentielles-tiktok-v1": {
@@ -81,7 +81,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "01cc3247a208a04ce79ec316fb8bb499369d1be52a6ea33152beaa07dc122982",
       "updated_at": "2026-11-09T07:18:58.986682+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061747+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902635+00:00",
       "sent_at": "2026-11-10T17:06:11.741Z"
     },
     "20261111-attribution-transport-fondateur-v1": {
@@ -93,7 +93,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "b2a6316028cf74d47ca644abccd6083060e158183fb6bf01904421e5f084110f",
       "updated_at": "2026-11-10T08:54:36.903272+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061744+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902633+00:00",
       "sent_at": "2026-11-11T11:15:34.930Z"
     },
     "20261111-attribution-transport-entreprise-v1": {
@@ -105,7 +105,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "ba85c1b7796dd9561357a369e5854a3a6d0c3c3e95a5bdc7a196f24bd06e9c27",
       "updated_at": "2026-11-10T08:54:39.953889+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061742+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902631+00:00",
       "sent_at": "2026-11-11T16:15:29.622Z"
     },
     "20261111-attribution-transport-tiktok-v1": {
@@ -117,7 +117,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "b46c513a119330e2842fa48776b1cb3ae24594c11355b2791280831de95f5d5d",
       "updated_at": "2026-11-10T08:54:42.920212+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061739+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902629+00:00",
       "sent_at": "2026-11-11T17:06:34.935Z"
     },
     "20261112-confirmation-affretement-tiktok-v1": {
@@ -129,7 +129,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "0faeb0a24e8374389e249ef1014bbf2f2cb3ca8da7fc40de2462ab6f04a2272e",
       "updated_at": "2026-11-11T07:02:56.001571+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061737+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902627+00:00",
       "sent_at": "2026-11-12T17:05:33.949Z"
     },
     "20261113-lettre-voiture-logo-fondateur-v1": {
@@ -141,7 +141,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "cdeb3f32a3bd65f54d4fbbce15f832da6b138115e614b5f01dae629e06bf8971",
       "updated_at": "2026-11-12T07:07:05.429019+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061734+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902625+00:00",
       "sent_at": "2026-11-13T11:15:40.396Z"
     },
     "20261113-lettre-voiture-logo-entreprise-v1": {
@@ -153,7 +153,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "02c1a5149c1d77cc0899c9aae8b973468df46281f492edb9de6787c8097db1c0",
       "updated_at": "2026-11-12T07:07:07.934640+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061732+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902623+00:00",
       "sent_at": "2026-11-13T16:15:47.776Z"
     },
     "20261113-lettre-voiture-logo-tiktok-v1": {
@@ -165,7 +165,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "daebef5ab9212c170e91b6aa54d25ea79d64a698fa621901307d3a414a3bbe2c",
       "updated_at": "2026-11-12T07:07:10.562051+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061729+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902621+00:00",
       "sent_at": "2026-11-13T17:05:59.209Z"
     },
     "20261114-conducteur-vehicule-tiktok-v1": {
@@ -177,7 +177,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "a4aabc1f2dc4da5c44383c41161ffba9f20effadbd6821cc6b9798d7204f8b59",
       "updated_at": "2026-11-13T07:04:35.869648+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061726+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902619+00:00",
       "sent_at": "2026-11-14T17:06:05.292Z"
     },
     "20261115-acces-mobile-tiktok-v1": {
@@ -189,7 +189,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "ecf6f8bbf6d93ff9b96aecfe195513d7b5794ee48c2569cf96c3d68aa8f86e20",
       "updated_at": "2026-11-14T07:57:00.690350+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061724+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902617+00:00",
       "sent_at": "2026-11-15T17:05:37.247Z"
     },
     "20261117-devis-demenagement-tiktok-v1": {
@@ -201,7 +201,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "a2dd6cb8010b4996da7d294a941da40da03862d62c5af6ac3da4b49307bb6d54",
       "updated_at": "2026-11-16T09:34:40.535944+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061721+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902615+00:00",
       "sent_at": "2026-11-17T17:06:44.009Z"
     },
     "20261116-profil-professionnel-fondateur-v1": {
@@ -213,7 +213,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "2c48da259e16c6f2586d979bda5b957d7c763cbe00790b2623614dc457046706",
       "updated_at": "2026-11-16T09:36:06.751016+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061718+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902612+00:00",
       "sent_at": "2026-11-16T11:15:26.969Z"
     },
     "20261116-profil-professionnel-entreprise-v1": {
@@ -225,7 +225,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "d69100e6099b6d6aa5dcd0c6bd73b25e8640ecd4a4f2ba1caef06883b233e354",
       "updated_at": "2026-11-16T09:36:09.648056+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061715+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902610+00:00",
       "sent_at": "2026-11-16T16:15:43.245Z"
     },
     "20261116-profil-professionnel-tiktok-v1": {
@@ -237,7 +237,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "9cd8d9f79840cac92d9481051b6e067db949f9f6998a39c5f6fae03a7b65b8b3",
       "updated_at": "2026-11-16T09:36:12.439322+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061713+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902608+00:00",
       "sent_at": "2026-11-16T17:06:27.323Z"
     },
     "20261118-devis-colis-volumineux-fondateur-v1": {
@@ -249,7 +249,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "0c99c975bc2235dc3ab63a7fe9fec3ebbc83eeec435d5704d5f8b426d517646f",
       "updated_at": "2026-11-17T15:59:38.496930+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061710+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902606+00:00",
       "sent_at": "2026-11-18T11:15:34.364Z"
     },
     "20261118-devis-colis-volumineux-entreprise-v1": {
@@ -261,7 +261,7 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "2669a1c3dfd6bb5e0c8d578d0694c9ca0477c6dacce5ecf713c48c0ade6162fd",
       "updated_at": "2026-11-17T15:59:41.495450+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061707+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902603+00:00",
       "sent_at": "2026-11-18T16:15:49.246Z"
     },
     "20261119-deposer-transport-tiktok-v1": {
@@ -273,41 +273,44 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "e8f22e04b29759e41fc110303de89dd04eff795dbca3ab2a0fe92c79e1aa9fc0",
       "updated_at": "2026-11-18T15:38:38.128649+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061703+00:00",
+      "last_verified_at": "2026-11-22T14:33:52.902600+00:00",
       "sent_at": "2026-11-19T17:07:17.420Z"
     },
     "20261120-remplacement-ponctuel-fondateur-v1": {
       "fingerprint": "39332b34d34e437d04cbb53877c0dfdc52c2d53f8dda2756f56fb4acb0f1837e",
-      "status": "scheduled",
+      "status": "sent",
       "created_at": "2026-11-19T15:45:42.283769+00:00",
       "due_at": "2026-11-20T11:15:00.000Z",
-      "provider_status": "scheduled",
+      "provider_status": "sent",
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "b7d38db8a2cd9f124ca8572a57e864781e0cd74ad7aa76528e65588e273a0af7",
       "updated_at": "2026-11-19T15:45:44.332974+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061700+00:00"
+      "last_verified_at": "2026-11-22T14:33:52.902597+00:00",
+      "sent_at": "2026-11-20T11:15:28.729Z"
     },
     "20261120-remplacement-ponctuel-entreprise-v1": {
       "fingerprint": "71ba38f5d729a691aaa354aaade00843e0a06953e92f5d59813c895c103e7e25",
-      "status": "scheduled",
+      "status": "sent",
       "created_at": "2026-11-19T15:45:45.743758+00:00",
       "due_at": "2026-11-20T16:15:00.000Z",
-      "provider_status": "scheduled",
+      "provider_status": "sent",
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "310dab665451ee41086069210d9bb06f8be1d93efcbab4b86721340346ba914f",
       "updated_at": "2026-11-19T15:45:47.518606+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061695+00:00"
+      "last_verified_at": "2026-11-22T14:33:52.902593+00:00",
+      "sent_at": "2026-11-20T16:15:51.165Z"
     },
     "20261120-remplacement-ponctuel-tiktok-v1": {
       "fingerprint": "7e9de06ecd46df17ffdcc5495f8740db3c5386091177ffb7833c1851dd110ca0",
-      "status": "scheduled",
+      "status": "provider_not_scheduled",
       "created_at": "2026-11-19T15:45:48.640233+00:00",
       "due_at": "2026-11-20T17:00:00.000Z",
-      "provider_status": "scheduled",
+      "provider_status": "draft",
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "9f9b0ef1d1a35cf3e1086adb6e0ad06bdb74c11d2d1ceffaeddd72e3fa629c2a",
       "updated_at": "2026-11-19T15:45:50.241445+00:00",
-      "last_verified_at": "2026-11-19T17:24:22.061676+00:00"
+      "last_verified_at": "2026-11-22T14:33:52.902574+00:00",
+      "error": "buffer_automatic_schedule_not_confirmed"
     }
   }
 }
