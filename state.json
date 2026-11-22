@@ -321,6 +321,12 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "cab14fc6adb395d70e86d4b8ee39d5b935e99e30859fd68fcfaf0f1108191a43",
       "updated_at": "2026-11-22T14:34:04.445585+00:00"
+    },
+    "20261123-attribution-transport-entreprise-v1": {
+      "fingerprint": "84baeb162f8b7165cc2efc1fbc19fa53569cab889a17dadb379960b7bae01c3a",
+      "status": "intent",
+      "created_at": "2026-11-22T14:34:06.058829+00:00",
+      "due_at": "2026-11-23T16:15:00Z"
     }
   }
 }
