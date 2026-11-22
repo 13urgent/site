@@ -324,9 +324,13 @@
     },
     "20261123-attribution-transport-entreprise-v1": {
       "fingerprint": "84baeb162f8b7165cc2efc1fbc19fa53569cab889a17dadb379960b7bae01c3a",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-22T14:34:06.058829+00:00",
-      "due_at": "2026-11-23T16:15:00Z"
+      "due_at": "2026-11-23T16:15:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "fda9b03a3f16909d93c4740d7ac6a48df007fae8a06cf969132f5dd6fa98977e",
+      "updated_at": "2026-11-22T14:34:07.489141+00:00"
     }
   }
 }
