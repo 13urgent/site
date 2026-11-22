@@ -311,6 +311,12 @@
       "updated_at": "2026-11-19T15:45:50.241445+00:00",
       "last_verified_at": "2026-11-22T14:33:52.902574+00:00",
       "error": "buffer_automatic_schedule_not_confirmed"
+    },
+    "20261123-attribution-transport-fondateur-v1": {
+      "fingerprint": "0f2bc7e75dae4c9eac847c96962be77c954543ec2109afa0383ac233617a9734",
+      "status": "intent",
+      "created_at": "2026-11-22T14:34:03.004733+00:00",
+      "due_at": "2026-11-23T11:15:00Z"
     }
   }
 }
