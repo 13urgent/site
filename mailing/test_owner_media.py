@@ -39,6 +39,11 @@ class OwnerMediaTests(unittest.TestCase):
   for f in files:self.assertEqual(f.get_content(),contents[f.get_filename()])
   p['attachments'][1]=self.payload['attachments'][0]
   with self.assertRaises(media.agent.CampaignError):self.validate(p)
+ def test_single_requested_edit_allowed(self):
+  p={**self.payload,'attachments':[{**self.payload['attachments'][0],'filename':'13URGENT-MONEXPLOIT-VOIX-CORRIGEE.mp4'}]}
+  self.validate(p)
+  self.assertEqual(len(list(media.build_message(p,'b'*64,'Mon, 23 Nov 2026 20:00:00 +0100').iter_attachments())),1)
+  with self.assertRaises(media.agent.CampaignError):self.validate({**self.payload,'attachments':self.payload['attachments'][:1]})
  def test_archive_failure_never_causes_a_duplicate_send(self):
   smtp,archive=SMTP(),Archive(fail=True)
   def send():return media.sealed.deliver(self.payload,'a'*64,self.state,'FAKE',lambda:None,smtp_factory=lambda:smtp,archive_factory=lambda:archive,message_builder=media.build_message)
