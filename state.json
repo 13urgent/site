@@ -334,8 +334,11 @@
     },
     "linkedin-monexploit-20261123-approved-v1": {
       "fingerprint": "1925fa5845cdcf7819a02b94bd2ad1649c85e5656491ae1529a6fd66e6b49bf0",
-      "status": "intent",
-      "created_at": "2026-11-23T13:21:15.358887+00:00"
+      "status": "scheduled",
+      "created_at": "2026-11-23T13:21:15.358887+00:00",
+      "buffer_post_fingerprint": "2d36e84d784f03e4c120c39fc148068d335820fa709186079d594ddd3e5ce32a",
+      "provider_status": "sending",
+      "scheduling_type": "automatic"
     }
   }
 }
