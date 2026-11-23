@@ -1,0 +1,69 @@
+import json,tempfile,unittest
+from pathlib import Path
+import send_tiktok_testers_20261123 as m
+
+class Client:
+    def __init__(self,state,timeout=False,status='sent',scheduling='automatic',duplicate=False):
+        self.state=state;self.timeout=timeout;self.status=status;self.scheduling=scheduling;self.duplicate=duplicate;self.created=0;self.queries=[]
+    def query(self,q):
+        self.queries.append(q)
+        if 'account {' in q:return {'account':{'organizations':[{'id':'private-org'}]}}
+        if 'channels(input' in q:return {'channels':[{'id':'private-tiktok','name':'13urgentsite','service':'tiktok','isDisconnected':False,'isLocked':False,'isQueuePaused':True,'metadata':{'defaultToReminders':False}}]}
+        if '__type(name:' in q:return {'__type':{'inputFields':[{'name':'isAiGenerated'},{'name':'title'}]}}
+        if 'posts(first:' in q:
+            assert 'private-tiktok' in q
+            nodes=[{'id':'private-post','text':m.TEXT,'status':'sent','schedulingType':'automatic','externalLink':'https://www.tiktok.com/@13urgentsite/video/1234567890','assets':[]}] if self.duplicate else []
+            return {'posts':{'edges':[{'node':p} for p in nodes],'pageInfo':{'hasNextPage':False,'endCursor':None}}}
+        if q.startswith('mutation'):
+            self.created+=1
+            assert 'mode:shareNow' in q and 'schedulingType:automatic' in q
+            assert 'metadata:{tiktok:{isAiGenerated:true}}' in q
+            assert 'private-tiktok' in q and 'linkedin' not in q
+            assert json.loads(self.state.read_text())['posts'][m.CAMPAIGN]['status']=='intent'
+            if self.timeout:raise TimeoutError('simulated uncertain response')
+            return {'createPost':{'__typename':'PostActionSuccess','post':{'id':'private-post','status':'sending','schedulingType':self.scheduling,'metadata':{'isAiGenerated':True}}}}
+        return {'post':{'status':self.status,'schedulingType':self.scheduling,'sentAt':'2026-11-23T14:00:00Z','externalLink':'https://www.tiktok.com/@13urgentsite/video/1234567890?tracking=remove','metadata':{'isAiGenerated':True}}}
+
+class Tests(unittest.TestCase):
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
+        self.state=Path(self.tmp.name)/'state.json';self.state.write_text('{"schema_version":1,"posts":{}}')
+        original=m.pipeline.write_summary;m.pipeline.write_summary=lambda value:None
+        self.addCleanup(setattr,m.pipeline,'write_summary',original)
+    def test_publishes_once_with_ai_disclosure_without_lifting_pause(self):
+        client=Client(self.state);checkpoints=[]
+        r=m.send(client,self.state,lambda:checkpoints.append(json.loads(self.state.read_text())['posts'][m.CAMPAIGN]['status']),wait=lambda n:None)
+        self.assertEqual(r['status'],'sent');self.assertEqual(client.created,1);self.assertTrue(r['ai_disclosure'])
+        record=json.loads(self.state.read_text())['posts'][m.CAMPAIGN]
+        self.assertTrue(record['queue_paused_before']);self.assertEqual(checkpoints[0],'intent')
+        self.assertFalse(any('pause' in q.lower() for q in client.queries if q.startswith('mutation')))
+        self.assertNotIn('private-post',self.state.read_text());self.assertNotIn('private-tiktok',self.state.read_text())
+        self.assertEqual(m.send(client,self.state,lambda:None)['status'],'sent');self.assertEqual(client.created,1)
+    def test_checkpoint_failure_stops_before_create(self):
+        client=Client(self.state)
+        def fail():raise RuntimeError('checkpoint')
+        with self.assertRaises(RuntimeError):m.send(client,self.state,fail)
+        self.assertEqual(client.created,0)
+    def test_uncertain_timeout_is_not_retried(self):
+        client=Client(self.state,timeout=True)
+        with self.assertRaises(m.PUBLISHER.SafeFailure):m.send(client,self.state,lambda:None)
+        with self.assertRaises(m.PUBLISHER.SafeFailure):m.send(client,self.state,lambda:None)
+        self.assertEqual(client.created,1)
+    def test_notification_is_reported_as_manual(self):
+        client=Client(self.state,status='draft',scheduling='notification')
+        result=m.send(client,self.state,lambda:None,wait=lambda n:None)
+        self.assertEqual(result['status'],'manual_completion_required');self.assertEqual(result['scheduling_type'],'notification')
+    def test_processing_is_not_reported_sent(self):
+        client=Client(self.state,status='sending')
+        result=m.send(client,self.state,lambda:None,wait=lambda n:None,max_polls=2)
+        self.assertEqual(result['status'],'processing');self.assertEqual(client.created,1)
+    def test_duplicate_is_reconciled_without_create(self):
+        client=Client(self.state,duplicate=True)
+        result=m.send(client,self.state,lambda:None)
+        self.assertEqual(result['status'],'sent');self.assertTrue(result['already_recorded']);self.assertEqual(client.created,0)
+    def test_link_validation_excludes_secrets_and_tracking(self):
+        self.assertEqual(m.public_link('https://www.tiktok.com/@13urgentsite/video/123?tracking=secret'),'https://www.tiktok.com/@13urgentsite/video/123')
+        for value in ['https://evil.invalid/video/123','https://www.tiktok.com/login?secret=x','http://www.tiktok.com/@a/video/123']:
+            self.assertIsNone(m.public_link(value))
+
+if __name__=='__main__':unittest.main()

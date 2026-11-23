@@ -1,27 +1,24 @@
-name: Inspecter les options de pause TikTok sans publier
+name: Publier le post TikTok testeurs explicitement valide
 on:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: marketing-13urgent
   cancel-in-progress: false
 jobs:
-  inspect:
+  publish:
+    name: Publier uniquement le TikTok testeurs valide
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Lire uniquement le schema des commandes Buffer
+      - name: Verifier l’anti-doublon et les disclosures TikTok
+        run: python -m unittest discover -s marketing -p test_tiktok_testers_20261123.py
+      - name: Publier le seul post TikTok et verifier son accusé
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-        run: python tools/tiktok_control_inspect.py
-      - uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: tiktok-control-schema
-          path: .runtime/tiktok-control-schema.json
-          retention-days: 1
+        run: python marketing/send_tiktok_testers_20261123.py
