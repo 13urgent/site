@@ -345,15 +345,18 @@
     },
     "tiktok-monexploit-testers-20261123-approved-v1": {
       "fingerprint": "8b904edd1b5b1ce1f6548573afeca17fa74bc78f3efe1c6c6276462ead66b137",
-      "status": "scheduled",
+      "status": "sent",
       "created_at": "2026-11-23T17:34:44.445093+00:00",
       "ai_disclosure_requested": true,
       "commercial_disclosure_api_available": false,
       "queue_paused_before": false,
       "buffer_post_fingerprint": "36648a70a5e73e9c39ae58103c987e6c0a5099c4a3863d66140e88c3fc6bd419",
-      "provider_status": "sending",
+      "provider_status": "sent",
       "scheduling_type": "automatic",
-      "is_ai_generated": true
+      "is_ai_generated": true,
+      "last_verified_at": "2026-11-23T17:37:41.442911+00:00",
+      "sent_at": "2026-11-23T17:37:39.496Z",
+      "external_link": "https://tiktok.com/@13urgentsite/video/7711422165496646944"
     }
   }
 }
