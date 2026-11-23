@@ -342,6 +342,14 @@
       "last_verified_at": "2026-11-23T13:21:44.030030+00:00",
       "sent_at": "2026-11-23T13:21:39.443Z",
       "external_link": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7530621588623474688"
+    },
+    "tiktok-monexploit-testers-20261123-approved-v1": {
+      "fingerprint": "8b904edd1b5b1ce1f6548573afeca17fa74bc78f3efe1c6c6276462ead66b137",
+      "status": "intent",
+      "created_at": "2026-11-23T17:34:44.445093+00:00",
+      "ai_disclosure_requested": true,
+      "commercial_disclosure_api_available": false,
+      "queue_paused_before": false
     }
   }
 }
