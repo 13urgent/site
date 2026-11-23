@@ -4,7 +4,7 @@
 Only the configured owner can receive them. No media is uploaded to a public
 website. Reuses the existing durable send ledger and independent Sent archive.
 """
-import argparse,base64,binascii,hashlib,json,os,re
+import argparse,base64,binascii,hashlib,json,os,re,io,zipfile
 from email import policy
 from email.message import EmailMessage
 import commercial_agent as agent
@@ -14,6 +14,8 @@ MAX_RAW=10_000_000
 MAX_FILES_BYTES=7_000_000
 MAX_MIME_BYTES=9_500_000
 FILENAMES={'13URGENT-VOIX-OFF-SEULE.mp4','MON-EXPLOIT-VOIX-OFF-SEULE.mp4'}
+DOCUMENT_FILENAMES={'Kling-complet.zip','Guide-Kling.pdf'}
+MIME={'Kling-complet.zip':('application','zip'),'Guide-Kling.pdf':('application','pdf')}
 
 def validate_payload(raw,request_id,digest):
  if len(raw)>MAX_RAW or hashlib.sha256(raw).hexdigest()!=digest:raise agent.CampaignError('owner_media_digest_mismatch')
@@ -28,18 +30,26 @@ def validate_payload(raw,request_id,digest):
  for file in files:
   if not isinstance(file,dict)or set(file)!={'filename','sha256','content_base64'}:raise agent.CampaignError('owner_media_file_invalid')
   name=file['filename']
-  if not isinstance(name,str)or name not in FILENAMES or name in names:raise agent.CampaignError('owner_media_filename_invalid')
+  if not isinstance(name,str)or name not in FILENAMES|DOCUMENT_FILENAMES or name in names:raise agent.CampaignError('owner_media_filename_invalid')
   names.add(name)
   try:content=base64.b64decode(file['content_base64'],validate=True)
   except (ValueError,TypeError,binascii.Error):raise agent.CampaignError('owner_media_file_invalid')from None
-  if len(content)<12 or content[4:8]!=b'ftyp'or hashlib.sha256(content).hexdigest()!=file['sha256']:raise agent.CampaignError('owner_media_content_mismatch')
+  if hashlib.sha256(content).hexdigest()!=file['sha256']:raise agent.CampaignError('owner_media_content_mismatch')
+  if name in FILENAMES and (len(content)<12 or content[4:8]!=b'ftyp'):raise agent.CampaignError('owner_media_content_mismatch')
+  if name=='Guide-Kling.pdf' and not content.startswith(b'%PDF-'):raise agent.CampaignError('owner_media_content_mismatch')
+  if name=='Kling-complet.zip':
+   if not zipfile.is_zipfile(io.BytesIO(content)):raise agent.CampaignError('owner_media_content_mismatch')
+   with zipfile.ZipFile(io.BytesIO(content)) as archive:
+    if any(n.startswith('/') or '..' in n.split('/') for n in archive.namelist()):raise agent.CampaignError('owner_media_content_mismatch')
   total+=len(content)
+ if names not in (FILENAMES,DOCUMENT_FILENAMES):raise agent.CampaignError('owner_media_files_invalid')
  if total>MAX_FILES_BYTES:raise agent.CampaignError('owner_media_too_large')
  return value
 
 def build_message(payload,digest,date):
  mail=EmailMessage(policy=policy.SMTP);mail['From']='CHRONOSS <'+agent.SENDER+'>';mail['To']=agent.SENDER;mail['Reply-To']=agent.SENDER;mail['Subject']=payload['subject'];mail['Date']=date;mail['Message-ID']='<'+digest+'@13urgent.fr>';mail.set_content(payload['body'])
- for file in payload['attachments']:mail.add_attachment(base64.b64decode(file['content_base64']),maintype='video',subtype='mp4',filename=file['filename'])
+ for file in payload['attachments']:
+  maintype,subtype=MIME.get(file['filename'],('video','mp4'));mail.add_attachment(base64.b64decode(file['content_base64']),maintype=maintype,subtype=subtype,filename=file['filename'])
  if len(mail.as_bytes())>MAX_MIME_BYTES:raise agent.CampaignError('owner_media_mime_too_large')
  return mail
 

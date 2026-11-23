@@ -27,6 +27,18 @@ class OwnerMediaTests(unittest.TestCase):
   attachments=list(smtp.calls[0][0].iter_attachments());self.assertEqual({f.get_filename()for f in attachments},media.FILENAMES)
   for f in attachments:self.assertEqual(f.get_content(),self.raw);self.assertEqual(f.get_content_type(),'video/mp4')
   self.assertNotIn('content_base64',self.state.read_text())
+ def test_requested_zip_and_pdf_delivered_privately(self):
+  import io,zipfile
+  out=io.BytesIO()
+  with zipfile.ZipFile(out,'w') as z:z.writestr('SCRIPT.txt','Démonstration fictive')
+  contents={'Kling-complet.zip':out.getvalue(),'Guide-Kling.pdf':b'%PDF-1.4\nFAKE TEST ONLY'}
+  p={**self.payload,'attachments':[{'filename':n,'sha256':hashlib.sha256(c).hexdigest(),'content_base64':base64.b64encode(c).decode()}for n,c in contents.items()]}
+  self.validate(p)
+  files=list(media.build_message(p,'a'*64,'Mon, 23 Nov 2026 10:00:00 +0000').iter_attachments())
+  self.assertEqual([f.get_content_type() for f in files],['application/zip','application/pdf'])
+  for f in files:self.assertEqual(f.get_content(),contents[f.get_filename()])
+  p['attachments'][1]=self.payload['attachments'][0]
+  with self.assertRaises(media.agent.CampaignError):self.validate(p)
  def test_archive_failure_never_causes_a_duplicate_send(self):
   smtp,archive=SMTP(),Archive(fail=True)
   def send():return media.sealed.deliver(self.payload,'a'*64,self.state,'FAKE',lambda:None,smtp_factory=lambda:smtp,archive_factory=lambda:archive,message_builder=media.build_message)
