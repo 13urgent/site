@@ -364,9 +364,13 @@
     },
     "20261125-lettre-voiture-logo-fondateur-v1": {
       "fingerprint": "19f242d1a405d42a4827f1751717a2fef0b08a6c81d5477d295100a636f06e96",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-24T17:43:32.869750+00:00",
-      "due_at": "2026-11-25T11:15:00Z"
+      "due_at": "2026-11-25T11:15:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "2aa2f647896dba04fed2cf7d7efdb159967705d748a878aaee18e8a5105aa5a1",
+      "updated_at": "2026-11-24T17:43:34.961035+00:00"
     }
   }
 }
