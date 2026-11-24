@@ -374,9 +374,13 @@
     },
     "20261125-lettre-voiture-logo-entreprise-v1": {
       "fingerprint": "63eabdb7caf6c755fe06dcee4838a912d121f7ada8d5dc287cf6066cf73f42e9",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-24T17:43:36.097056+00:00",
-      "due_at": "2026-11-25T16:15:00Z"
+      "due_at": "2026-11-25T16:15:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "07bd98a9b9ab5bdc516a4091538be1934d565e9f2550eb807b07db99dff542ad",
+      "updated_at": "2026-11-24T17:43:37.648361+00:00"
     }
   }
 }
