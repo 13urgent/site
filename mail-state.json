@@ -961,10 +961,12 @@
         "service_category": "urgent"
       },
       "p-b1d251e76ea2f23c161a": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "083592a0e033d8980a2dcd155e01f1c357bbedcf842ce4c12f16ee49fff507c6",
         "message_date": "Thu, 26 Nov 2026 17:49:43 +0000",
         "created_at": "2026-11-26T17:49:43.171082+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:49:46.612664+00:00",
         "recipient_fingerprint": "b1d251e76ea2f23c161a34bab13632aa44d09837a8e747d591e1aa448fb74cc0",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:49:43.171082+00:00",
