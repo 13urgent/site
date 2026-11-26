@@ -647,6 +647,17 @@
         "followup_due_at": "2026-12-03T17:39:52.010781+00:00",
         "followup_count": 0,
         "service_category": "urgent"
+      },
+      "exp-20261126-horizons": {
+        "status": "intent",
+        "fingerprint": "7b286929a17aa5a9dded9c6f6d7d2ba06ceac92365ab121a253d7ed6b7b9a398",
+        "message_date": "Thu, 26 Nov 2026 17:39:59 +0000",
+        "created_at": "2026-11-26T17:39:59.366600+00:00",
+        "recipient_fingerprint": "2a0218534d3cd45a2d25b068f6aebbec51c1c8433b964e49e51ff8c3898cd9b8",
+        "followup_allowed": true,
+        "followup_due_at": "2026-12-03T17:39:59.366600+00:00",
+        "followup_count": 0,
+        "service_category": "urgent"
       }
     }
   },
