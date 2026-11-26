@@ -870,10 +870,12 @@
         "service_category": "mon_exploit"
       },
       "p-fa39a650ea6c96755f8e": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "30d2327ff5eb7ce1dcb790b825b2faa149130d37fea0cdc1d2ccb0a4c6bf4fa7",
         "message_date": "Thu, 26 Nov 2026 17:48:55 +0000",
         "created_at": "2026-11-26T17:48:55.653945+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:48:58.940021+00:00",
         "recipient_fingerprint": "fa39a650ea6c96755f8eae39774f1c56b0d0397325cb7cfe3d18ab6b225cc375",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:48:55.653945+00:00",
