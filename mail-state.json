@@ -623,10 +623,12 @@
         "service_category": "urgent"
       },
       "exp-20261126-cepro": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "d6fbd395453e54ec3b394e9559792c377234b29ee76333d77b4b0a5048732f63",
         "message_date": "Thu, 26 Nov 2026 17:39:45 +0000",
         "created_at": "2026-11-26T17:39:45.127299+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:39:48.692912+00:00",
         "recipient_fingerprint": "eeda10ca05d25f5d54b4e0a08cb6e3e7b08aef9b7358bf0d5cfb169dbf229214",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:39:45.127299+00:00",
