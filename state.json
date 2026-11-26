@@ -395,15 +395,18 @@
     },
     "tiktok-monexploit-brochure-20261126-approved-v1": {
       "fingerprint": "628ce9a7a4d45fbad26e9370dd10fb2b86251523cd3d8d8366fd8bd48b830203",
-      "status": "scheduled",
+      "status": "sent",
       "created_at": "2026-11-26T13:50:04.937595+00:00",
       "ai_disclosure_requested": true,
       "commercial_disclosure_api_available": false,
       "queue_paused_before": false,
       "buffer_post_fingerprint": "3e6a3e9637b92e806e380d136a16dbed3e06175c9f537358d9e9a0003aa63202",
-      "provider_status": "sending",
+      "provider_status": "sent",
       "scheduling_type": "automatic",
-      "is_ai_generated": true
+      "is_ai_generated": true,
+      "last_verified_at": "2026-11-26T13:51:52.150332+00:00",
+      "sent_at": "2026-11-26T13:51:50.232Z",
+      "external_link": "https://tiktok.com/@13urgentsite/video/7712477135339867425"
     }
   }
 }
