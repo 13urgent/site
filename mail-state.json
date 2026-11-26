@@ -734,6 +734,35 @@
         "followup_count": 0,
         "service_category": "mon_exploit"
       }
+    },
+    "commercial-direction-v1": {
+      "2516a2c5330878d2f1a3e31d5a9f24ba8994228fb612456c2e52039d771292b4": {
+        "status": "reported",
+        "category": "transport_a_qualifier",
+        "received_at": "2026-11-10T20:35:20+04:00",
+        "owner_reported": true,
+        "correspondent_hash": "98d5fb22871122c003ee441fcc9f8fd4e6aa81a7f3dbd57a5cca1b57491745d8",
+        "ack_attempted": false,
+        "ack_status": "not_sent"
+      },
+      "0a0c7a6ab209acd98f9e17b67d5f328f1177386f64ec22dcb60155839844a361": {
+        "status": "reported",
+        "category": "transport_a_qualifier",
+        "received_at": "2026-11-12T15:54:22+04:00",
+        "owner_reported": true,
+        "correspondent_hash": "98d5fb22871122c003ee441fcc9f8fd4e6aa81a7f3dbd57a5cca1b57491745d8",
+        "ack_attempted": false,
+        "ack_status": "not_sent"
+      },
+      "31f87e6aa74f50a8e4c5daebfbe82d500556762017abf04c46eaad8ac3038127": {
+        "status": "reported",
+        "category": "transport_a_qualifier",
+        "received_at": "2026-11-12T16:03:28+04:00",
+        "owner_reported": true,
+        "correspondent_hash": "98d5fb22871122c003ee441fcc9f8fd4e6aa81a7f3dbd57a5cca1b57491745d8",
+        "ack_attempted": false,
+        "ack_status": "not_sent"
+      }
     }
   },
   "suppressed": []
