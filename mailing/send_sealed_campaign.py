@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import re
+from datetime import timedelta
 
 import commercial_agent as agent
 import run_campaign
@@ -25,6 +26,7 @@ def validate_payload(raw, request_id, digest):
     if not isinstance(campaign, dict) or campaign.get('campaign_id') != request_id:
         raise agent.CampaignError('campaign_identity_mismatch')
     rows = agent.campaign_rows(campaign)
+    if campaign.get('followup_after_days') not in (None,7):raise agent.CampaignError('followup_period_invalid')
     if not rows:
         raise agent.CampaignError('empty_campaign')
     try:
@@ -78,6 +80,13 @@ def deliver(campaign, state_path, password, checkpoint, **kwargs):
         for row_id, record in state['campaigns'].get(campaign['campaign_id'], {}).items():
             if row_id in fingerprints:
                 record['recipient_fingerprint'] = fingerprints[row_id]
+                if campaign.get('followup_after_days')==7:
+                    created=datetime.fromisoformat(record['created_at'])
+                    record['followup_allowed']=True
+                    record.setdefault('followup_due_at',(created+timedelta(days=7)).isoformat())
+                    record.setdefault('followup_count',0)
+                    source=next(x for x in retained if x['id']==row_id)
+                    record['service_category']=source.get('pdf_attachment','urgent')
         agent.save(state_path, state)
         checkpoint()
 

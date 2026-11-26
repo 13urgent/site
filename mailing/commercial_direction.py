@@ -71,7 +71,8 @@ def describe(raw,state,now):
     first=next((x.strip() for x in text.splitlines() if x.strip()),'')
     stop=bool(re.search(r'\b(stop|desinscri|ne.*contact|retir.*liste|plus.*contact|opposition)\b',incoming.folded(first)))
     tms=bool(re.search(r'mon\s*exploit',incoming.folded(subject+' '+text)))
-    category='opposition' if stop else 'mon_exploit' if tms else 'transport_a_qualifier'
+    receipt=bool(re.search(r'message recu|accuse de reception|nous avons bien recu',incoming.folded(subject+' '+text[:500]))) and bool(re.search(r'48h|72h|automatique|patience|en general',f))
+    category='opposition' if stop else 'automated_receipt' if receipt else 'mon_exploit' if tms else 'transport_a_qualifier'
     auth=' '.join(str(v) for v in m.get_all('Authentication-Results',[])).lower()
     aligned=bool(re.search(r'\bdmarc=pass\b',auth))
     return {'source_hash':h(mid),'message_id':mid,'references':incoming.MESSAGE_ID.findall(str(m.get('References',''))+' '+str(m.get('In-Reply-To','')))[-18:],'sender':sender,'recipient':reply,'subject':subject,'text':text,'category':category,'attachments':attachments,'received_at':received.isoformat(),'tms_ack_eligible':tms and not stop and aligned and not attachments and received.date()>=START and len(raw)<262144}
@@ -104,7 +105,7 @@ def read(state,password,now):
 
 def process(records,state_path,password,checkpoint,now,deliver=service.deliver):
     path=Path(state_path);state=json.loads(path.read_text());old=state.get('campaigns',{}).get(STORE,{})
-    todo=[r for r in records if old.get(r['source_hash'],{}).get('status')!='reported'][:10]
+    todo=[r for r in records if r['category']!='automated_receipt' and old.get(r['source_hash'],{}).get('status')!='reported'][:10]
     if not todo:return {'new_requests':0,'qualification_emails':0,'owner_reports':0}
     for r in todo:
         if r['category']=='opposition':

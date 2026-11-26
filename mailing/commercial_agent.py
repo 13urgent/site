@@ -2,6 +2,8 @@
 """Private targeted email campaign with durable dedup and IMAP Sent copies."""
 from __future__ import annotations
 import argparse,base64,hashlib,imaplib,json,os,re,smtplib,ssl,tempfile,time,unicodedata
+from functools import lru_cache
+from urllib.request import Request,urlopen
 from datetime import datetime,timezone
 from email import policy
 from email.message import EmailMessage
@@ -33,6 +35,21 @@ def recipient(row):
     if not isinstance(row.get('source_url'),str) or not row['source_url'].startswith('https://') or not row.get('verified_on'):return None
     return value
 
+PDF_ATTACHMENTS={
+ 'mon_exploit':('https://13urgent.fr/documents/Mon-Exploit-brochure-formulaire.pdf','Mon-Exploit-presentation-et-demande.pdf','175d365ea1a3f20ab5d3d91848a032b964573ab4aecdb996e4860da7f45e46b2'),
+ 'urgent':('https://13urgent.fr/documents/13-URGENT-expedier-une-marchandise.pdf','13-URGENT-expedier-une-marchandise.pdf','049a40e70beb9a2143225a0b505e2d68030354d54cb1040a5d4fc543f660b84f'),
+ 'chronoss':('https://13urgent.fr/documents/CHRONOSS-services-transport-sur-devis.pdf','CHRONOSS-services-transport-sur-devis.pdf','6827eb7abcff11a06a06897bbd0f9e25794c6c539ee52f9962833b0f2e12fe40')}
+
+@lru_cache(maxsize=3)
+def verified_pdf(key):
+ if key not in PDF_ATTACHMENTS:raise CampaignError('attachment_not_authorized')
+ url,filename,digest=PDF_ATTACHMENTS[key]
+ with urlopen(Request(url,headers={'User-Agent':'13URGENT-commercial/1.0'}),timeout=20) as response:
+  if response.url!=url:raise CampaignError('attachment_redirect_not_authorized')
+  raw=response.read(1000001)
+ if len(raw)>1000000 or not raw.startswith(b'%PDF-') or hashlib.sha256(raw).hexdigest()!=digest:raise CampaignError('attachment_integrity_failed')
+ return raw,filename,digest
+
 def message(row,campaign_id,message_date=None):
     address=recipient(row)
     if not address:raise CampaignError('recipient_not_verified')
@@ -42,9 +59,12 @@ def message(row,campaign_id,message_date=None):
     if 'STOP' not in body:body+='\n\nSi vous ne souhaitez plus recevoir nos messages, répondez STOP.'
     m=EmailMessage(policy=policy.SMTP);m['From']='13 URGENT — Équipe commerciale <'+SENDER+'>';m['To']=address;m['Cc']=COPY;m['Reply-To']=SENDER
     m['Subject']=subject;m['Date']=message_date or format_datetime(datetime.now(timezone.utc))
-    digest=hashlib.sha256((campaign_id+'\n'+SENDER+'\n'+address.lower()+'\n'+subject+'\n'+body).encode()).hexdigest()
+    attachment=verified_pdf(row['pdf_attachment']) if row.get('pdf_attachment') else None
+    attachment_identity='\npdf:'+attachment[2] if attachment else ''
+    digest=hashlib.sha256((campaign_id+'\n'+SENDER+'\n'+address.lower()+'\n'+subject+'\n'+body+attachment_identity).encode()).hexdigest()
     m['Message-ID']='<'+digest+'@13urgent.fr>';m['List-Unsubscribe']='<mailto:'+SENDER+'?subject=STOP>'
     m.set_content(body)
+    if attachment:m.add_attachment(attachment[0],maintype='application',subtype='pdf',filename=attachment[1])
     return m,digest
 
 def mailbox_rows(rows):
