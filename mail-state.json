@@ -766,10 +766,12 @@
     },
     "direction-nationale-20261126-lot2-v1": {
       "p-95395326802951d744ff": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "3aec15f5aa7ff25b6cb0e54a21988c56246befd832491daaba92e6a36be98fe6",
         "message_date": "Thu, 26 Nov 2026 17:47:58 +0000",
         "created_at": "2026-11-26T17:48:01.386501+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:48:05.528572+00:00",
         "recipient_fingerprint": "95395326802951d744ff63e9215ef7418c8faeaf8b0d801e61999ea24e884448",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:48:01.386501+00:00",
