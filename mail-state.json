@@ -467,9 +467,11 @@
       },
       "direction-digest-49e94564bdcc943174677603b6062b113b9a888bb0410b9a451b5d3ae987b37f": {
         "fingerprint": "dbaab02faaf709bf34378744b1b71c8fc8e15e5b06bcbbcf15afca5cb1edd460",
-        "status": "accepted_archive_pending",
+        "status": "accepted_and_archived",
         "message_date": "Thu, 26 Nov 2026 17:42:02 +0000",
-        "created_at": "2026-11-26T17:42:04.235189+00:00"
+        "created_at": "2026-11-26T17:42:04.235189+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:42:07.160097+00:00"
       }
     },
     "acquisition-20261110-nouveaux-expediteurs-v1": {
