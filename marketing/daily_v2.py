@@ -200,7 +200,12 @@ def main():
         pipeline.write_summary({'status':'daily2_previews_created','posts_created':0,'slots':safe_slots(posts[:4])});return 0
     client=Client(os.environ.get('BUFFER_API_KEY'));rows=client.scan()
     if args.mode=='probe':
-        pipeline.write_summary({'status':'daily2_connection_and_plan_checked','active_accounts':2,'posts_per_account_per_day':2,'cycle_days':31,'rolling_days':4,'queue_limit_per_account':10,'new_posts_created':0,'first_day_slots':safe_slots(posts[:4]),'company_page_scheduling':False});return 0
+        pipeline.git(pipeline.REPO,'fetch','--depth=1','origin','refs/heads/marketing-state')
+        ledger=json.loads(pipeline.git(pipeline.REPO,'show','FETCH_HEAD:state.json').stdout)
+        expected={ledger.get('posts',{}).get(o['legacy_id'],{}).get('buffer_post_fingerprint') for o in overrides()};expected.discard(None)
+        multiple=client.scan(selection='multiple');unfiltered=client.scan(selection='unfiltered')
+        comparisons={name:{'rows':len(values),'legacy_matches':len({hashed(row['id']) for row in values}&expected),'scheduled':sum(row.get('status')=='scheduled' for row in values)} for name,values in [('single_status',rows),('multiple_statuses',multiple),('unfiltered',unfiltered)]}
+        pipeline.write_summary({'status':'daily2_connection_and_plan_checked','active_accounts':2,'posts_per_account_per_day':2,'cycle_days':31,'rolling_days':4,'queue_limit_per_account':10,'new_posts_created':0,'first_day_slots':safe_slots(posts[:4]),'company_page_scheduling':False,'calendar_comparison':comparisons});return 0
     media,state_dir=pipeline.setup_runtime();state_path=state_dir/'state.json'
     if args.mode=='verify':
         counts,_=reconcile(client,state_path);pipeline.write_summary({'status':'daily2_delivery_check','counts':counts,'new_posts_created':0});return 0 if not counts['errors'] and not counts['uncertain'] else 2

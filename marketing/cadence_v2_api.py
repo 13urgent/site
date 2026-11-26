@@ -55,18 +55,21 @@ class Client(P.BufferClient):
         contexts=self.all_channels()
         return [{k:c[k] for k in ('id','name','service')} for role,c in contexts.items() if role in ('founder','tiktok')]
 
-    def scan(self):
+    def scan(self,selection='single'):
         contexts=self.all_channels();groups={};roles={}
         for role,ctx in contexts.items():groups.setdefault(ctx['organization'],[]).append(ctx['id']);roles[ctx['id']]=role
         result=[]
         for oid,ids in groups.items():
             # Always inspect ALL pending posts, separately from bounded history.
             # A growing archive must not block the next month's daily cadence.
-            for statuses,pages,strict in [('scheduled,sending,needs_approval',5,True),('sent,error,draft',3,False)]:
+            selections=([('scheduled,sending,needs_approval',5,True),('sent,error,draft',3,False)] if selection=='multiple'
+                        else [('',3,False)] if selection=='unfiltered'
+                        else [('scheduled',5,True),('sending',1,True),('needs_approval',1,True),('sent',3,False),('error',1,False),('draft',1,False)])
+            for statuses,pages,strict in selections:
                 after=None
                 for _ in range(pages):
                     q=('query { posts(first:50,'+('after:'+json.dumps(after)+',' if after else '')
-                       +'input:{organizationId:'+json.dumps(oid)+',filter:{channelIds:'+json.dumps(ids)+',status:['+statuses+']},sort:[{field:createdAt,direction:desc}]}) '
+                       +'input:{organizationId:'+json.dumps(oid)+',filter:{channelIds:'+json.dumps(ids)+(',status:['+statuses+']' if statuses else '')+'},sort:[{field:createdAt,direction:desc}]}) '
                        +'{ edges { node { id channelId text status dueAt sentAt schedulingType externalLink assets { source } metadata { __typename ... on TiktokPostMetadata { isAiGenerated } } } } pageInfo { hasNextPage endCursor } } }')
                     data=self.query(q).get('posts')
                     if not isinstance(data,dict) or not isinstance(data.get('edges'),list) or not isinstance(data.get('pageInfo'),dict):raise P.SafeFailure('cadence_calendar_schema')
