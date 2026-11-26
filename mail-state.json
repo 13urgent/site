@@ -881,6 +881,17 @@
         "followup_due_at": "2026-12-03T17:48:55.653945+00:00",
         "followup_count": 0,
         "service_category": "mon_exploit"
+      },
+      "p-f3489506154708a41975": {
+        "status": "intent",
+        "fingerprint": "ed29f896cc063447eb09fd73b521b89964f570c3e1eb54bc22b0c651e5101c29",
+        "message_date": "Thu, 26 Nov 2026 17:49:02 +0000",
+        "created_at": "2026-11-26T17:49:02.251806+00:00",
+        "recipient_fingerprint": "f3489506154708a41975947171932aada5af53a8945396c4950193d4294c2171",
+        "followup_allowed": true,
+        "followup_due_at": "2026-12-03T17:49:02.251806+00:00",
+        "followup_count": 0,
+        "service_category": "mon_exploit"
       }
     }
   },
