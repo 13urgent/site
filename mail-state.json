@@ -831,10 +831,12 @@
         "service_category": "mon_exploit"
       },
       "p-83000e9bcea5847a6de0": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "2ce0f1a0b9169dc84ba7ec0fa803257906bb08d44594954e9acd6d0e19e4feca",
         "message_date": "Thu, 26 Nov 2026 17:48:35 +0000",
         "created_at": "2026-11-26T17:48:35.507145+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:48:38.849954+00:00",
         "recipient_fingerprint": "83000e9bcea5847a6de06b294824545bca4ae1925db194394a4a0c15ac50faf2",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:48:35.507145+00:00",
