@@ -7,6 +7,7 @@ from email.utils import getaddresses
 import hashlib,json,os,re
 from pathlib import Path
 import commercial_agent as agent
+import commercial_hours
 import run_campaign
 import monitor_replies
 import send_service_reply as service
@@ -73,11 +74,13 @@ Si vous ne souhaitez plus recevoir nos messages, répondez STOP.
 
 
 def execute(path,password,checkpoint,now,deliver=service.deliver,archive_factory=None):
+    if not commercial_hours.allowed(now):return {'eligible':0,'followups_accepted':0,'followups_blocked':0,'deferred_business_hours':True}
     path=Path(path);state=json.loads(path.read_text());rows=eligible(state,now)
     if not rows:return {'eligible':0,'followups_accepted':0,'followups_blocked':0}
     archive=archive_factory() if archive_factory else agent.SentArchive(password);accepted=blocked=0
     try:
         for cid,rid,r in rows:
+            if not commercial_hours.allowed(now):break
             try:address,subject,mid=original(archive,r)
             except agent.CampaignError:blocked+=1;continue
             category=r.get('service_category','urgent')
@@ -89,7 +92,9 @@ def execute(path,password,checkpoint,now,deliver=service.deliver,archive_factory
                 mail=service.build_message(payload,digest,date);mail['In-Reply-To']=mid;mail['References']=mid;mail['List-Unsubscribe']='<mailto:'+agent.SENDER+'?subject=STOP>';mail.add_attachment(attachment[0],maintype='application',subtype='pdf',filename=attachment[1]);return mail
             state=json.loads(path.read_text());parent=state['campaigns'][cid][rid];parent.update(followup_count=1,followup_state='intent',followup_attempted_at=now.isoformat());agent.save(path,state);checkpoint()
             result=deliver(payload,digest,path,password,checkpoint,message_builder=build)
-            state=json.loads(path.read_text());state['campaigns'][cid][rid]['followup_state']=result['status'];agent.save(path,state);checkpoint()
+            state=json.loads(path.read_text());state['campaigns'][cid][rid]['followup_state']=result['status']
+            if result['status']=='deferred_business_hours':state['campaigns'][cid][rid]['followup_count']=0
+            agent.save(path,state);checkpoint()
             accepted+=int(result.get('emails_sent',0));blocked+=int(result['status'] not in ('accepted_and_archived','already_recorded','archive_reconciled_without_resend'))
     finally:archive.close()
     return {'eligible':len(rows),'followups_accepted':accepted,'followups_blocked':blocked}

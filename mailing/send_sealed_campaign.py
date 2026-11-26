@@ -121,9 +121,8 @@ def main():
     try:
         campaign = validate_payload(sealed.fetch_payload(request_id, directory), request_id, digest)
         _, state_dir = run_campaign.pipeline.setup_runtime()
-        rows = deliver(campaign, state_dir / 'mail-state.json', os.environ.get('CONTACT_MAIL_PASSWORD'),
-                       lambda: run_campaign.checkpoint(state_dir))
-        result = summary(rows)
+        from commercial_queue import process
+        result = process(campaign,state_dir,os.environ.get('CONTACT_MAIL_PASSWORD'))
         print(json.dumps(result))
         return 0 if result['status'] == 'campaign_processed' else 2
     finally:

@@ -22,7 +22,7 @@ def checkpoint(state_dir):
 
 def scheduled_send_window_open(now):
     local=now.astimezone(ZoneInfo('Europe/Paris'))
-    return local.weekday()==0 and local.hour>=8
+    return local.weekday()==0 and (local.hour>=8 if local.date()<__import__('commercial_hours').EFFECTIVE else 10<=local.hour<18)
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--mode',choices=['probe','send','verify'],default='probe');parser.add_argument('--scheduled',action='store_true');parser.add_argument('--reported-bounce-id');args=parser.parse_args()

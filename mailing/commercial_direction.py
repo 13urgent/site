@@ -8,6 +8,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 import argparse,hashlib,imaplib,json,os,re,ssl,subprocess,tempfile
 import commercial_agent as agent
+import commercial_hours
 import run_campaign
 import incoming_quotes as incoming
 import send_service_reply as service
@@ -122,6 +123,8 @@ def process(records,state_path,password,checkpoint,now,deliver=service.deliver):
             state=json.loads(path.read_text());state['campaigns'].setdefault(STORE,{})[r['source_hash']]={'status':'pending_report','correspondent_hash':h(r['sender'].lower()),'ack_attempted':True};agent.save(path,state);checkpoint();attempted+=1
             outcome=deliver(payload,digest,path,password,checkpoint,message_builder=incoming.message_builder(r))
             prior_senders.add(h(r['sender'].lower()));accepted+=int(outcome.get('emails_sent',0))
+            if outcome['status']=='deferred_business_hours':
+                state=json.loads(path.read_text());state['campaigns'][STORE][r['source_hash']]['ack_attempted']=False;agent.save(path,state);checkpoint()
             state=json.loads(path.read_text());state['campaigns'][STORE][r['source_hash']]['ack_status']=outcome['status'];agent.save(path,state);checkpoint()
         outcomes[r['source_hash']]=outcome
     digest_id=h('|'.join(sorted(r['source_hash'] for r in todo)))
@@ -148,6 +151,7 @@ def encrypted_review(records,cert,out):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--mode',choices=['review','run'],default='review');args=parser.parse_args();now=datetime.now(timezone.utc)
     if now.astimezone(ZoneInfo('Europe/Paris')).date()<START:print(json.dumps({'status':'before_authorized_period','emails_sent':0}));return
+    if args.mode=='run' and not commercial_hours.allowed(now):print(json.dumps(commercial_hours.deferred()));return
     password=os.environ.get('CONTACT_MAIL_PASSWORD')
     if not password:raise agent.CampaignError('mail_access_not_connected')
     _,sd=run_campaign.pipeline.setup_runtime();path=sd/'mail-state.json';state=json.loads(path.read_text());records,info=read(state,password,now)

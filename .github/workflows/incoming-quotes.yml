@@ -12,7 +12,7 @@ on:
         type: string
         required: false
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/15 8-16 * * 1-5'
 permissions:
   contents: write
 concurrency:

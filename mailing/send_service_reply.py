@@ -110,6 +110,8 @@ def build_message(payload, digest, date):
 def deliver(payload, digest, state_path, password, checkpoint, smtp_factory=None, archive_factory=None, message_builder=None):
     if not password:
         raise agent.CampaignError('mail_access_not_connected')
+    import commercial_hours
+    if str(payload.get('request_id','')).startswith(('direction-','inbound-','followup-','receipt-')) and not commercial_hours.allowed():return commercial_hours.deferred()
     state_path = Path(state_path)
     state = json.loads(state_path.read_text()) if state_path.exists() else {'schema_version': 1, 'campaigns': {}, 'suppressed': []}
     if state.get('schema_version') != 1:

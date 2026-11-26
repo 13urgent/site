@@ -3,6 +3,7 @@
 from __future__ import annotations
 import argparse,base64,hashlib,imaplib,json,os,re,smtplib,ssl,tempfile,time,unicodedata
 from functools import lru_cache
+import commercial_hours
 from urllib.request import Request,urlopen
 from datetime import datetime,timezone
 from email import policy
@@ -185,6 +186,7 @@ def run(campaign,state_path,execute=False,smtp_factory=None,password=None,now=No
                         previous['status']='accepted_and_archived';persist();results.append({'id':row['id'],'status':'reconciled_from_sent_without_resend'});continue
                 results.append({'id':row['id'],'status':'already_recorded','recorded_status':previous.get('status')});continue
             if not execute:results.append({'id':row['id'],'status':'ready_preview','message':mail.as_string()});continue
+            if not commercial_hours.allowed(now):results.append({'id':row['id'],'status':'deferred_business_hours'});continue
             # Require a usable Sent folder BEFORE sending to any prospect.
             get_archive()
             if connection is None:
