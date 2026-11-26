@@ -608,6 +608,17 @@
         "followup_due_at": "2026-12-03T17:39:30.606582+00:00",
         "followup_count": 0,
         "service_category": "urgent"
+      },
+      "exp-20261126-manorga": {
+        "status": "intent",
+        "fingerprint": "dbb44b16a11ac38272c38f7030f7245f62640c1739e18bb07cefb5099ab17b6e",
+        "message_date": "Thu, 26 Nov 2026 17:39:38 +0000",
+        "created_at": "2026-11-26T17:39:38.125259+00:00",
+        "recipient_fingerprint": "57a29493ae0302b002eb143447781d21db00395c506ed8ef8fedd4699fe18d3b",
+        "followup_allowed": true,
+        "followup_due_at": "2026-12-03T17:39:38.125259+00:00",
+        "followup_count": 0,
+        "service_category": "urgent"
       }
     }
   },
