@@ -57,10 +57,13 @@ def deliver(campaign, state_path, password, checkpoint, **kwargs):
         raise agent.CampaignError('state_schema')
     prior = {row.get('recipient_fingerprint') for cid, records in old['campaigns'].items()
              if cid != campaign['campaign_id'] for row in records.values()}
+    suppressed=set(old.get('suppressed_hashes',[]))
     retained, held = [], []
     for row in campaign['recipients']:
         address = agent.recipient(row)
-        if address and recipient_hash(address) in prior:
+        if address and recipient_hash(address) in suppressed:
+            held.append({'id':row['id'],'status':'held_opposition'})
+        elif address and recipient_hash(address) in prior:
             held.append({'id': row['id'], 'status': 'held_previous_contact'})
         else:
             retained.append(row)

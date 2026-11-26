@@ -1,0 +1,43 @@
+name: Direction commerciale — qualification et compte rendu
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [review, run]
+        default: review
+      review_cert_pem:
+        description: Certificat public éphémère pour la seule revue privée
+        type: string
+        required: false
+  schedule:
+    - cron: '30 7,12,16 * * 1-5'
+permissions:
+  contents: write
+concurrency:
+  group: marketing-13urgent
+  cancel-in-progress: false
+jobs:
+  direction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Vérifier le périmètre et les reprises sans doublon
+        run: python -m unittest discover -s mailing -p test_commercial_direction.py
+      - name: Traiter uniquement les demandes commerciales autorisées
+        env:
+          CONTACT_MAIL_PASSWORD: ${{ secrets.CONTACT_MAIL_PASSWORD }}
+          REVIEW_CERT_PEM: ${{ inputs.review_cert_pem }}
+          RUN_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'run' }}
+        run: python mailing/commercial_direction.py --mode "$RUN_MODE"
+      - uses: actions/upload-artifact@v4
+        if: inputs.mode == 'review'
+        with:
+          name: commercial-review-${{ github.run_id }}
+          path: ${{ runner.temp }}/commercial-review.cms
+          retention-days: 1
+          if-no-files-found: error
