@@ -522,6 +522,12 @@
       "is_ai_generated": true,
       "buffer_post_fingerprint": "d5deca272922193bfaa666198e67678220779ec45f39ef0424447263268177af",
       "updated_at": "2026-11-26T18:30:53.345368+00:00"
+    },
+    "daily2-20261127-s1-linkedin": {
+      "fingerprint": "6ea023bd24c41d020a874386d9f1c07b92911a2490c93424c66d9f443c318597",
+      "status": "intent",
+      "created_at": "2026-11-26T18:30:55.067862+00:00",
+      "due_at": "2026-11-27T16:00:00Z"
     }
   },
   "daily2_edits": {
