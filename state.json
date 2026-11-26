@@ -492,6 +492,12 @@
       "target_due_at": "2026-12-01T09:00:00Z",
       "method": "edit_existing_post",
       "provider_status": "scheduled"
+    },
+    "daily2-20261203-s0-linkedin": {
+      "status": "intent",
+      "source_post_fingerprint": "13e3cb1599ec465b3a5ea70abb2c348eb6f0d8936205e9934e8964d1b6cd6db1",
+      "old_due_at": "2026-12-03T11:15:00.000Z",
+      "target_due_at": "2026-12-03T09:00:00Z"
     }
   }
 }
