@@ -660,6 +660,17 @@
         "followup_due_at": "2026-12-03T17:39:59.366600+00:00",
         "followup_count": 0,
         "service_category": "urgent"
+      },
+      "me-20261126-sallaberry": {
+        "status": "intent",
+        "fingerprint": "32fb95b847f1afbfce2f985204e903b9fd0cc499595804d6cd2e1df1054030a4",
+        "message_date": "Thu, 26 Nov 2026 17:40:06 +0000",
+        "created_at": "2026-11-26T17:40:06.223573+00:00",
+        "recipient_fingerprint": "78ce4cf143aacea19ba070946afb0d5aa2d9d7cf13d8dacf16e82fdf98a3bbaa",
+        "followup_allowed": true,
+        "followup_due_at": "2026-12-03T17:40:06.223573+00:00",
+        "followup_count": 0,
+        "service_category": "mon_exploit"
       }
     }
   },
