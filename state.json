@@ -449,5 +449,13 @@
       "buffer_post_fingerprint": "d2bec5721c8a1e6e988fbe59e4d544753ef0b189437a511b02ee6391a7df99a6",
       "updated_at": "2026-11-26T17:35:09.531325+00:00"
     }
+  },
+  "daily2_edits": {
+    "daily2-20261128-s0-linkedin": {
+      "status": "intent",
+      "source_post_fingerprint": "866cb431b3bc8ebe5e08eb7ded262a4df18714f24a39a40cde1ea53c46c38a31",
+      "old_due_at": "2026-11-28T11:15:00.000Z",
+      "target_due_at": "2026-11-28T09:00:00Z"
+    }
   }
 }
