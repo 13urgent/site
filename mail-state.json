@@ -1000,10 +1000,12 @@
         "service_category": "urgent"
       },
       "p-9bb8df3a340467152672": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "6f966830ffa4ff310187dd51c61fa1d8b53ed80811bf9dfa2c1baa1d17d1e82f",
         "message_date": "Thu, 26 Nov 2026 17:50:03 +0000",
         "created_at": "2026-11-26T17:50:03.630296+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:50:07.045336+00:00",
         "recipient_fingerprint": "9bb8df3a340467152672e21d06b1f8442c0c32325d73fcb9ea2ce18cd46e6e3a",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:50:03.630296+00:00",
