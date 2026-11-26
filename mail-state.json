@@ -701,10 +701,12 @@
         "service_category": "mon_exploit"
       },
       "me-20261126-davin": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "5b9df5ce80f89f31a1e0a007525b0325f4006ea41089be7f903cfaa44f264e0d",
         "message_date": "Thu, 26 Nov 2026 17:40:27 +0000",
         "created_at": "2026-11-26T17:40:27.202963+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:40:30.777760+00:00",
         "recipient_fingerprint": "4deddf702030fea533bb306cc9a9fc72b070a518586a0a06e21eb39470a4b5dd",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:40:27.202963+00:00",
