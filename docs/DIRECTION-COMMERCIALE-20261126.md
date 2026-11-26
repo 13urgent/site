@@ -2,7 +2,7 @@
 
 Autorisation du dirigeant dans la conversation : organisation commerciale et envoi de messages aux transporteurs, donneurs d’ordre et prospects des services CHRONOSS. Aucun budget payant engagé.
 
-`commercial-direction.yml` est borné du 26/11 au 10/12/2026 inclus. Passage les jours ouvrés à 07h30, 12h30 et 16h30 UTC (08h30, 13h30, 17h30 Paris sur cette période). Aucun démarchage froid n’est déclenché par ce workflow.
+`commercial-direction.yml` est activé à partir du 26/11/2026. Premier bilan prévu le 10/12/2026, sans arrêt automatique du suivi entrant à cette date. Passage les jours ouvrés à 07h30, 12h30 et 16h30 UTC (08h30, 13h30, 17h30 Paris sur cette période). Aucun démarchage froid n’est déclenché par ce workflow. La poursuite du suivi entrant est autorisée par la délégation de direction commerciale du propriétaire ; volumes fixes par passage, aucun budget engagé.
 
 Il lit au plus 600 en-têtes dans INBOX, puis au plus 40 messages : réponses aux campagnes commerciales reconnues dans le registre et sujets explicites d’essai/demande Mon Exploit. Les messages juridiques, RH et factures sans lien commercial reconnu restent hors sélection. Les pièces jointes ne sont pas exportées.
 
@@ -14,4 +14,4 @@ La lecture IMAP est seule (`BODY.PEEK`, INBOX readonly). Les envois utilisent le
 
 Les données du registre public se limitent aux empreintes, catégories et états. Les prix transport, confirmations de moyens et conditions négociées restent soumis à la validation du dirigeant.
 
-Arrêt : désactiver le workflow depuis Actions, ou attendre le 10/12 ; le code refuse tout traitement hors période même si la planification subsiste. La pause de la campagne TikTok est indépendante et reste inchangée.
+Arrêt : désactiver le workflow depuis Actions sur demande du propriétaire. Le premier bilan du 10/12 est une échéance de mesure et non une date de fin du projet ou du suivi entrant. La pause de la campagne TikTok est indépendante et reste inchangée.

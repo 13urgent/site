@@ -13,7 +13,7 @@ import incoming_quotes as incoming
 import send_service_reply as service
 
 START=date(2026,11,26)
-END=date(2026,12,10)
+REVIEW_DUE=date(2026,12,10)
 STORE='commercial-direction-v1'
 ACK='''Bonjour,
 
@@ -146,14 +146,14 @@ def encrypted_review(records,cert,out):
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--mode',choices=['review','run'],default='review');args=parser.parse_args();now=datetime.now(timezone.utc)
-    if not START<=now.astimezone(ZoneInfo('Europe/Paris')).date()<=END:print(json.dumps({'status':'outside_authorized_period','emails_sent':0}));return
+    if now.astimezone(ZoneInfo('Europe/Paris')).date()<START:print(json.dumps({'status':'before_authorized_period','emails_sent':0}));return
     password=os.environ.get('CONTACT_MAIL_PASSWORD')
     if not password:raise agent.CampaignError('mail_access_not_connected')
     _,sd=run_campaign.pipeline.setup_runtime();path=sd/'mail-state.json';state=json.loads(path.read_text());records,info=read(state,password,now)
     if args.mode=='review':
         out=Path(os.environ['RUNNER_TEMP'])/'commercial-review.cms';encrypted_review(records,os.environ.get('REVIEW_CERT_PEM',''),out)
         print(json.dumps({'status':'private_review_encrypted',**info,'emails_sent':0}));return
-    result=process(records,path,password,lambda:run_campaign.checkpoint(sd),now);print(json.dumps({'status':'commercial_intake_processed',**info,**result}))
+    result=process(records,path,password,lambda:run_campaign.checkpoint(sd),now);print(json.dumps({'status':'commercial_intake_processed','first_review_due':REVIEW_DUE.isoformat(),**info,**result}))
 if __name__=='__main__':
     try:main()
     except Exception as e:
