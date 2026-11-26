@@ -985,6 +985,17 @@
         "followup_due_at": "2026-12-03T17:49:49.805312+00:00",
         "followup_count": 0,
         "service_category": "urgent"
+      },
+      "p-d5edd2f9d6747dac1af3": {
+        "status": "intent",
+        "fingerprint": "78ce5542ee56342065af5e7670c317c15636a4a53fd28d29f96e7ac0cfcde518",
+        "message_date": "Thu, 26 Nov 2026 17:49:56 +0000",
+        "created_at": "2026-11-26T17:49:56.671343+00:00",
+        "recipient_fingerprint": "d5edd2f9d6747dac1af35ea44db5dc8d556c6b6d8b19ba1189153aa636f540f3",
+        "followup_allowed": true,
+        "followup_due_at": "2026-12-03T17:49:56.671343+00:00",
+        "followup_count": 0,
+        "service_category": "urgent"
       }
     }
   },
