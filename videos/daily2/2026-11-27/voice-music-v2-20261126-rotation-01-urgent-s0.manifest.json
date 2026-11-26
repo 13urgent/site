@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "topic_id": "rotation-01-urgent",
+  "service": "urgent",
+  "editorial_date": "2026-11-27",
+  "slot": 0,
+  "video_file": "rotation-01-urgent-20261127-s0.mp4",
+  "duration_seconds": 30.0,
+  "width": 720,
+  "height": 1280,
+  "sha256": "603746776725d2190288f9b7413d5a141710ee656ce6337e65458107efdc4733",
+  "voice": {
+    "present": true,
+    "source_url": "https://raw.githubusercontent.com/13urgent/site/gh-pages/videos/linkedin-20261031/13urgent-linkedin-avec-voix.mp4",
+    "source_sha256": "fa2dfb6f25ec9425af210f03ddae50bf6efb2c6c0508aac139f5118b44b5064e",
+    "source_metrics": {
+      "mean_db": -17.2,
+      "peak_db": -3.2
+    },
+    "content_and_tempo_preserved": true,
+    "correlation_to_approved_source": 0.99481,
+    "new_voice_generation": false
+  },
+  "music": {
+    "kind": "previously_approved_original_instrumental",
+    "url": "https://raw.githubusercontent.com/13urgent/site/gh-pages/videos/rotation-20261127/original-background.wav",
+    "volume_factor_before_ducking": 0.22,
+    "ducked_under_speech": true,
+    "paid_music": false,
+    "verified_trend": false
+  },
+  "audio_metrics": {
+    "mean_db": -18.6,
+    "peak_db": -4.7
+  },
+  "visual_style": 0,
+  "business_diagrams": [
+    "boxes",
+    "steps"
+  ],
+  "animated_business_panels": true,
+  "palette": 0,
+  "cta_url": "https://13urgent.fr/deposer.html",
+  "client_data": false,
+  "ai_disclosure_required": true,
+  "publication_status": "not_published",
+  "limitations": [
+    "Prepared editorial rotation, not autonomous live trend research.",
+    "Voice is a preexisting approved general presentation matched to the service, not newly synthesized per hook."
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "topic_id": "rotation-06-chronoss",
+  "service": "chronoss",
+  "editorial_date": "2026-11-29",
+  "slot": 1,
+  "video_file": "rotation-06-chronoss-20261129-s1.mp4",
+  "duration_seconds": 24.0,
+  "width": 720,
+  "height": 1280,
+  "sha256": "45123cd215ee989b87b40b07bea9144c5a656e5483c7a8581e0326749b9d057a",
+  "voice": {
+    "present": true,
+    "source_url": "https://raw.githubusercontent.com/13urgent/site/gh-pages/videos/particuliers-20261102/13urgent-particuliers-avec-voix.mp4",
+    "source_sha256": "a8115bdf0fa48d1c02e02546f3ee7209ab6c245709a09e11d9140a542fefb1d7",
+    "source_metrics": {
+      "mean_db": -18.2,
+      "peak_db": -1.5
+    },
+    "content_and_tempo_preserved": true,
+    "correlation_to_approved_source": 0.99365,
+    "new_voice_generation": false
+  },
+  "music": {
+    "kind": "previously_approved_original_instrumental",
+    "url": "https://raw.githubusercontent.com/13urgent/site/gh-pages/videos/rotation-20261127/original-background.wav",
+    "volume_factor_before_ducking": 0.22,
+    "ducked_under_speech": true,
+    "paid_music": false,
+    "verified_trend": false
+  },
+  "audio_metrics": {
+    "mean_db": -19.2,
+    "peak_db": -2.4
+  },
+  "visual_style": 1,
+  "business_diagrams": [
+    "route",
+    "steps"
+  ],
+  "animated_business_panels": true,
+  "palette": 2,
+  "cta_url": "https://13urgent.fr/demander-un-devis.html?service=moving",
+  "client_data": false,
+  "ai_disclosure_required": true,
+  "publication_status": "not_published",
+  "limitations": [
+    "Prepared editorial rotation, not autonomous live trend research.",
+    "Voice is a preexisting approved general presentation matched to the service, not newly synthesized per hook."
+  ]
+}
