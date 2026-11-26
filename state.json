@@ -427,6 +427,12 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "9784eef1f06e0f4bff59769d2851f88ee46523a8ce56ab2327b178f2a43ba879",
       "updated_at": "2026-11-26T17:35:02.499755+00:00"
+    },
+    "commercial-linkedin-chronoss-20261202-v1": {
+      "fingerprint": "f6fcfdb4513e133dc63be338e7966f1a9631fee68ba4058098d099f99d7265a7",
+      "status": "intent",
+      "created_at": "2026-11-26T17:35:03.991791+00:00",
+      "due_at": "2026-12-03T11:15:00Z"
     }
   }
 }
