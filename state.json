@@ -422,13 +422,15 @@
     },
     "commercial-linkedin-13-urgent-20261130-v1": {
       "fingerprint": "9a0fe3ac0cc72f6cbf77ebfd22c4aa1bc6b03e80921fec61d7743b9947541213",
-      "status": "scheduled",
+      "status": "migrated_alias",
       "created_at": "2026-11-26T17:35:00.550638+00:00",
-      "due_at": "2026-12-01T11:15:00.000Z",
+      "due_at": "2026-12-01T09:00:00Z",
       "provider_status": "scheduled",
       "scheduling_type": "automatic",
-      "buffer_post_fingerprint": "9784eef1f06e0f4bff59769d2851f88ee46523a8ce56ab2327b178f2a43ba879",
-      "updated_at": "2026-11-26T17:35:02.499755+00:00"
+      "updated_at": "2026-11-26T17:35:02.499755+00:00",
+      "migrated_post_fingerprint": "9784eef1f06e0f4bff59769d2851f88ee46523a8ce56ab2327b178f2a43ba879",
+      "canonical_id": "daily2-20261201-s0-linkedin",
+      "old_due_at": "2026-12-01T11:15:00.000Z"
     },
     "commercial-linkedin-chronoss-20261202-v1": {
       "fingerprint": "f6fcfdb4513e133dc63be338e7966f1a9631fee68ba4058098d099f99d7265a7",
@@ -461,6 +463,17 @@
       "migrated_from": "commercial-linkedin-mon-exploit-20261127-v1",
       "voice_and_music": true,
       "is_ai_generated": false
+    },
+    "daily2-20261201-s0-linkedin": {
+      "fingerprint": "37ef1c3a22e12f20eeed0bc5d673549f0775840d5797b62578d48f8e3f86e6a2",
+      "status": "scheduled",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "due_at": "2026-12-01T09:00:00Z",
+      "buffer_post_fingerprint": "9784eef1f06e0f4bff59769d2851f88ee46523a8ce56ab2327b178f2a43ba879",
+      "migrated_from": "commercial-linkedin-13-urgent-20261130-v1",
+      "voice_and_music": true,
+      "is_ai_generated": false
     }
   },
   "daily2_edits": {
@@ -473,10 +486,12 @@
       "provider_status": "scheduled"
     },
     "daily2-20261201-s0-linkedin": {
-      "status": "intent",
+      "status": "completed",
       "source_post_fingerprint": "9784eef1f06e0f4bff59769d2851f88ee46523a8ce56ab2327b178f2a43ba879",
       "old_due_at": "2026-12-01T11:15:00.000Z",
-      "target_due_at": "2026-12-01T09:00:00Z"
+      "target_due_at": "2026-12-01T09:00:00Z",
+      "method": "edit_existing_post",
+      "provider_status": "scheduled"
     }
   }
 }
