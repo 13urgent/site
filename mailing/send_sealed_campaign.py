@@ -124,7 +124,7 @@ def main():
         from commercial_queue import process
         result = process(campaign,state_dir,os.environ.get('CONTACT_MAIL_PASSWORD'))
         print(json.dumps(result))
-        return 0 if result['status'] == 'campaign_processed' else 2
+        return 0 if result['status'] in ('campaign_processed','queued_for_start_date','queued_for_business_hours') else 2
     finally:
         for name in ('private.key', 'request.cms'):
             (directory / name).unlink(missing_ok=True)
