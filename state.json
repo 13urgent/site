@@ -392,6 +392,14 @@
       "last_verified_at": "2026-11-26T13:49:44.730783+00:00",
       "sent_at": "2026-11-26T13:49:44.494Z",
       "external_link": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7531715819790090240"
+    },
+    "tiktok-monexploit-brochure-20261126-approved-v1": {
+      "fingerprint": "628ce9a7a4d45fbad26e9370dd10fb2b86251523cd3d8d8366fd8bd48b830203",
+      "status": "intent",
+      "created_at": "2026-11-26T13:50:04.937595+00:00",
+      "ai_disclosure_requested": true,
+      "commercial_disclosure_api_available": false,
+      "queue_paused_before": false
     }
   }
 }
