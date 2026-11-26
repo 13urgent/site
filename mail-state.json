@@ -636,10 +636,12 @@
         "service_category": "urgent"
       },
       "exp-20261126-haemmerlin": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "b87065ed54e0cea5ff93dbfe5f71c0634988a1ed5351fb4fd2bbd4f440c01921",
         "message_date": "Thu, 26 Nov 2026 17:39:52 +0000",
         "created_at": "2026-11-26T17:39:52.010781+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:39:55.781294+00:00",
         "recipient_fingerprint": "bb61e18853ff3830fc3ca38424954eb058b883d29ae3f22169011c11294cbca9",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:39:52.010781+00:00",
