@@ -1,0 +1,32 @@
+[
+  {
+    "id": "moving-particuliers-a",
+    "audience": "particulier_demenagement",
+    "operator": "CHRONOSS",
+    "status": "draft_not_published",
+    "destination_url": "https://13urgent.fr/demander-un-devis.html?service=moving",
+    "text": "Un déménagement à organiser ? Décrivez votre projet à CHRONOSS : villes, date souhaitée, volume et accès. Demandez votre devis sur 13 URGENT : https://13urgent.fr/demander-un-devis.html?service=moving\n#Déménagement #CHRONOSS",
+    "suggested_video_scenes": [
+      "Un déménagement à organiser ?",
+      "Vos villes et votre date",
+      "Volume, étages et accès",
+      "Présentez votre projet à CHRONOSS",
+      "13urgent.fr · Demandez votre devis"
+    ]
+  },
+  {
+    "id": "moving-particuliers-b",
+    "audience": "particulier_demenagement",
+    "operator": "CHRONOSS",
+    "status": "draft_not_published",
+    "destination_url": "https://13urgent.fr/demander-un-devis.html?service=moving",
+    "text": "Meubles, cartons, étages, ascenseur… Chaque déménagement a ses contraintes. Présentez les vôtres à CHRONOSS pour étudier votre transport : https://13urgent.fr/demander-un-devis.html?service=moving\n#Déménagement #13URGENT",
+    "suggested_video_scenes": [
+      "Meubles, cartons, objets volumineux",
+      "Quel volume à transporter ?",
+      "Quels étages et accès ?",
+      "Une étude selon votre besoin",
+      "13urgent.fr · Présentez votre projet"
+    ]
+  }
+]

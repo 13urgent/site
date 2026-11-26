@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "enabled": true,
   "timezone": "Europe/Paris",
   "accounts": [
@@ -9,21 +9,18 @@
       "caption_key": "linkedin_founder",
       "weekdays": [
         0,
+        1,
         2,
-        4
+        3,
+        4,
+        5,
+        6
       ],
-      "hour": "12:15"
-    },
-    {
-      "name": "Chronos",
-      "service": "linkedin",
-      "caption_key": "linkedin_page",
-      "weekdays": [
-        0,
-        2,
-        4
-      ],
-      "hour": "17:15"
+      "hour": "10:00",
+      "hours": [
+        "10:00",
+        "17:00"
+      ]
     },
     {
       "name": "13urgentsite",
@@ -38,7 +35,11 @@
         5,
         6
       ],
-      "hour": "18:00"
+      "hour": "10:00",
+      "hours": [
+        "10:00",
+        "19:00"
+      ]
     }
   ],
   "topic_epoch": "2026-11-07",
@@ -49,10 +50,42 @@
   "music": "Original instrumental; no verified trending commercial track",
   "dm_automation": false,
   "catalogue_prepared_on": "2026-11-06",
-  "publication_holds": {
-    "tiktok": {
-      "since": "2026-11-19",
-      "reason": "Signalements de modération TikTok à examiner avec le propriétaire."
+  "publication_holds": {},
+  "retired_accounts": [
+    {
+      "name": "Chronos",
+      "service": "linkedin",
+      "caption_key": "linkedin_page",
+      "weekdays": [
+        0,
+        2,
+        4
+      ],
+      "hour": "17:15"
     }
+  ],
+  "publication_hold_history": [
+    {
+      "service": "tiktok",
+      "since": "2026-11-19",
+      "reason": "Signalements de modération TikTok à examiner avec le propriétaire.",
+      "ended_on": "2026-11-26",
+      "owner_instruction": "Reprise régulière2publications/jourà10h/19h dès27novembre2026"
+    }
+  ],
+  "daily_v2": {
+    "enabled": true,
+    "starts_on": "2026-11-27",
+    "cycle_days": 31,
+    "topics_per_day": 2,
+    "rolling_days": 4,
+    "buffer_free_limit_per_channel": 10,
+    "media_prefix": "videos/daily2",
+    "asset_revision": "voice-music-v2-20261126",
+    "music_url": "https://raw.githubusercontent.com/13urgent/site/gh-pages/videos/rotation-20261127/original-background.wav",
+    "voice_required": true,
+    "music_required": true,
+    "paid_generation": false,
+    "company_page_scheduling": false
   }
 }

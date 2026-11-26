@@ -8,6 +8,11 @@ p=importlib.util.module_from_spec(SPEC);SPEC.loader.exec_module(p)
 class PipelineTests(unittest.TestCase):
     def setUp(self):
         self.settings=p.config();self.settings.pop('publication_holds',None)
+        # Retain the historical helper contract for old one-off callers.
+        self.settings['accounts']+=self.settings.get('retired_accounts',[])
+        for account in self.settings['accounts']:
+            account['weekdays']=list(range(7)) if account['service']=='tiktok' else [0,2,4]
+            account['hour']='18:00' if account['service']=='tiktok' else '17:15' if account['caption_key']=='linkedin_page' else '12:15'
         self.catalogue=json.loads((p.ROOT/'content/catalogue.json').read_text())
         self.topic=self.catalogue['topics'][0]
     def test_paris_schedule_handles_summer_and_winter(self):
@@ -57,7 +62,7 @@ class PipelineTests(unittest.TestCase):
                 if name=='buffer_publish':return publisher
                 self.fail('Renderer must not load during verification or a fully recorded retry')
             with patch.object(p,'REPO',root),patch.object(p,'load_module',side_effect=module),patch.object(p,'setup_runtime',return_value=(root/'media',state)),patch.object(p,'write_summary'),patch.object(p,'config',return_value=self.settings),patch.object(p,'publish_media') as upload,patch('sys.argv',['pipeline','--mode',mode,'--date',day.isoformat()]):
-                result=p.main()
+                result=p.legacy_main()
             upload.assert_not_called()
             publisher.verify_delivery.assert_called_once()
             if mode=='verify':

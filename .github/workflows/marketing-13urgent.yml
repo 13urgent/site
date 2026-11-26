@@ -1,4 +1,4 @@
-name: Marketing 13 URGENT
+name: Marketing 13 URGENT — deux publications par jour
 on:
   push:
     branches: [main]
@@ -6,17 +6,16 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: Lecture seule ou programmation automatique
+        description: Controle, migration des anciens posts ou remplissage automatique
         type: choice
-        options: [probe, verify, publish]
+        options: [probe, verify, migrate, publish, preview]
         default: probe
       date:
-        description: Date éditoriale facultative AAAA-MM-JJ (sinon demain à Paris)
+        description: Debut du calendrier facultatif AAAA-MM-JJ
         type: string
         required: false
   schedule:
-    # Retries after 08:00 Paris survive GitHub delays; the durable ledger deduplicates.
-    - cron: '17 6,7,10 * * *'
+    - cron: '10 5,6,7 * * *'
 permissions:
   contents: write
 concurrency:
@@ -24,11 +23,13 @@ concurrency:
   cancel-in-progress: false
 jobs:
   daily:
-    name: Preparer et programmer les publications
+    name: Deux videos par reseau, voix et musique, file glissante gratuite
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -44,32 +45,33 @@ jobs:
             sudo timeout 420 apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends ffmpeg
           fi
           ffmpeg -version | head -n 1
-          ffprobe -version | head -n 1
-      - name: Verifier les textes et la protection contre les doublons
+      - name: Verifier catalogue, cadence, compatibilite et anti-doublons
         run: |
-          python marketing/content/validate_content.py
           python -m unittest discover -s marketing/publisher -p 'test_*.py'
+          python -m unittest discover -s marketing -p test_rotation.py
+          python -m unittest discover -s marketing -p test_daily_v2.py
           python -m unittest discover -s marketing -p test_pipeline.py
-      - name: Produire et programmer sans intervention manuelle
+      - name: Controler ou remplir le calendrier sans intervention manuelle
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-          RUN_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'publish' }}
+          RUN_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || github.event_name == 'push' && 'probe' || 'publish' }}
           EVENT_NAME: ${{ github.event_name }}
           REQUESTED_DATE: ${{ inputs.date }}
+          MARKETING_FONT_DIR: marketing/video/assets/fonts
+          MARKETING_MEDIA_CACHE: .runtime/approved-sources
         run: |
           args=(--mode "$RUN_MODE")
           if [ "$EVENT_NAME" = schedule ]; then args+=(--scheduled); fi
           if [ -n "$REQUESTED_DATE" ]; then args+=(--date "$REQUESTED_DATE"); fi
-          python marketing/pipeline.py "${args[@]}"
-      - name: Conserver les videos produites
+          python marketing/daily_v2.py "${args[@]}"
+      - name: Conserver les preuves audio et le calendrier filtre
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: videos-13urgent
+          name: marketing-daily2-proof
           path: |
-            .runtime/output/*/*.mp4
-            .runtime/output/*/cover.jpg
-            .runtime/output/*/storyboard.jpg
+            .runtime/daily2-result.json
             .runtime/output/*/manifest.json
+            .runtime/output/*/cover.jpg
           if-no-files-found: ignore
           retention-days: 7

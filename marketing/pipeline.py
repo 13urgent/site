@@ -159,7 +159,7 @@ def write_summary(value):
     if summary:
         with open(summary,'a') as stream:stream.write('# Marketing 13 URGENT\n\n```json\n'+json.dumps(value,ensure_ascii=False,indent=2)+'\n```\n')
 
-def main():
+def legacy_main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mode',choices=['probe','verify','publish','preview'],default='probe')
     parser.add_argument('--date',help='Editorial date in Paris; normally tomorrow')
@@ -221,6 +221,11 @@ def main():
     outcomes=report['posts']
     write_summary({'status':'scheduled' if report['ok'] else 'needs_attention','ok':report['ok'],'scheduled':sum(p['status']=='scheduled' for p in outcomes),'already_recorded':sum(p['status']=='already_recorded' for p in outcomes),'attention':sum(p['status'] not in ('scheduled','already_recorded') for p in outcomes),'publication_sent_not_yet_verified':True})
     return 0 if report['ok'] else 2
+
+def main():
+    # Default CLI follows the current owner-approved two-post daily cadence.
+    from daily_v2 import main as daily_main
+    return daily_main()
 
 if __name__=='__main__':
     try:raise SystemExit(main())
