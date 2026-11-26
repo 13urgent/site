@@ -384,8 +384,11 @@
     },
     "linkedin-monexploit-brochure-20261126-approved-v1": {
       "fingerprint": "601170737deb46bbc40df013792e817557a3e0c6442ac5edbe6c096950686570",
-      "status": "intent",
-      "created_at": "2026-11-26T13:49:20.544794+00:00"
+      "status": "scheduled",
+      "created_at": "2026-11-26T13:49:20.544794+00:00",
+      "buffer_post_fingerprint": "907887b7fc15d3d09ce268034640b1cf8828059905613f9fb5af2b89d34292be",
+      "provider_status": "sending",
+      "scheduling_type": "automatic"
     }
   }
 }
