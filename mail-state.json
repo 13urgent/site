@@ -714,10 +714,12 @@
         "service_category": "mon_exploit"
       },
       "me-20261126-landry": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "0d135350718a00149e3b36ee6f93f1b7a7f4a9ed6109a21a63376404cd4f8c00",
         "message_date": "Thu, 26 Nov 2026 17:40:34 +0000",
         "created_at": "2026-11-26T17:40:34.086918+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:40:37.657837+00:00",
         "recipient_fingerprint": "589d000a4e829b7969c130ad2787785c112bdfedf8a24a7ca87f5154bf7bc0b2",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:40:34.086918+00:00",
