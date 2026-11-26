@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "posts": [
+    {
+      "id": "commercial-linkedin-mon-exploit-20261127-v1",
+      "target": "linkedin_founder",
+      "topic": "mon_exploit",
+      "requested_date": "2026-11-27",
+      "hour": "12:15",
+      "text": "Le bon document, au bon moment. 📲\n\nDans une journée de transport, il faut aussi transmettre une consigne, retrouver un PDF et tenir le planning à jour.\n\nAvec Mon Exploit, nous voulons réunir ces échanges entre le bureau et les chauffeurs : missions, planning, documents et signatures eCMR sur smartphone.\n\nVous êtes transporteur et souhaitez voir si cela convient à votre équipe ? Découvrez la brochure et préparez votre demande :\nhttps://13urgent.fr/mon-exploit.html\n\n30 jours d’essai gratuits à compter de la remise effective des accès, sans renouvellement payant automatique. Le périmètre et la date d’ouverture sont confirmés avec vous. La page prépare un e-mail à vérifier et à envoyer depuis votre messagerie.\n\nQuel document manque le plus souvent à votre équipe au moment où elle en a besoin ?\n\n#Transport #TransportRoutier #TMS #MonExploit"
+    },
+    {
+      "id": "commercial-linkedin-13-urgent-20261130-v1",
+      "target": "linkedin_founder",
+      "topic": "13_urgent",
+      "requested_date": "2026-11-30",
+      "hour": "12:15",
+      "text": "Une palette ou du matériel à expédier ? 📦\n\nCommencez par six informations : départ, arrivée, date, marchandise, poids et volume.\n\nSur 13 URGENT, les professionnels avec SIRET peuvent déposer leur besoin de transport, étudier les offres confidentielles éventuellement reçues et choisir une proposition adaptée.\n\n👉 Préparez votre demande :\nhttps://13urgent.fr/deposer.html\n\nLe dépôt est gratuit. Les frais sont présentés avant attribution. Les propositions dépendent des capacités des transporteurs et du trajet : une demande ne garantit pas de réponse ni de transport.\n\n#Expedition #Logistique #Transport #13URGENT"
+    },
+    {
+      "id": "commercial-linkedin-chronoss-20261202-v1",
+      "target": "linkedin_founder",
+      "topic": "chronoss",
+      "requested_date": "2026-12-02",
+      "hour": "12:15",
+      "text": "Un transport à organiser ? Parlons du besoin avant de parler du prix. 🚛\n\nAvec CHRONOSS, nous étudions vos besoins de transport express, de tournées et de prestations ponctuelles.\n\nVous préparez un déménagement ou le transport d’un objet volumineux ? Le trajet, les accès, le volume et les moyens nécessaires sont étudiés avant toute proposition.\n\nPour préparer un devis, indiquez le départ, l’arrivée, la date, la marchandise, le poids, le volume et les contraintes d’accès.\n\n👉 Présentez votre projet :\nhttps://13urgent.fr/demander-un-devis.html\n\nÉtude et devis avant engagement, selon les moyens disponibles. Aucun tarif ni disponibilité n’est garanti avant confirmation.\n\n#CHRONOSS #TransportExpress #Transport #Logistique #Demenagement"
+    },
+    {
+      "id": "commercial-tiktok-expediteurs-20261128-v1",
+      "target": "tiktok",
+      "topic": "13_urgent",
+      "requested_date": "2026-11-28",
+      "hour": "18:00",
+      "text": "📦 Une palette, du matériel ou une pièce à expédier ?\n\nSur 13 URGENT, les professionnels avec SIRET déposent leur demande gratuitement et étudient les offres confidentielles éventuellement reçues.\n\nDépart, arrivée, date, poids et volume : prépare ton besoin 👇\nhttps://13urgent.fr/deposer.html\n\nFrais présentés avant attribution. Offres selon les capacités disponibles. Si le lien n’est pas cliquable, saisis l’adresse dans ton navigateur.\n\n#Expedition #Transport #Logistique #13URGENT",
+      "video_url": "https://raw.githubusercontent.com/13urgent/site/gh-pages/videos/expediteurs-20261126/13urgent-expediteurs-avec-voix-30s.mp4"
+    }
+  ]
+}

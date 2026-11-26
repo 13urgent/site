@@ -1,4 +1,4 @@
-name: Verifier les destinations et liens Buffer
+name: Controler le calendrier des publications commerciales autorisees
 on:
   workflow_dispatch:
 permissions:
@@ -7,24 +7,24 @@ concurrency:
   group: marketing-13urgent
   cancel-in-progress: false
 jobs:
-  visibility:
+  planning:
     runs-on: ubuntu-24.04
-    timeout-minutes: 6
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verifier le filtrage des comptes et des URLs publiques
-        run: python -m unittest discover -s marketing -p test_visibility.py
-      - name: Lire les statuts et liens sans publier
+      - name: Verifier les espacements et la confidentialite du calendrier
+        run: python -m unittest discover -s marketing -p test_commercial_planning_20261126.py
+      - name: Lire le calendrier Buffer sans publier
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-        run: python marketing/diagnose_visibility.py
-      - name: Conserver uniquement le rapport public filtre
-        uses: actions/upload-artifact@v4
+        run: python marketing/commercial_planning_20261126.py --mode audit
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: buffer-public-visibility
-          path: .runtime/visibility-report.json
-          if-no-files-found: error
+          name: commercial-planning-public-report
+          path: .runtime/commercial-planning-report.json
+          if-no-files-found: ignore
           retention-days: 3
