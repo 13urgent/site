@@ -430,9 +430,13 @@
     },
     "commercial-linkedin-chronoss-20261202-v1": {
       "fingerprint": "f6fcfdb4513e133dc63be338e7966f1a9631fee68ba4058098d099f99d7265a7",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-26T17:35:03.991791+00:00",
-      "due_at": "2026-12-03T11:15:00Z"
+      "due_at": "2026-12-03T11:15:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "13e3cb1599ec465b3a5ea70abb2c348eb6f0d8936205e9934e8964d1b6cd6db1",
+      "updated_at": "2026-11-26T17:35:05.831392+00:00"
     }
   }
 }
