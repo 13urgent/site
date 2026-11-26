@@ -535,5 +535,11 @@
       "method": "edit_existing_post",
       "provider_status": "scheduled"
     }
+  },
+  "daily2_migration": {
+    "status": "completed",
+    "version": 2,
+    "completed_at": "2026-11-26T18:27:54.189605+00:00",
+    "old_company_page_cadence_removed": true
   }
 }
