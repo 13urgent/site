@@ -1,4 +1,4 @@
-name: Publier la video LinkedIn demandee
+name: Publier la presentation Mon Exploit brochure sur LinkedIn
 on:
   workflow_dispatch:
 permissions:
@@ -17,8 +17,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Verifier la publication immediate et les doublons
-        run: python -m unittest discover -s marketing -p test_linkedin_now.py
+        run: python -m unittest discover -s marketing -p 'test_linkedin*brochure_20261126.py'
       - name: Publier et verifier le statut LinkedIn
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-        run: python marketing/send_linkedin_now.py
+        run: python marketing/send_linkedin_monexploit_brochure_20261126.py
