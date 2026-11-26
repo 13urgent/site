@@ -42,9 +42,10 @@ jobs:
         timeout-minutes: 8
         run: |
           if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null; then
-            sudo timeout 420 apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends ffmpeg
+            sudo timeout 120 apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update
+            sudo timeout 300 apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends ffmpeg
           fi
-          ffmpeg -version | head -n 1
+          ffmpeg -version
       - name: Verifier catalogue, cadence, compatibilite et anti-doublons
         run: |
           python -m unittest discover -s marketing/publisher -p 'test_*.py'
