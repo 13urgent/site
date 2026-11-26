@@ -513,6 +513,12 @@
       "target_due_at": "2026-12-03T09:00:00Z",
       "method": "edit_existing_post",
       "provider_status": "scheduled"
+    },
+    "daily2-20261128-s1-tiktok": {
+      "status": "intent",
+      "source_post_fingerprint": "d2bec5721c8a1e6e988fbe59e4d544753ef0b189437a511b02ee6391a7df99a6",
+      "old_due_at": "2026-11-28T17:00:00.000Z",
+      "target_due_at": "2026-11-28T18:00:00Z"
     }
   }
 }
