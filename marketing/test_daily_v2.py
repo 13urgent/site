@@ -3,6 +3,7 @@ from datetime import date,datetime,timezone
 from pathlib import Path
 from unittest.mock import patch
 import daily_v2 as m
+from cadence_v2_api import Client
 
 
 class FakeClient:
@@ -99,5 +100,26 @@ class Tests(unittest.TestCase):
         with guard:
             with self.assertRaisesRegex(m.P.SafeFailure,'unknown_company_page_post_requires_review'):m.migrate(client,path,self.topics,self.config)
         self.assertEqual(client.edits,0)
+
+    def test_pending_statuses_are_requested_separately(self):
+        client=Client('local-test-only');queries=[]
+        def query(text):
+            queries.append(text)
+            return {'posts':{'edges':[],'pageInfo':{'hasNextPage':False,'endCursor':None}}}
+        contexts={'founder':{'organization':'private-org','id':'private-channel'}}
+        with patch.object(client,'all_channels',return_value=contexts),patch.object(client,'query',side_effect=query):
+            self.assertEqual(client.scan(),[])
+        self.assertEqual(len(queries),6)
+        self.assertTrue(all('status:['+status+']' in query for status,query in zip(('scheduled','sending','needs_approval','sent','error','draft'),queries)))
+
+    def test_pending_history_is_never_silently_truncated(self):
+        client=Client('local-test-only');calls=[]
+        def query(text):
+            calls.append(text)
+            return {'posts':{'edges':[],'pageInfo':{'hasNextPage':True,'endCursor':'cursor-'+str(len(calls))}}}
+        contexts={'founder':{'organization':'private-org','id':'private-channel'}}
+        with patch.object(client,'all_channels',return_value=contexts),patch.object(client,'query',side_effect=query):
+            with self.assertRaisesRegex(m.P.SafeFailure,'cadence_pending_scan_incomplete'):client.scan()
+        self.assertEqual(len(calls),5)
 
 if __name__=='__main__':unittest.main()

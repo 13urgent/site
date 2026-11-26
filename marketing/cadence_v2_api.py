@@ -64,7 +64,7 @@ class Client(P.BufferClient):
             # A growing archive must not block the next month's daily cadence.
             selections=([('scheduled,sending,needs_approval',5,True),('sent,error,draft',3,False)] if selection=='multiple'
                         else [('',3,False)] if selection=='unfiltered'
-                        else [('scheduled',5,True),('sending',1,True),('needs_approval',1,True),('sent',3,False),('error',1,False),('draft',1,False)])
+                        else [('scheduled',5,True),('sending',1,True),('needs_approval',1,True),('sent',1,False),('error',1,False),('draft',1,False)])
             for statuses,pages,strict in selections:
                 after=None
                 for _ in range(pages):
