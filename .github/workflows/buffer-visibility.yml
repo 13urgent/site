@@ -1,8 +1,8 @@
-name: Controler le calendrier des publications commerciales autorisees
+name: Programmer quatre publications commerciales autorisees
 on:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: marketing-13urgent
   cancel-in-progress: false
@@ -17,10 +17,10 @@ jobs:
           python-version: '3.12'
       - name: Verifier les espacements et la confidentialite du calendrier
         run: python -m unittest discover -s marketing -p test_commercial_planning_20261126.py
-      - name: Lire le calendrier Buffer sans publier
+      - name: Programmer les quatre posts apres controle du calendrier
         env:
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-        run: python marketing/commercial_planning_20261126.py --mode audit
+        run: python marketing/commercial_planning_20261126.py --mode publish
       - uses: actions/upload-artifact@v4
         if: always()
         with:
