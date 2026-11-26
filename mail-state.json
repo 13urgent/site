@@ -867,7 +867,12 @@
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:48:48.889825+00:00",
         "followup_count": 0,
-        "service_category": "mon_exploit"
+        "service_category": "mon_exploit",
+        "delivery_status": "hard_bounced",
+        "delivery_code": "5.1.1",
+        "blocked_for_resend": true,
+        "bounce_source": "matched_delivery_report",
+        "bounce_checked_at": "2026-11-26T18:12:24.737315+00:00"
       },
       "p-fa39a650ea6c96755f8e": {
         "status": "accepted_and_archived",
