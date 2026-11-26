@@ -51,3 +51,7 @@ class DirectionTests(unittest.TestCase):
  def test_automatic_receipt_body_not_counted_as_a_lead(self):
   raw=self.raw(subject='Message reçu 5/5',body='Nous avons bien reçu votre message. Réponse sous 48h. Merci pour votre patience.',References='<'+('a'*64)+'@13urgent.fr>')
   self.assertEqual(d.describe(raw,self.state(),NOW)['category'],'automated_receipt')
+
+ def test_decline_and_greeting_before_stop_never_trigger_questionnaire(self):
+  for text,cat in [('Bonjour,\nJe ne suis pas intéressé.','declined'),('Bonjour,\nMerci de ne plus nous contacter.','opposition')]:
+   r=d.describe(self.raw(body=text),self.state(),NOW);self.assertEqual(r['category'],cat);self.assertFalse(r['tms_ack_eligible'])

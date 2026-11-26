@@ -70,13 +70,15 @@ def describe(raw,state,now):
     if not text.strip():return None
     f=incoming.folded(text);subject=' '.join(str(m.get('Subject','')).split())[:180]
     first=next((x.strip() for x in text.splitlines() if x.strip()),'')
-    stop=bool(re.search(r'\b(stop|desinscri|ne.*contact|retir.*liste|plus.*contact|opposition)\b',incoming.folded(first)))
+    intent_lines=[incoming.folded(line) for line in text.splitlines()[:10] if line.strip() and 'repondez stop' not in incoming.folded(line) and not incoming.folded(line).startswith('si vous')]
+    stop=any(re.fullmatch(r'stop[.!]?',line) or re.search(r'desinscri|retir.*liste|ne.*plus.*(?:contact|recev)|plus.*(?:contacter|messages)|arret.*envoi',line) for line in intent_lines)
+    declined=bool(re.search(r'(?:pas|plus) interesse|aucun besoin|pas de besoin|non merci|ne (?:suis|sommes).*pas interesse',f[:1200]))
     tms=bool(re.search(r'mon\s*exploit',incoming.folded(subject+' '+text)))
     receipt=bool(re.search(r'message recu|accuse de reception|nous avons bien recu',incoming.folded(subject+' '+text[:500]))) and bool(re.search(r'48h|72h|automatique|patience|en general',f))
-    category='opposition' if stop else 'automated_receipt' if receipt else 'mon_exploit' if tms else 'transport_a_qualifier'
+    category='opposition' if stop else 'declined' if declined else 'automated_receipt' if receipt else 'mon_exploit' if tms else 'transport_a_qualifier'
     auth=' '.join(str(v) for v in m.get_all('Authentication-Results',[])).lower()
     aligned=bool(re.search(r'\bdmarc=pass\b',auth))
-    return {'source_hash':h(mid),'message_id':mid,'references':incoming.MESSAGE_ID.findall(str(m.get('References',''))+' '+str(m.get('In-Reply-To','')))[-18:],'sender':sender,'recipient':reply,'subject':subject,'text':text,'category':category,'attachments':attachments,'received_at':received.isoformat(),'tms_ack_eligible':tms and not stop and aligned and not attachments and received.date()>=START and len(raw)<262144}
+    return {'source_hash':h(mid),'message_id':mid,'references':incoming.MESSAGE_ID.findall(str(m.get('References',''))+' '+str(m.get('In-Reply-To','')))[-18:],'sender':sender,'recipient':reply,'subject':subject,'text':text,'category':category,'attachments':attachments,'received_at':received.isoformat(),'tms_ack_eligible':tms and not stop and not declined and not receipt and bool(re.search(r'essai|test|interess|demo|information',incoming.folded(subject+' '+text[:1200])) or incoming.folded(first).startswith('oui')) and aligned and not attachments and received.date()>=START and len(raw)<262144}
 
 def read(state,password,now):
     client=imaplib.IMAP4_SSL('ssl0.ovh.net',993,ssl_context=ssl.create_default_context(),timeout=25)
