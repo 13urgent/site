@@ -410,9 +410,13 @@
     },
     "commercial-linkedin-mon-exploit-20261127-v1": {
       "fingerprint": "91ad2f11a9ff23fd1bd9d75676e1eae667976a635bc98c73d0372f587f59c0e2",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-26T17:34:57.484862+00:00",
-      "due_at": "2026-11-28T11:15:00Z"
+      "due_at": "2026-11-28T11:15:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "buffer_post_fingerprint": "866cb431b3bc8ebe5e08eb7ded262a4df18714f24a39a40cde1ea53c46c38a31",
+      "updated_at": "2026-11-26T17:34:59.195902+00:00"
     }
   }
 }
