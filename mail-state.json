@@ -922,10 +922,12 @@
         "service_category": "urgent"
       },
       "p-fdb35c2c3760b4493c58": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "8d5465f858f8696d5d4ebd4bad7cf266d417ff5522589c931d6e9fc20cee69a7",
         "message_date": "Thu, 26 Nov 2026 17:49:22 +0000",
         "created_at": "2026-11-26T17:49:22.404000+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:49:25.996439+00:00",
         "recipient_fingerprint": "fdb35c2c3760b4493c58787ec2ff5a8b15f1213c8d9150213d566821b6a0880b",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:49:22.404000+00:00",
