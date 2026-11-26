@@ -675,10 +675,12 @@
         "service_category": "mon_exploit"
       },
       "me-20261126-evenisse": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "bc2a4b7d3abfcb4425d2a8487d85402631b691bcfd79fe99bb89a0cabaafcc0a",
         "message_date": "Thu, 26 Nov 2026 17:40:13 +0000",
         "created_at": "2026-11-26T17:40:13.231348+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:40:16.790057+00:00",
         "recipient_fingerprint": "72f3755e2b59d7c43a08eb981f2bd87d7f3cbf8dd7ae158bbfaba8a61e9aed48",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:40:13.231348+00:00",
