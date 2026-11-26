@@ -417,6 +417,12 @@
       "scheduling_type": "automatic",
       "buffer_post_fingerprint": "866cb431b3bc8ebe5e08eb7ded262a4df18714f24a39a40cde1ea53c46c38a31",
       "updated_at": "2026-11-26T17:34:59.195902+00:00"
+    },
+    "commercial-linkedin-13-urgent-20261130-v1": {
+      "fingerprint": "9a0fe3ac0cc72f6cbf77ebfd22c4aa1bc6b03e80921fec61d7743b9947541213",
+      "status": "intent",
+      "created_at": "2026-11-26T17:35:00.550638+00:00",
+      "due_at": "2026-12-01T11:15:00Z"
     }
   }
 }
