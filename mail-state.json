@@ -594,6 +594,19 @@
         "task_archive_saved": true,
         "checked_at": "2026-11-12T12:36:17.489437+00:00"
       }
+    },
+    "direction-prospection-20261126-pdf-v1": {
+      "exp-20261126-deglon": {
+        "status": "intent",
+        "fingerprint": "12d9111fa1378d932e12b96362d307865f7503bee6b911560a9ac8c6e459006b",
+        "message_date": "Thu, 26 Nov 2026 17:39:27 +0000",
+        "created_at": "2026-11-26T17:39:30.606582+00:00",
+        "recipient_fingerprint": "ae6848264521bccc4c8d83a1c4388b4190845412c0984d7f476815648d62b537",
+        "followup_allowed": true,
+        "followup_due_at": "2026-12-03T17:39:30.606582+00:00",
+        "followup_count": 0,
+        "service_category": "urgent"
+      }
     }
   },
   "suppressed": []
