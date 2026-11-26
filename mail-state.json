@@ -688,10 +688,12 @@
         "service_category": "mon_exploit"
       },
       "me-20261126-bleger": {
-        "status": "intent",
+        "status": "accepted_and_archived",
         "fingerprint": "80887759009c583736b197153d6c6d5f1f9e167d7c78fd6b6f5b987e8438be91",
         "message_date": "Thu, 26 Nov 2026 17:40:20 +0000",
         "created_at": "2026-11-26T17:40:20.181069+00:00",
+        "archived_in_sent": true,
+        "updated_at": "2026-11-26T17:40:23.771285+00:00",
         "recipient_fingerprint": "ce35d7d46e65a701c5ad41b8572dbc5a7bdbcfb8ec7b87edb66ea7db09553ed6",
         "followup_allowed": true,
         "followup_due_at": "2026-12-03T17:40:20.181069+00:00",
