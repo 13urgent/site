@@ -503,25 +503,27 @@
     },
     "daily2-20261127-s0-linkedin": {
       "fingerprint": "ca3d56320ee9404ef55a7e881ab0611d3e00c3c95fa610240bf7406b673fd6ac",
-      "status": "scheduled",
+      "status": "sent",
       "created_at": "2026-11-26T18:30:47.162117+00:00",
       "due_at": "2026-11-27T09:00:00.000Z",
-      "provider_status": "scheduled",
+      "provider_status": "sent",
       "scheduling_type": "automatic",
       "is_ai_generated": null,
       "buffer_post_fingerprint": "89eb7004f0036412d1883a5e1413f8551bdb64c000c8be1b12cd90faff182b66",
-      "updated_at": "2026-11-26T18:30:49.621925+00:00"
+      "updated_at": "2026-11-26T18:30:49.621925+00:00",
+      "sent_at": "2026-11-27T09:01:44.485Z"
     },
     "daily2-20261127-s0-tiktok": {
       "fingerprint": "fbf31360c31d3cfc6ac32eae7f5974ccb438c415e07d7581f3655f652df844a8",
-      "status": "scheduled",
+      "status": "sent",
       "created_at": "2026-11-26T18:30:51.254251+00:00",
       "due_at": "2026-11-27T09:00:00.000Z",
-      "provider_status": "scheduled",
+      "provider_status": "sent",
       "scheduling_type": "automatic",
       "is_ai_generated": true,
       "buffer_post_fingerprint": "d5deca272922193bfaa666198e67678220779ec45f39ef0424447263268177af",
-      "updated_at": "2026-11-26T18:30:53.345368+00:00"
+      "updated_at": "2026-11-26T18:30:53.345368+00:00",
+      "sent_at": "2026-11-27T09:02:09.036Z"
     },
     "daily2-20261127-s1-linkedin": {
       "fingerprint": "6ea023bd24c41d020a874386d9f1c07b92911a2490c93424c66d9f443c318597",
