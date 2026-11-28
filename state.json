@@ -674,9 +674,14 @@
     },
     "daily2-20261201-s1-linkedin": {
       "fingerprint": "f9a0dc7100fe5dec510b43686262932005f1dd77c1a8d350059e7529f654aa71",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-28T14:10:57.899936+00:00",
-      "due_at": "2026-12-01T16:00:00Z"
+      "due_at": "2026-12-01T16:00:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "is_ai_generated": null,
+      "buffer_post_fingerprint": "807f5ceb926eb79a2e38eb7fee62b1e2a91742df95b7345450903eab859c7d74",
+      "updated_at": "2026-11-28T14:10:59.239171+00:00"
     }
   },
   "daily2_edits": {
