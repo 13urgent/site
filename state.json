@@ -660,6 +660,12 @@
       "is_ai_generated": true,
       "buffer_post_fingerprint": "739bed41853e684b99bd9657c37a996d21c810f67076bc1949e33f4e956803cf",
       "updated_at": "2026-11-26T18:31:38.483243+00:00"
+    },
+    "daily2-20261201-s0-tiktok": {
+      "fingerprint": "9bd2056340e0c5af40ec6f4639d9dd42c22f9d1098f24843fa8ac2e77ba3c16e",
+      "status": "intent",
+      "created_at": "2026-11-28T14:10:55.500857+00:00",
+      "due_at": "2026-12-01T09:00:00Z"
     }
   },
   "daily2_edits": {
