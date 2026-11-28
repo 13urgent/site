@@ -671,6 +671,12 @@
       "is_ai_generated": true,
       "buffer_post_fingerprint": "26f7228ef68c8e45578d49a25c52e8a20e6dd22e2e9c55c165f21d6fdbc7f162",
       "updated_at": "2026-11-28T14:10:56.927645+00:00"
+    },
+    "daily2-20261201-s1-linkedin": {
+      "fingerprint": "f9a0dc7100fe5dec510b43686262932005f1dd77c1a8d350059e7529f654aa71",
+      "status": "intent",
+      "created_at": "2026-11-28T14:10:57.899936+00:00",
+      "due_at": "2026-12-01T16:00:00Z"
     }
   },
   "daily2_edits": {
