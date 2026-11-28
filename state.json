@@ -685,9 +685,14 @@
     },
     "daily2-20261201-s1-tiktok": {
       "fingerprint": "697693bf96234e286e89af5eef32bf348ec04b74898a8a93e0e8655de1c9c92e",
-      "status": "intent",
+      "status": "scheduled",
       "created_at": "2026-11-28T14:11:00.226785+00:00",
-      "due_at": "2026-12-01T18:00:00Z"
+      "due_at": "2026-12-01T18:00:00.000Z",
+      "provider_status": "scheduled",
+      "scheduling_type": "automatic",
+      "is_ai_generated": true,
+      "buffer_post_fingerprint": "3ef30059c227c39466caecacf06ab39a34b01ced76400fc91742a6506f413381",
+      "updated_at": "2026-11-28T14:11:01.702413+00:00"
     }
   },
   "daily2_edits": {
